@@ -1,0 +1,68 @@
+plugins {
+    id "de.undercouch.download" version "4.1.1"
+}
+apply plugin: 'com.android.library'
+apply plugin: 'com.google.protobuf'
+
+
+def protobufFolder = new File(buildDir, "protobuf-download").getAbsolutePath()
+
+
+
+android {
+    compileSdkVersion 30
+    buildToolsVersion "30.0.1"
+
+    defaultConfig {
+        minSdkVersion 16
+        targetSdkVersion 30
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+//    // TODO: Does this need to be here?
+//    // TODO: This needs to match the backend .proto that the rust lib was built with.
+//    if (!new File(protobufFolder).exists()) {
+//        throw new GradleException("Protobuf folder does not exist: " + new File(protobufFolder).getAbsolutePath())
+//    }
+
+    sourceSets {
+        main {
+            proto {
+                srcDir protobufFolder
+            }
+        }
+    }
+}
+
+task downloadFile(type: Download) {
+    new File(buildDir, "protobuf-download").mkdir()
+
+    src 'https://raw.githubusercontent.com/ankitects/anki/master/proto/backend.proto'
+    dest new File(buildDir, "protobuf-download").getAbsolutePath()
+    overwrite false
+}
+
+
+apply from: "proto.gradle"
+
+dependencies {
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    // protobuf
+    implementation 'com.google.protobuf:protobuf-java:3.13.0'
+
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+
+}
