@@ -1,17 +1,15 @@
-plugins {
-    id "de.undercouch.download" version "4.1.1"
-}
 apply plugin: 'com.android.library'
 apply plugin: 'com.google.protobuf'
-
-
-def protobufFolder = new File(buildDir, "protobuf-download").getAbsolutePath()
-
 
 
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.1"
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 
     defaultConfig {
         minSdkVersion 16
@@ -29,34 +27,23 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-//    // TODO: Does this need to be here?
-//    // TODO: This needs to match the backend .proto that the rust lib was built with.
-//    if (!new File(protobufFolder).exists()) {
-//        throw new GradleException("Protobuf folder does not exist: " + new File(protobufFolder).getAbsolutePath())
-//    }
-
-    sourceSets {
-        main {
-            proto {
-                srcDir protobufFolder
-            }
-        }
-    }
 }
 
-task downloadFile(type: Download) {
-    new File(buildDir, "protobuf-download").mkdir()
+apply plugin: 'org.mozilla.rust-android-gradle.rust-android'
 
-    src 'https://raw.githubusercontent.com/ankitects/anki/master/proto/backend.proto'
-    dest new File(buildDir, "protobuf-download").getAbsolutePath()
-    overwrite false
+cargo {
+    module = "../rslib-bridge"
+    libname = "rsdroid"
+    targets = ["arm", "x86"]
+    profile = 'release'
+    apiLevel = 16
+    verbose = true
 }
-
 
 apply from: "proto.gradle"
 
 dependencies {
-    implementation fileTree(dir: "libs", include: ["*.jar"])
+    implementation fileTree(dir: "libs", include: ["*.jar", '*.so'])
     implementation 'androidx.appcompat:appcompat:1.2.0'
     // protobuf
     implementation 'com.google.protobuf:protobuf-java:3.13.0'
@@ -66,3 +53,5 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
 }
+
+preBuild.dependsOn "cargoBuild"

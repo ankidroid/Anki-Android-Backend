@@ -42,8 +42,10 @@ Thumbs.db
 *.iml
 *.ipr
 *.iws
-/.idea/*
 /captures
+
+# ignore nested .idea folders for now
+.idea/
 
 # IDEA/Android Studio Ignore exceptions - this lets you share things you specifically want all team members to use
 !/.idea/codeStyles/

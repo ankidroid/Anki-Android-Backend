@@ -1,0 +1,4 @@
+[submodule "anki"]
+	path = anki
+	url = https://github.com/david-allison-1/anki
+	branch = ankidroid
