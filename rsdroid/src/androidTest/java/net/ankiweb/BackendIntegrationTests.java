@@ -49,10 +49,9 @@ public class BackendIntegrationTests extends InstrumentedTest {
     public void schedTimingTodayCall() throws BackendException {
         BackendV1 backendV1 = new BackendV1();
         String path = getAssetFilePath("initial_version_2_12_1.anki2");
-        backendV1.openCollection(OpenCollectionIn.newBuilder().setCollectionPath(path).build());
+        backendV1.openCollection(path, null, null, null);
         SchedTimingTodayOut ret = backendV1.schedTimingToday();
-
-        int elpased = ret.getDaysElapsed();
+        int elapsed = ret.getDaysElapsed();
         long nextDayAt = ret.getNextDayAt();
     }
 }
