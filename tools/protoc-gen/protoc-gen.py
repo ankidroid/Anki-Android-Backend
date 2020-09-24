@@ -243,7 +243,7 @@ def generate_code(request, response):
                          "import BackendProto.Backend;\n\n"
                          "public abstract class {} {{\n\n"
                          "    public abstract Pointer ensureBackend();\n\n\n"
-                         "    private void validateMessage(byte[] result, GeneratedMessageV3 message) throws BackendException, InvalidProtocolBufferException {{\n"
+                         "    protected void validateMessage(byte[] result, GeneratedMessageV3 message) throws BackendException, InvalidProtocolBufferException {{\n"
                          "        if (message.getUnknownFields().asMap().isEmpty()) {{\n"
                          "            return;\n"
                          "        }}\n"

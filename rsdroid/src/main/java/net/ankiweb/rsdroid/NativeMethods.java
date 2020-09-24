@@ -19,4 +19,7 @@ public class NativeMethods {
     static void execCommand(long backendPointer, final int command, byte[] args) {
         command(backendPointer, command, args);
     }
+
+    @CheckResult
+    static native byte[] openCollection(long backendPointer, byte[] data);
 }

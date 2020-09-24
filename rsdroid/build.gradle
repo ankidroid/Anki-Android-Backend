@@ -1,4 +1,5 @@
-apply plugin: 'com.android.library'
+apply plugin: 'com.android.library' // required for aar generation to link to from AnkiDroid
+// apply plugin: 'com.android.application' // required for instrumented tests - might be problematic
 apply plugin: 'com.google.protobuf'
 
 
@@ -19,6 +20,7 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
+        testApplicationId 'net.ankiweb.rsdroid.tests'
     }
 
     buildTypes {
