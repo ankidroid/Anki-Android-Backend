@@ -1420,6 +1420,10 @@ dependencies = [
  "jni",
  "libc",
  "prost",
+ "rusqlite",
+ "serde",
+ "serde_derive",
+ "serde_json",
 ]
 
 [[package]]

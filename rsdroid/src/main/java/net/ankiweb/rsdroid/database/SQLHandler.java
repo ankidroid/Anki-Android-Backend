@@ -14,16 +14,26 @@
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.ankiweb.rsdroid;
+package net.ankiweb.rsdroid.database;
 
-public class Backend {
+import net.ankiweb.rsdroid.BackendException;
 
-    private static net.ankiweb.rsdroid.BackendService mBackend;
+import org.json.JSONArray;
 
-    public synchronized static net.ankiweb.rsdroid.BackendService getInstance() {
-        if (mBackend != null) {
-            mBackend = new BackendV1();
-        }
-        return mBackend;
-    }
+import java.util.ArrayList;
+
+public interface SQLHandler {
+    // TODO: Exceptions
+    JSONArray fullQuery(String query, Object[] bindArgs) throws BackendException;
+    int executeGetRowsAffected(String sql, Object[] bindArgs) throws BackendException;
+    long insertForId(String sql, Object[] bindArgs) throws BackendException;
+
+    void beginTransaction();
+    void commitTransaction();
+    void rollbackTransaction();
+
+    String[] getColumnNames(String sql);
+
+    // TODO
+    // String getPath();
 }

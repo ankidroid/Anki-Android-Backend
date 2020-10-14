@@ -23,6 +23,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 https://searchfox.org/mozilla-central/rev/38bcf897f1fa19c1eba441a611cf309482e0d6e5/nsprpub/pr/src/md/unix/unix.c#2716-2737
  */
 
+#[cfg(not(feature = "no-android"))]
 use libc::{size_t, c_int, loff_t, c_void, syscall, SYS_mmap2, MAP_FAILED};
 
 
@@ -43,6 +44,7 @@ use libc::{size_t, c_int, loff_t, c_void, syscall, SYS_mmap2, MAP_FAILED};
  */
 
 #[no_mangle]
+#[cfg(not(feature = "no-android"))]
 pub unsafe extern "C" fn mmap64(addr : *mut c_void, len: size_t, prot: c_int, flags: c_int, fd: c_int, offset: loff_t) -> *mut c_void {
     let android_page_size = 4096 as loff_t;
     if offset & (android_page_size - 1) != 0 {
