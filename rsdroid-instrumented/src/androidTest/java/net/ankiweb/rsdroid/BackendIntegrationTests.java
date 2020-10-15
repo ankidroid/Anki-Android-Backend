@@ -14,12 +14,9 @@
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.ankiweb;
+package net.ankiweb.rsdroid;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
-
-import net.ankiweb.rsdroid.BackendException;
-import net.ankiweb.rsdroid.BackendV1;
 
 import org.json.JSONArray;
 import org.junit.Assert;

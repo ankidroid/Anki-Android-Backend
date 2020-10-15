@@ -1,5 +1,4 @@
 apply plugin: 'com.android.library' // required for aar generation to link to from AnkiDroid
-// apply plugin: 'com.android.application' // required for instrumented tests - might be problematic
 apply plugin: 'com.google.protobuf'
 
 
@@ -18,9 +17,7 @@ android {
         versionCode 1
         versionName "1.0"
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
-        testApplicationId 'net.ankiweb.rsdroid.tests'
     }
 
     buildTypes {
@@ -47,18 +44,14 @@ apply from: "proto.gradle"
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar", '*.so'])
     implementation 'androidx.appcompat:appcompat:1.2.0'
-    // protobuf
-    implementation 'com.google.protobuf:protobuf-java:3.13.0'
+    // Protobuf is part of the ABI, so include it as a compile/api dependency.
+    api 'com.google.protobuf:protobuf-java:3.13.0'
     implementation 'androidx.sqlite:sqlite:2.1.0'
 
     testImplementation 'junit:junit:4.12'
     testImplementation "org.robolectric:robolectric:4.3.1"
     testImplementation 'androidx.test:core:1.2.0'
     testImplementation 'androidx.test.ext:junit:1.1.1'
-
-    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
-    androidTestImplementation 'androidx.sqlite:sqlite-framework:2.1.0'
 
 }
 

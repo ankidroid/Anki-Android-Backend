@@ -14,15 +14,12 @@
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.ankiweb;
+package net.ankiweb.rsdroid;
 
 import android.content.Context;
 import android.os.Build;
 
 import androidx.test.platform.app.InstrumentationRegistry;
-
-import net.ankiweb.rsdroid.BackendException;
-import net.ankiweb.rsdroid.BackendV1;
 
 public class InstrumentedTest {
     protected String getAssetFilePath(String fileName) {

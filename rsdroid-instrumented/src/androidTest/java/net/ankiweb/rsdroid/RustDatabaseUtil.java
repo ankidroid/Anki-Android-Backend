@@ -14,7 +14,7 @@
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.ankiweb;
+package net.ankiweb.rsdroid;
 
 import android.database.Cursor;
 

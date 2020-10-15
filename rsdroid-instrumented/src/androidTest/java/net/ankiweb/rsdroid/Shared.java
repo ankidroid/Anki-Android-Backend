@@ -1,10 +1,5 @@
 /*
- * Copyright (c) 2009 Daniel Svärd <daniel.svard@gmail.com>         (Utils.java)
- * Copyright (c) 2009 Edu Zamora <edu.zasu@gmail.com>               (Utils.java)
- * Copyright (c) 2011 Norbert Nagold <norbert.nagold@gmail.com>     (Utils.java)
- * Copyright (c) 2012 Kostas Spyropoulos <inigo.aldana@gmail.com>   (Utils.java)
- * Copyright (c) 2014 Houssam Salem <houssam.salem.au@gmail.com>    (Shared.java)
- * Copyright (c) 2020 David Allison <davidallisongithub@gmail.com>  (rsdroid/Shared.java)
+ * Copyright (c) 2020 David Allison <davidallisongithub@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,13 +12,9 @@
  *
  * You should have received a copy of the GNU General Public License along with
  * this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- * This combines the works of
- * https://github.com/ankidroid/Anki-Android/blob/a711811eacddcb2a114bf18e6b92f22d06251b4c/AnkiDroid/src/main/java/com/ichi2/libanki/Utils.java
- * https://github.com/ankidroid/Anki-Android/blob/7a7ea56acba27fe538852700d4a4719659cff14f/AnkiDroid/src/androidTest/java/com/ichi2/anki/tests/Shared.java
  */
 
-package net.ankiweb;
+package net.ankiweb.rsdroid;
 
 import android.annotation.SuppressLint;
 import android.content.Context;

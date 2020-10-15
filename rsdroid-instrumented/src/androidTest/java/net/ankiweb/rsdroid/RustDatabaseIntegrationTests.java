@@ -14,18 +14,15 @@
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.ankiweb;
+package net.ankiweb.rsdroid;
 
 import android.content.ContentValues;
 import android.database.Cursor;
 
 import androidx.annotation.CheckResult;
 
-import net.ankiweb.rsdroid.BackendException;
-import net.ankiweb.rsdroid.BackendV1;
 import net.ankiweb.rsdroid.database.RustSupportSQLiteDatabase;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;

@@ -14,18 +14,15 @@
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.ankiweb;
+package net.ankiweb.rsdroid;
 
 import androidx.annotation.NonNull;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 import androidx.sqlite.db.SupportSQLiteOpenHelper;
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory;
 
-import net.ankiweb.rsdroid.BackendFactory;
-import net.ankiweb.rsdroid.database.NotImplementedException;
 import net.ankiweb.rsdroid.database.RustSQLiteOpenHelperFactory;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
