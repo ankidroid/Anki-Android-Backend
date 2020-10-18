@@ -8,16 +8,15 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import net.ankiweb.rsdroid.BackendException;
 import net.ankiweb.rsdroid.BackendV1;
-import net.ankiweb.rsdroid.NativeMethods;
 import net.ankiweb.rsdroid.database.RustSupportSQLiteDatabase;
+import net.ankiweb.rsdroid.testing.ModuleLoader;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.File;
-
-import static org.junit.Assert.*;
+import java.io.IOException;
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -27,25 +26,9 @@ import static org.junit.Assert.*;
 @RunWith(AndroidJUnit4.class)
 public class CollectionCreationTest {
 
-    private static boolean sLoaded;
-
     @Before
     public void loadLibrary() {
-        if (!sLoaded) {
-            try {
-                File d = new File("C:\\GitHub\\Rust-Test\\rslib-bridge\\target\\release\\rsdroid.dll");
-                Runtime.getRuntime().load("C:\\GitHub\\Rust-Test\\rslib-bridge\\target\\release\\rsdroid.dll");
-            } catch (UnsatisfiedLinkError e) {
-                if (e.getMessage() == null || !e.getMessage().contains("already loaded in another classloader")) {
-                    throw e;
-                }
-            }
-            sLoaded = true;
-        }
-
-        if (!NativeMethods.isRoboUnitTest()) {
-            throw new IllegalStateException();
-        }
+        ModuleLoader.init();
     }
 
     @Test

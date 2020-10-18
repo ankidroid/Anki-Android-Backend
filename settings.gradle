@@ -1,3 +1,4 @@
+include ':rsdroid-testing'
 include ':rsdroid-instrumented'
 include ':rsdroid'
 rootProject.name = "Anki-Android-Backend"
