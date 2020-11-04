@@ -6,7 +6,8 @@ import android.database.Cursor;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-import net.ankiweb.rsdroid.BackendException;
+import net.ankiweb.rsdroid.BackendFactory;
+import net.ankiweb.rsdroid.BackendUtils;
 import net.ankiweb.rsdroid.BackendV1;
 import net.ankiweb.rsdroid.database.RustSupportSQLiteDatabase;
 import net.ankiweb.rsdroid.testing.ModuleLoader;
@@ -32,15 +33,15 @@ public class CollectionCreationTest {
     }
 
     @Test
-    public void ensureCollectionCreatedIsValid() throws BackendException {
+    public void ensureCollectionCreatedIsValid() {
         // We use this routine in AnkiDroid to create the collection, therefore we need to ensure
         // that the database is valid, open, and the values returned match how the Java used to work
 
-        BackendV1 backendV1 = new BackendV1();
+        BackendV1 backendV1 = new BackendFactory().getInstance();
 
         String collectionPath = new File(getTargetContext().getFilesDir(), "collection.anki2").getAbsolutePath();
 
-        backendV1.openAnkiDroidCollection(collectionPath);
+        BackendUtils.openAnkiDroidCollection(backendV1, collectionPath);
         RustSupportSQLiteDatabase database = new RustSupportSQLiteDatabase(backendV1, collectionPath);
 
         database.beginTransaction();

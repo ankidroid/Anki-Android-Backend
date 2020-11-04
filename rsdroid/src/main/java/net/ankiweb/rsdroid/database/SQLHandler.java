@@ -24,9 +24,9 @@ import java.util.ArrayList;
 
 public interface SQLHandler {
     // TODO: Exceptions
-    JSONArray fullQuery(String query, Object[] bindArgs) throws BackendException;
-    int executeGetRowsAffected(String sql, Object[] bindArgs) throws BackendException;
-    long insertForId(String sql, Object[] bindArgs) throws BackendException;
+    JSONArray fullQuery(String query, Object... bindArgs) throws BackendException;
+    int executeGetRowsAffected(String sql, Object... bindArgs) throws BackendException;
+    long insertForId(String sql, Object... bindArgs) throws BackendException;
 
     void beginTransaction();
     void commitTransaction();

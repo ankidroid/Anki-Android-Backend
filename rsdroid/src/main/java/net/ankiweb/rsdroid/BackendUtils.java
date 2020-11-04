@@ -16,27 +16,10 @@
 
 package net.ankiweb.rsdroid;
 
-public class BackendFactory {
+import BackendProto.Backend;
 
-    private BackendV1 mBackend;
-
-    public synchronized BackendV1 getInstance() {
-        if (mBackend == null) {
-            mBackend = new BackendMutex(new BackendV1Impl());
-        }
-        return mBackend;
-    }
-
-    public synchronized void closeCollection() {
-        if (mBackend == null) {
-            return;
-        }
-
-        // we could swallow the exception here, most of the time it will be "collection is already closed"
-        try {
-            mBackend.closeCollection(false);
-        } catch (BackendException e) {
-            throw new RuntimeException(e);
-        }
+public class BackendUtils {
+    public static void openAnkiDroidCollection(BackendV1 backendV1, String path) throws BackendException {
+        backendV1.openAnkiDroidCollection(Backend.OpenCollectionIn.newBuilder().setCollectionPath(path).build());
     }
 }

@@ -67,8 +67,7 @@ public class RustSupportSQLiteDatabase implements SupportSQLiteDatabase {
         // TODO: Pass this on through to the session and don't use the variable, it can be out-of-sync
         // We need to reconsider this abstraction, as the
         this.mPath = dbPath;
-        RustSQLBackend mSqlBackend = new RustSQLBackend(backend);
-        this.sessionFactory = new SessionThreadLocal(mSqlBackend);
+        this.sessionFactory = new SessionThreadLocal(backend);
     }
 
     // TODO: These need to be accurate

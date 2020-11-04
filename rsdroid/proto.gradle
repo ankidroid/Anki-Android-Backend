@@ -27,7 +27,13 @@ protobuf {
         all().each { task ->
             task.builtins {
                 java {
-                    //    option "lite"
+                    // Options ref:
+                    // https://github.com/protocolbuffers/protobuf/blob/1dd483444c19a9b1fa2c782156db8e7eefe3ad38/src/google/protobuf/compiler/java/java_generator.cc#L76-L97
+
+                    // can no longer use common interface: GeneratedMessageV3 if we use lite
+                    // But we should consider other options, as this generates a class: BackendService
+                    // which is confusing and of no use to us
+                    // option "lite"
                 }
             }
             task.plugins {

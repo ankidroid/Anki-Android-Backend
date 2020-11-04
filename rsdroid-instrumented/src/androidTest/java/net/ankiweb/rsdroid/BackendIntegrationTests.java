@@ -49,7 +49,7 @@ public class BackendIntegrationTests extends InstrumentedTest {
 
     @Test
     public void testBackendException() {
-        BackendV1 backendV1 = new BackendV1();
+        BackendV1 backendV1 = getClosedBackend();
         try {
             SchedTimingTodayOut ret = backendV1.schedTimingToday();
             Assert.fail("call should have failed - needs an open collection");
@@ -72,7 +72,7 @@ public class BackendIntegrationTests extends InstrumentedTest {
         BackendV1 backendV1 = getBackend("initial_version_2_12_1.anki2");
         backendV1.closeCollection(false);
 
-        assertThat(false, is(true));
+        assertThat("Needs assertion", false, is(true));
     }
 
     @Test

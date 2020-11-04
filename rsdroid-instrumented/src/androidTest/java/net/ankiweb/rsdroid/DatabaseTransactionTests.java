@@ -117,7 +117,7 @@ public class DatabaseTransactionTests extends InstrumentedTest {
                 BackendFactory mBackendFactory = new BackendFactory();
                 // TODO: Does this work?
                 try {
-                    mBackendFactory.getInstance().openAnkiDroidCollection(":memory:");
+                    BackendUtils.openAnkiDroidCollection(mBackendFactory.getInstance(), ":memory:");
                 } catch (Exception e) {
 
                 }
