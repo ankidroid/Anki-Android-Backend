@@ -59,14 +59,14 @@ public class BackendIntegrationTests extends InstrumentedTest {
     }
 
     @Test
-    public void schedTimingTodayCall() throws BackendException {
+    public void schedTimingTodayCall() {
         BackendV1 backendV1 = getBackend("initial_version_2_12_1.anki2");
         SchedTimingTodayOut ret = backendV1.schedTimingToday();
         int elapsed = ret.getDaysElapsed();
         long nextDayAt = ret.getNextDayAt();
     }
     @Test
-    public void collectionIsVersion11AfterOpen() throws BackendException {
+    public void collectionIsVersion11AfterOpen() {
         // This test will be decomissioned, but before we get an upgrade stategy, we need to ensure we're not upgrading the database.
 
         BackendV1 backendV1 = getBackend("initial_version_2_12_1.anki2");
@@ -76,13 +76,13 @@ public class BackendIntegrationTests extends InstrumentedTest {
     }
 
     @Test
-    public void fullQueryTest() throws BackendException {
+    public void fullQueryTest() {
         BackendV1 backendV1 = getBackend("initial_version_2_12_1.anki2");
         JSONArray result = backendV1.fullQuery("select * from col");
     }
 
     @Test
-    public void columnNamesTest() throws BackendException {
+    public void columnNamesTest() {
         BackendV1 backendV1 = getBackend("initial_version_2_12_1.anki2");
         String[] names = backendV1.getColumnNames("select * from col");
 

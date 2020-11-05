@@ -58,7 +58,7 @@ public class InstrumentedTest {
         return InstrumentationRegistry.getInstrumentation().getTargetContext();
     }
 
-    protected BackendV1 getBackend(String fileName) throws BackendException {
+    protected BackendV1 getBackend(String fileName) {
         BackendV1 backendV1 = getClosedBackend();
         String path = getAssetFilePath(fileName);
         BackendUtils.openAnkiDroidCollection(backendV1, path);

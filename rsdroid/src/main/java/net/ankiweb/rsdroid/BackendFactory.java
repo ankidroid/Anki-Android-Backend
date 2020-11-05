@@ -33,10 +33,6 @@ public class BackendFactory {
         }
 
         // we could swallow the exception here, most of the time it will be "collection is already closed"
-        try {
-            mBackend.closeCollection(false);
-        } catch (BackendException e) {
-            throw new RuntimeException(e);
-        }
+        mBackend.closeCollection(false);
     }
 }

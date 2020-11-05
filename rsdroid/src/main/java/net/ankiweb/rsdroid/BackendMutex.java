@@ -78,7 +78,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public JSONArray fullQuery(String query, Object... bindArgs) throws BackendException {
+    public JSONArray fullQuery(String query, Object... bindArgs) {
         try {
             mLock.lock();
             return mBackend.fullQuery(query, bindArgs);
@@ -88,7 +88,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public int executeGetRowsAffected(String sql, Object... bindArgs) throws BackendException {
+    public int executeGetRowsAffected(String sql, Object... bindArgs) {
         try {
             mLock.lock();
             return mBackend.executeGetRowsAffected(sql, bindArgs);
@@ -98,7 +98,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public long insertForId(String sql, Object... bindArgs) throws BackendException {
+    public long insertForId(String sql, Object... bindArgs) {
         try {
             mLock.lock();
             return mBackend.insertForId(sql, bindArgs);
@@ -120,7 +120,7 @@ public class BackendMutex implements BackendV1 {
     // RustBackend Implementation
 
     @Override
-    public Backend.Progress latestProgress() throws BackendException {
+    public Backend.Progress latestProgress() {
         try {
             mLock.lock();
             return mBackend.latestProgress();
@@ -130,7 +130,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public void setWantsAbort() throws BackendException {
+    public void setWantsAbort() {
         try {
             mLock.lock();
             mBackend.setWantsAbort();
@@ -140,7 +140,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.ExtractAVTagsOut extractAVTags(@Nullable String text, boolean questionSide) throws BackendException {
+    public Backend.ExtractAVTagsOut extractAVTags(@Nullable String text, boolean questionSide) {
         try {
             mLock.lock();
             return mBackend.extractAVTags(text, questionSide);
@@ -150,7 +150,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.ExtractLatexOut extractLatex(@Nullable String text, boolean svg, boolean expandClozes) throws BackendException {
+    public Backend.ExtractLatexOut extractLatex(@Nullable String text, boolean svg, boolean expandClozes) {
         try {
             mLock.lock();
             return mBackend.extractLatex(text, svg, expandClozes);
@@ -160,7 +160,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.EmptyCardsReport getEmptyCards() throws BackendException {
+    public Backend.EmptyCardsReport getEmptyCards() {
         try {
             mLock.lock();
             return mBackend.getEmptyCards();
@@ -170,7 +170,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.RenderCardOut renderExistingCard(long cardId, boolean browser) throws BackendException {
+    public Backend.RenderCardOut renderExistingCard(long cardId, boolean browser) {
         try {
             mLock.lock();
             return mBackend.renderExistingCard(cardId, browser);
@@ -180,7 +180,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.RenderCardOut renderUncommittedCard(@Nullable Backend.Note note, int cardOrd, @Nullable ByteString template, boolean fillEmpty) throws BackendException {
+    public Backend.RenderCardOut renderUncommittedCard(@Nullable Backend.Note note, int cardOrd, @Nullable ByteString template, boolean fillEmpty) {
         try {
             mLock.lock();
             return mBackend.renderUncommittedCard(note, cardOrd, template, fillEmpty);
@@ -190,7 +190,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.String stripAVTags(Backend.String args) throws BackendException {
+    public Backend.String stripAVTags(Backend.String args) {
         try {
             mLock.lock();
             return mBackend.stripAVTags(args);
@@ -200,7 +200,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.SearchCardsOut searchCards(@Nullable String search, @Nullable Backend.SortOrder order) throws BackendException {
+    public Backend.SearchCardsOut searchCards(@Nullable String search, @Nullable Backend.SortOrder order) {
         try {
             mLock.lock();
             return mBackend.searchCards(search, order);
@@ -210,7 +210,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.SearchNotesOut searchNotes(@Nullable String search) throws BackendException {
+    public Backend.SearchNotesOut searchNotes(@Nullable String search) {
         try {
             mLock.lock();
             return mBackend.searchNotes(search);
@@ -220,7 +220,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.UInt32 findAndReplace(List<Long> nids, @Nullable String search, @Nullable String replacement, boolean regex, boolean matchCase, @Nullable String fieldName) throws BackendException {
+    public Backend.UInt32 findAndReplace(List<Long> nids, @Nullable String search, @Nullable String replacement, boolean regex, boolean matchCase, @Nullable String fieldName) {
         try {
             mLock.lock();
             return mBackend.findAndReplace(nids, search, replacement, regex, matchCase, fieldName);
@@ -230,7 +230,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.Int32 localMinutesWest(Backend.Int64 args) throws BackendException {
+    public Backend.Int32 localMinutesWest(Backend.Int64 args) {
         try {
             mLock.lock();
             return mBackend.localMinutesWest(args);
@@ -240,7 +240,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public void setLocalMinutesWest(Backend.Int32 args) throws BackendException {
+    public void setLocalMinutesWest(Backend.Int32 args) {
         try {
             mLock.lock();
             mBackend.setLocalMinutesWest(args);
@@ -250,7 +250,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.SchedTimingTodayOut schedTimingToday() throws BackendException {
+    public Backend.SchedTimingTodayOut schedTimingToday() {
         try {
             mLock.lock();
             return mBackend.schedTimingToday();
@@ -260,7 +260,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.String studiedToday(int cards, double seconds) throws BackendException {
+    public Backend.String studiedToday(int cards, double seconds) {
         try {
             mLock.lock();
             return mBackend.studiedToday(cards, seconds);
@@ -270,7 +270,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.String congratsLearnMessage(float nextDue, int remaining) throws BackendException {
+    public Backend.String congratsLearnMessage(float nextDue, int remaining) {
         try {
             mLock.lock();
             return mBackend.congratsLearnMessage(nextDue, remaining);
@@ -280,7 +280,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public void updateStats(long deckId, int newDelta, int reviewDelta, int millisecondDelta) throws BackendException {
+    public void updateStats(long deckId, int newDelta, int reviewDelta, int millisecondDelta) {
         try {
             mLock.lock();
             mBackend.updateStats(deckId, newDelta, reviewDelta, millisecondDelta);
@@ -290,7 +290,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public void extendLimits(long deckId, int newDelta, int reviewDelta) throws BackendException {
+    public void extendLimits(long deckId, int newDelta, int reviewDelta) {
         try {
             mLock.lock();
             mBackend.extendLimits(deckId, newDelta, reviewDelta);
@@ -300,7 +300,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.CountsForDeckTodayOut countsForDeckToday(Backend.DeckID args) throws BackendException {
+    public Backend.CountsForDeckTodayOut countsForDeckToday(Backend.DeckID args) {
         try {
             mLock.lock();
             return mBackend.countsForDeckToday(args);
@@ -310,7 +310,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.String cardStats(Backend.CardID args) throws BackendException {
+    public Backend.String cardStats(Backend.CardID args) {
         try {
             mLock.lock();
             return mBackend.cardStats(args);
@@ -320,7 +320,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.GraphsOut graphs(@Nullable String search, int days) throws BackendException {
+    public Backend.GraphsOut graphs(@Nullable String search, int days) {
         try {
             mLock.lock();
             return mBackend.graphs(search, days);
@@ -330,7 +330,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.CheckMediaOut checkMedia() throws BackendException {
+    public Backend.CheckMediaOut checkMedia() {
         try {
             mLock.lock();
             return mBackend.checkMedia();
@@ -340,7 +340,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public void trashMediaFiles(List<String> fnames) throws BackendException {
+    public void trashMediaFiles(List<String> fnames) {
         try {
             mLock.lock();
             mBackend.trashMediaFiles(fnames);
@@ -350,7 +350,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.String addMediaFile(@Nullable String desiredName, @Nullable ByteString data) throws BackendException {
+    public Backend.String addMediaFile(@Nullable String desiredName, @Nullable ByteString data) {
         try {
             mLock.lock();
             return mBackend.addMediaFile(desiredName, data);
@@ -360,7 +360,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public void emptyTrash() throws BackendException {
+    public void emptyTrash() {
         try {
             mLock.lock();
             mBackend.emptyTrash();
@@ -370,7 +370,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public void restoreTrash() throws BackendException {
+    public void restoreTrash() {
         try {
             mLock.lock();
             mBackend.restoreTrash();
@@ -380,7 +380,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.DeckID addOrUpdateDeckLegacy(@Nullable ByteString deck, boolean preserveUsnAndMtime) throws BackendException {
+    public Backend.DeckID addOrUpdateDeckLegacy(@Nullable ByteString deck, boolean preserveUsnAndMtime) {
         try {
             mLock.lock();
             return mBackend.addOrUpdateDeckLegacy(deck, preserveUsnAndMtime);
@@ -390,7 +390,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.DeckTreeNode deckTree(long now, long topDeckId) throws BackendException {
+    public Backend.DeckTreeNode deckTree(long now, long topDeckId) {
         try {
             mLock.lock();
             return mBackend.deckTree(now, topDeckId);
@@ -400,7 +400,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.Json deckTreeLegacy() throws BackendException {
+    public Backend.Json deckTreeLegacy() {
         try {
             mLock.lock();
             return mBackend.deckTreeLegacy();
@@ -410,7 +410,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.Json getAllDecksLegacy() throws BackendException {
+    public Backend.Json getAllDecksLegacy() {
         try {
             mLock.lock();
             return mBackend.getAllDecksLegacy();
@@ -420,7 +420,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.DeckID getDeckIDByName(Backend.String args) throws BackendException {
+    public Backend.DeckID getDeckIDByName(Backend.String args) {
         try {
             mLock.lock();
             return mBackend.getDeckIDByName(args);
@@ -430,7 +430,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.Json getDeckLegacy(Backend.DeckID args) throws BackendException {
+    public Backend.Json getDeckLegacy(Backend.DeckID args) {
         try {
             mLock.lock();
             return mBackend.getDeckLegacy(args);
@@ -440,7 +440,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.DeckNames getDeckNames(boolean skipEmptyDefault, boolean includeFiltered) throws BackendException {
+    public Backend.DeckNames getDeckNames(boolean skipEmptyDefault, boolean includeFiltered) {
         try {
             mLock.lock();
             return mBackend.getDeckNames(skipEmptyDefault, includeFiltered);
@@ -450,7 +450,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.Json newDeckLegacy(Backend.Bool args) throws BackendException {
+    public Backend.Json newDeckLegacy(Backend.Bool args) {
         try {
             mLock.lock();
             return mBackend.newDeckLegacy(args);
@@ -460,7 +460,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public void removeDeck(Backend.DeckID args) throws BackendException {
+    public void removeDeck(Backend.DeckID args) {
         try {
             mLock.lock();
             mBackend.removeDeck(args);
@@ -470,7 +470,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.DeckConfigID addOrUpdateDeckConfigLegacy(@Nullable ByteString config, boolean preserveUsnAndMtime) throws BackendException {
+    public Backend.DeckConfigID addOrUpdateDeckConfigLegacy(@Nullable ByteString config, boolean preserveUsnAndMtime) {
         try {
             mLock.lock();
             return mBackend.addOrUpdateDeckConfigLegacy(config, preserveUsnAndMtime);
@@ -480,7 +480,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.Json allDeckConfigLegacy() throws BackendException {
+    public Backend.Json allDeckConfigLegacy() {
         try {
             mLock.lock();
             return mBackend.allDeckConfigLegacy();
@@ -490,7 +490,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.Json getDeckConfigLegacy(Backend.DeckConfigID args) throws BackendException {
+    public Backend.Json getDeckConfigLegacy(Backend.DeckConfigID args) {
         try {
             mLock.lock();
             return mBackend.getDeckConfigLegacy(args);
@@ -500,7 +500,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.Json newDeckConfigLegacy() throws BackendException {
+    public Backend.Json newDeckConfigLegacy() {
         try {
             mLock.lock();
             return mBackend.newDeckConfigLegacy();
@@ -510,7 +510,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public void removeDeckConfig(Backend.DeckConfigID args) throws BackendException {
+    public void removeDeckConfig(Backend.DeckConfigID args) {
         try {
             mLock.lock();
             mBackend.removeDeckConfig(args);
@@ -520,7 +520,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.Card getCard(Backend.CardID args) throws BackendException {
+    public Backend.Card getCard(Backend.CardID args) {
         try {
             mLock.lock();
             return mBackend.getCard(args);
@@ -530,7 +530,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public void updateCard(Backend.Card args) throws BackendException {
+    public void updateCard(Backend.Card args) {
         try {
             mLock.lock();
             mBackend.updateCard(args);
@@ -540,7 +540,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.CardID addCard(Backend.Card args) throws BackendException {
+    public Backend.CardID addCard(Backend.Card args) {
         try {
             mLock.lock();
             return mBackend.addCard(args);
@@ -550,7 +550,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public void removeCards(List<Long> cardIds) throws BackendException {
+    public void removeCards(List<Long> cardIds) {
         try {
             mLock.lock();
             mBackend.removeCards(cardIds);
@@ -560,7 +560,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.Note newNote(Backend.NoteTypeID args) throws BackendException {
+    public Backend.Note newNote(Backend.NoteTypeID args) {
         try {
             mLock.lock();
             return mBackend.newNote(args);
@@ -570,7 +570,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.NoteID addNote(@Nullable Backend.Note note, long deckId) throws BackendException {
+    public Backend.NoteID addNote(@Nullable Backend.Note note, long deckId) {
         try {
             mLock.lock();
             return mBackend.addNote(note, deckId);
@@ -580,7 +580,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public void updateNote(Backend.Note args) throws BackendException {
+    public void updateNote(Backend.Note args) {
         try {
             mLock.lock();
             mBackend.updateNote(args);
@@ -590,7 +590,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.Note getNote(Backend.NoteID args) throws BackendException {
+    public Backend.Note getNote(Backend.NoteID args) {
         try {
             mLock.lock();
             return mBackend.getNote(args);
@@ -600,7 +600,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public void removeNotes(List<Long> noteIds, List<Long> cardIds) throws BackendException {
+    public void removeNotes(List<Long> noteIds, List<Long> cardIds) {
         try {
             mLock.lock();
             mBackend.removeNotes(noteIds, cardIds);
@@ -610,7 +610,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.UInt32 addNoteTags(List<Long> nids, @Nullable String tags) throws BackendException {
+    public Backend.UInt32 addNoteTags(List<Long> nids, @Nullable String tags) {
         try {
             mLock.lock();
             return mBackend.addNoteTags(nids, tags);
@@ -620,7 +620,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.UInt32 updateNoteTags(List<Long> nids, @Nullable String tags, @Nullable String replacement, boolean regex) throws BackendException {
+    public Backend.UInt32 updateNoteTags(List<Long> nids, @Nullable String tags, @Nullable String replacement, boolean regex) {
         try {
             mLock.lock();
             return mBackend.updateNoteTags(nids, tags, replacement, regex);
@@ -630,7 +630,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.ClozeNumbersInNoteOut clozeNumbersInNote(Backend.Note args) throws BackendException {
+    public Backend.ClozeNumbersInNoteOut clozeNumbersInNote(Backend.Note args) {
         try {
             mLock.lock();
             return mBackend.clozeNumbersInNote(args);
@@ -640,7 +640,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public void afterNoteUpdates(List<Long> nids, boolean markNotesModified, boolean generateCards) throws BackendException {
+    public void afterNoteUpdates(List<Long> nids, boolean markNotesModified, boolean generateCards) {
         try {
             mLock.lock();
             mBackend.afterNoteUpdates(nids, markNotesModified, generateCards);
@@ -650,7 +650,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.FieldNamesForNotesOut fieldNamesForNotes(List<Long> nids) throws BackendException {
+    public Backend.FieldNamesForNotesOut fieldNamesForNotes(List<Long> nids) {
         try {
             mLock.lock();
             return mBackend.fieldNamesForNotes(nids);
@@ -660,7 +660,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.NoteIsDuplicateOrEmptyOut noteIsDuplicateOrEmpty(Backend.Note args) throws BackendException {
+    public Backend.NoteIsDuplicateOrEmptyOut noteIsDuplicateOrEmpty(Backend.Note args) {
         try {
             mLock.lock();
             return mBackend.noteIsDuplicateOrEmpty(args);
@@ -670,7 +670,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.NoteTypeID addOrUpdateNotetype(@Nullable ByteString json, boolean preserveUsnAndMtime) throws BackendException {
+    public Backend.NoteTypeID addOrUpdateNotetype(@Nullable ByteString json, boolean preserveUsnAndMtime) {
         try {
             mLock.lock();
             return mBackend.addOrUpdateNotetype(json, preserveUsnAndMtime);
@@ -680,7 +680,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.Json getStockNotetypeLegacy(@Nullable Backend.StockNoteType kind) throws BackendException {
+    public Backend.Json getStockNotetypeLegacy(@Nullable Backend.StockNoteType kind) {
         try {
             mLock.lock();
             return mBackend.getStockNotetypeLegacy(kind);
@@ -690,7 +690,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.Json getNotetypeLegacy(Backend.NoteTypeID args) throws BackendException {
+    public Backend.Json getNotetypeLegacy(Backend.NoteTypeID args) {
         try {
             mLock.lock();
             return mBackend.getNotetypeLegacy(args);
@@ -700,7 +700,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.NoteTypeNames getNotetypeNames() throws BackendException {
+    public Backend.NoteTypeNames getNotetypeNames() {
         try {
             mLock.lock();
             return mBackend.getNotetypeNames();
@@ -710,7 +710,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.NoteTypeUseCounts getNotetypeNamesAndCounts() throws BackendException {
+    public Backend.NoteTypeUseCounts getNotetypeNamesAndCounts() {
         try {
             mLock.lock();
             return mBackend.getNotetypeNamesAndCounts();
@@ -720,7 +720,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.NoteTypeID getNotetypeIDByName(Backend.String args) throws BackendException {
+    public Backend.NoteTypeID getNotetypeIDByName(Backend.String args) {
         try {
             mLock.lock();
             return mBackend.getNotetypeIDByName(args);
@@ -730,7 +730,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public void removeNotetype(Backend.NoteTypeID args) throws BackendException {
+    public void removeNotetype(Backend.NoteTypeID args) {
         try {
             mLock.lock();
             mBackend.removeNotetype(args);
@@ -740,7 +740,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public void openCollection(@Nullable String collectionPath, @Nullable String mediaFolderPath, @Nullable String mediaDbPath, @Nullable String logPath) throws BackendException {
+    public void openCollection(@Nullable String collectionPath, @Nullable String mediaFolderPath, @Nullable String mediaDbPath, @Nullable String logPath) {
         try {
             mLock.lock();
             mBackend.openCollection(collectionPath, mediaFolderPath, mediaDbPath, logPath);
@@ -750,7 +750,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public void closeCollection(boolean downgradeToSchema11) throws BackendException {
+    public void closeCollection(boolean downgradeToSchema11) {
         try {
             mLock.lock();
             mBackend.closeCollection(downgradeToSchema11);
@@ -760,7 +760,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.CheckDatabaseOut checkDatabase() throws BackendException {
+    public Backend.CheckDatabaseOut checkDatabase() {
         try {
             mLock.lock();
             return mBackend.checkDatabase();
@@ -770,7 +770,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public void beforeUpload() throws BackendException {
+    public void beforeUpload() {
         try {
             mLock.lock();
             mBackend.beforeUpload();
@@ -780,7 +780,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.String translateString(Backend.TranslateStringIn args) throws BackendException {
+    public Backend.String translateString(Backend.TranslateStringIn args) {
         try {
             mLock.lock();
             return mBackend.translateString(args);
@@ -790,7 +790,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.String formatTimespan(float seconds, @Nullable Backend.FormatTimespanIn.Context context) throws BackendException {
+    public Backend.String formatTimespan(float seconds, @Nullable Backend.FormatTimespanIn.Context context) {
         try {
             mLock.lock();
             return mBackend.formatTimespan(seconds, context);
@@ -800,7 +800,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.Json i18nResources() throws BackendException {
+    public Backend.Json i18nResources() {
         try {
             mLock.lock();
             return mBackend.i18nResources();
@@ -810,7 +810,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.Bool registerTags(@Nullable String tags, boolean preserveUsn, int usn, boolean clearFirst) throws BackendException {
+    public Backend.Bool registerTags(@Nullable String tags, boolean preserveUsn, int usn, boolean clearFirst) {
         try {
             mLock.lock();
             return mBackend.registerTags(tags, preserveUsn, usn, clearFirst);
@@ -820,7 +820,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.AllTagsOut allTags() throws BackendException {
+    public Backend.AllTagsOut allTags() {
         try {
             mLock.lock();
             return mBackend.allTags();
@@ -830,7 +830,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.Json getConfigJson(Backend.String args) throws BackendException {
+    public Backend.Json getConfigJson(Backend.String args) {
         try {
             mLock.lock();
             return mBackend.getConfigJson(args);
@@ -840,7 +840,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public void setConfigJson(@Nullable String key, @Nullable ByteString valueJson) throws BackendException {
+    public void setConfigJson(@Nullable String key, @Nullable ByteString valueJson) {
         try {
             mLock.lock();
             mBackend.setConfigJson(key, valueJson);
@@ -850,7 +850,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public void removeConfig(Backend.String args) throws BackendException {
+    public void removeConfig(Backend.String args) {
         try {
             mLock.lock();
             mBackend.removeConfig(args);
@@ -860,7 +860,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public void setAllConfig(Backend.Json args) throws BackendException {
+    public void setAllConfig(Backend.Json args) {
         try {
             mLock.lock();
             mBackend.setAllConfig(args);
@@ -870,7 +870,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.Json getAllConfig() throws BackendException {
+    public Backend.Json getAllConfig() {
         try {
             mLock.lock();
             return mBackend.getAllConfig();
@@ -880,7 +880,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.Preferences getPreferences() throws BackendException {
+    public Backend.Preferences getPreferences() {
         try {
             mLock.lock();
             return mBackend.getPreferences();
@@ -890,7 +890,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public void setPreferences(Backend.Preferences args) throws BackendException {
+    public void setPreferences(Backend.Preferences args) {
         try {
             mLock.lock();
             mBackend.setPreferences(args);
@@ -900,7 +900,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public void openAnkiDroidCollection(Backend.OpenCollectionIn args) throws BackendException {
+    public void openAnkiDroidCollection(Backend.OpenCollectionIn args) {
         try {
             mLock.lock();
             mBackend.openAnkiDroidCollection(args);

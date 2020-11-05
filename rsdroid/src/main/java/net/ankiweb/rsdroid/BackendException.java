@@ -16,12 +16,21 @@
 
 package net.ankiweb.rsdroid;
 
-public class BackendException extends Exception {
-    public BackendException(String message)  {
-        super(message);
+import BackendProto.Backend;
+
+public class BackendException extends RuntimeException {
+    private final Backend.BackendError mError;
+
+    public BackendException(Backend.BackendError error)  {
+        super(error.getLocalized());
+        this.mError = error;
     }
 
-    public BackendException(Exception ex) {
-        super(ex);
+    public static BackendException fromError(Backend.BackendError error) {
+        return new BackendException(error);
+    }
+
+    public static RuntimeException fromException(Exception ex) {
+        return new RuntimeException(ex);
     }
 }

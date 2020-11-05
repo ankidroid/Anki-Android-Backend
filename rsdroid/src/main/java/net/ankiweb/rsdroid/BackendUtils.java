@@ -19,7 +19,7 @@ package net.ankiweb.rsdroid;
 import BackendProto.Backend;
 
 public class BackendUtils {
-    public static void openAnkiDroidCollection(BackendV1 backendV1, String path) throws BackendException {
+    public static void openAnkiDroidCollection(BackendV1 backendV1, String path) {
         backendV1.openAnkiDroidCollection(Backend.OpenCollectionIn.newBuilder().setCollectionPath(path).build());
     }
 }

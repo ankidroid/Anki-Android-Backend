@@ -34,8 +34,6 @@
 
 package net.ankiweb.rsdroid.database;
 
-import net.ankiweb.rsdroid.BackendException;
-
 import org.json.JSONArray;
 
 import java.util.Stack;
@@ -116,20 +114,16 @@ public class Session implements SQLHandler {
     }
 
     public JSONArray fullQuery(String query, Object[] bindArgs) {
-        try {
-            return mBackend.fullQuery(query, bindArgs);
-        } catch (BackendException e) {
-            throw new RuntimeException(e);
-        }
+        return mBackend.fullQuery(query, bindArgs);
     }
 
     @Override
-    public int executeGetRowsAffected(String sql, Object[] bindArgs) throws BackendException {
+    public int executeGetRowsAffected(String sql, Object[] bindArgs) {
         return mBackend.executeGetRowsAffected(sql, bindArgs);
     }
 
     @Override
-    public long insertForId(String sql, Object[] bindArgs) throws BackendException {
+    public long insertForId(String sql, Object[] bindArgs) {
         return mBackend.insertForId(sql, bindArgs);
     }
 

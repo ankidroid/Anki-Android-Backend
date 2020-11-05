@@ -32,7 +32,7 @@ import static org.junit.Assert.assertThat;
 public class BackendMutexTest extends InstrumentedTest {
 
     @Test
-    public void ensureDatabaseInTransactionIsLocked() throws BackendException, JSONException, InterruptedException {
+    public void ensureDatabaseInTransactionIsLocked() throws JSONException, InterruptedException {
 
         BackendMutex b = (BackendMutex) super.getBackend("initial_version_2_12_1.anki2");
 
@@ -47,7 +47,7 @@ public class BackendMutexTest extends InstrumentedTest {
 
                 b.fullQuery("insert into test (id) values (1)");
 
-            } catch (InterruptedException | BackendException e) {
+            } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             } finally {
                 transactionBegun.set(true);

@@ -136,15 +136,15 @@ class RPC:
         if self.get_output() == "void":
             k = self.method.input_type.replace(".BackendProto.", "")
             if k in self.method_lookup:
-                return "    {out} {name}{inv} throws BackendException;".format(out=self.get_output(), name=self.method_name(), inv="({})".format(self.method_lookup[k].as_params()))
+                return "    {out} {name}{inv};".format(out=self.get_output(), name=self.method_name(), inv="({})".format(self.method_lookup[k].as_params()))
             else:
-                return "    {out} {name}{inv} throws BackendException;".format(out=self.get_output(), name=self.method_name(), inv=self.get_input())
+                return "    {out} {name}{inv};".format(out=self.get_output(), name=self.method_name(), inv=self.get_input())
         else:
             k = self.method.input_type.replace(".BackendProto.", "")
             if k in self.method_lookup:
-                return "    {out} {name}{inv} throws BackendException;".format(out=self.get_output(), name=self.method_name(), inv="({})".format(self.method_lookup[k].as_params()))
+                return "    {out} {name}{inv};".format(out=self.get_output(), name=self.method_name(), inv="({})".format(self.method_lookup[k].as_params()))
             else:
-                return "    {out} {name}{inv} throws BackendException;".format(out=self.get_output(), name=self.method_name(), inv=self.get_input())
+                return "    {out} {name}{inv};".format(out=self.get_output(), name=self.method_name(), inv=self.get_input())
 
     def __repr__(self):
         args = "args.toByteArray()" if self.get_input() != "()" else "Backend.Empty.getDefaultInstance().toByteArray()"
@@ -154,7 +154,7 @@ class RPC:
         if self.get_output() == "void":
             k = self.method.input_type.replace(".BackendProto.", "")
             if k in self.method_lookup:
-                return "    public {out} {name}{inv} throws BackendException {{ \n" \
+                return "    public {out} {name}{inv} {{ \n" \
                        "        try {{\n" \
                        "            {deser}\n" \
                        "            Pointer backendPointer = ensureBackend();\n" \
@@ -162,20 +162,20 @@ class RPC:
                        "            Backend.Empty message = Backend.Empty.parseFrom(result);\n" \
                        "            validateMessage(result, message);\n" \
                        "        }} catch (InvalidProtocolBufferException ex) {{\n" \
-                       "            throw new BackendException(ex);\n" \
+                       "            throw BackendException.fromException(ex);\n" \
                        "        }}\n" \
                        "    }}".format(out=self.get_output(), name=self.method_name(), inv="({})".format(self.method_lookup[k].as_params()),
                                        num=self.command_num,
                                        deser=self.method_lookup[k].as_builder())
             else:
-                return "    public {out} {name}{inv} throws BackendException {{ \n" \
+                return "    public {out} {name}{inv} {{ \n" \
                        "        try {{\n" \
                        "            Pointer backendPointer = ensureBackend();\n" \
                        "            byte[] result = NativeMethods.command(backendPointer.toJni(), {num}, {args});\n" \
                        "            Backend.Empty message = Backend.Empty.parseFrom(result);\n" \
                        "            validateMessage(result, message);\n" \
                        "        }} catch (InvalidProtocolBufferException ex) {{\n" \
-                       "            throw new BackendException(ex);\n" \
+                       "            throw BackendException.fromException(ex);\n" \
                        "        }}\n" \
                        "    }}".format(out=self.get_output(), name=self.method_name(), inv=self.get_input(),
                                        num=self.command_num,
@@ -183,7 +183,7 @@ class RPC:
         else:
             k = self.method.input_type.replace(".BackendProto.", "")
             if k in self.method_lookup:
-                return "    public {out} {name}{inv} throws BackendException {{ \n" \
+                return "    public {out} {name}{inv} {{ \n" \
                        "        try {{\n" \
                        "            {deser}\n" \
                        "            Pointer backendPointer = ensureBackend();\n" \
@@ -192,14 +192,14 @@ class RPC:
                        "            validateMessage(result, message);\n" \
                        "            return message;\n" \
                        "        }} catch (InvalidProtocolBufferException ex) {{\n" \
-                       "            throw new BackendException(ex);\n" \
+                       "            throw BackendException.fromException(ex);\n" \
                        "        }}\n" \
                        "    }}".format(out=self.get_output(), name=self.method_name(), inv="({})".format(self.method_lookup[k].as_params()),
                                        num=self.command_num,
                                        deser=self.method_lookup[k].as_builder())
             else:
                 # Definitely empty - and TranslateStringIn (manually ignored)
-                return "    public {out} {name}{inv} throws BackendException {{ \n" \
+                return "    public {out} {name}{inv} {{ \n" \
                        "        try {{\n" \
                        "            Pointer backendPointer = ensureBackend();\n" \
                        "            byte[] result = NativeMethods.command(backendPointer.toJni(), {num}, {args});\n" \
@@ -207,7 +207,7 @@ class RPC:
                        "            validateMessage(result, message);\n" \
                        "            return message;\n" \
                        "        }} catch (InvalidProtocolBufferException ex) {{\n" \
-                       "            throw new BackendException(ex);\n" \
+                       "            throw BackendException.fromException(ex);\n" \
                        "        }}\n" \
                        "    }}".format(out=self.get_output(), name=self.method_name(), inv=self.get_input(),
                                        num=self.command_num,
@@ -258,12 +258,12 @@ def generate_code(request, response):
                          "import BackendProto.Backend;\n\n"
                          "public abstract class {cls}Impl implements net.ankiweb.rsdroid.{cls} {{\n\n"
                          "    public abstract Pointer ensureBackend();\n\n\n"
-                         "    protected void validateMessage(byte[] result, GeneratedMessageV3 message) throws BackendException, InvalidProtocolBufferException {{\n"
+                         "    protected void validateMessage(byte[] result, GeneratedMessageV3 message) throws InvalidProtocolBufferException {{\n"
                          "        if (message.getUnknownFields().asMap().isEmpty()) {{\n"
                          "            return;\n"
                          "        }}\n"
                          "        Backend.BackendError ex = Backend.BackendError.parseFrom(result);\n"
-                         "        throw new BackendException(ex.getLocalized());\n"
+                         "        throw BackendException.fromError(ex);\n"
                          "    }}".format(proto_file.name, __file__, cls=class_name)]
 
         for method in service_methods:

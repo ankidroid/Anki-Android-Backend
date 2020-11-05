@@ -16,17 +16,14 @@
 
 package net.ankiweb.rsdroid.database;
 
-import net.ankiweb.rsdroid.BackendException;
-
 import org.json.JSONArray;
 
 import java.util.ArrayList;
 
 public interface SQLHandler {
-    // TODO: Exceptions
-    JSONArray fullQuery(String query, Object... bindArgs) throws BackendException;
-    int executeGetRowsAffected(String sql, Object... bindArgs) throws BackendException;
-    long insertForId(String sql, Object... bindArgs) throws BackendException;
+    JSONArray fullQuery(String query, Object... bindArgs);
+    int executeGetRowsAffected(String sql, Object... bindArgs);
+    long insertForId(String sql, Object... bindArgs);
 
     void beginTransaction();
     void commitTransaction();

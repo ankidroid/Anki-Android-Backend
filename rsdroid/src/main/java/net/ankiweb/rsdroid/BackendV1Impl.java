@@ -60,20 +60,20 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
         return mBackEndPointer;
     }
 
-    public void openAnkiDroidCollection(Backend.OpenCollectionIn args) throws BackendException {
+    public void openAnkiDroidCollection(Backend.OpenCollectionIn args) {
         try {
             Pointer backendPointer = ensureBackend();
             byte[] result = NativeMethods.openCollection(backendPointer.toJni(), args.toByteArray());
             Backend.Empty message = Backend.Empty.parseFrom(result);
             validateMessage(result, message);
         } catch (InvalidProtocolBufferException ex) {
-            throw new BackendException(ex);
+            throw BackendException.fromException(ex);
         }
     }
 
     // the main openCollection does an upgrade to V15, which is not ideal
     @Override
-    public void openCollection(@Nullable String collectionPath, @Nullable String mediaFolderPath, @Nullable String mediaDbPath, @Nullable String logPath) throws BackendException {
+    public void openCollection(@Nullable String collectionPath, @Nullable String mediaFolderPath, @Nullable String mediaDbPath, @Nullable String logPath) {
         Backend.OpenCollectionIn in = Backend.OpenCollectionIn.newBuilder()
                 .setCollectionPath(collectionPath)
                 .setMediaFolderPath(mediaFolderPath)
@@ -117,7 +117,7 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
         }
     }
 
-    public long insertForId(String sql, Object[] args) throws BackendException {
+    public long insertForId(String sql, Object[] args) {
         try {
             List<Object> asList = args == null ? new ArrayList<>() : Arrays.asList(args);
             JSONObject o = new JSONObject();
@@ -136,11 +136,11 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
         } catch (JSONException e) {
             throw new RuntimeException(e);
         } catch (InvalidProtocolBufferException e) {
-            throw new BackendException(e);
+            throw BackendException.fromException(e);
         }
     }
 
-    public int executeGetRowsAffected(String sql, Object[] bindArgs) throws BackendException {
+    public int executeGetRowsAffected(String sql, Object[] bindArgs) {
         try {
             List<Object> asList = bindArgs == null ? new ArrayList<>() : Arrays.asList(bindArgs);
             JSONObject o = new JSONObject();
@@ -158,7 +158,7 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
         } catch (JSONException e) {
             throw new RuntimeException(e);
         } catch (InvalidProtocolBufferException e) {
-            throw new BackendException(e);
+            throw BackendException.fromException(e);
         }
     }
 
