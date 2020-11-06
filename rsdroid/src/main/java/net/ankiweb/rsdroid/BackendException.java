@@ -65,6 +65,8 @@ public class BackendException extends RuntimeException {
 
             if (message.contains("ConstraintViolation")) {
                 throw new SQLiteConstraintException(message);
+            } else if (message.contains("DiskFull")) {
+                throw new SQLiteFullException(message);
             } else {
                 String outMessage = String.format(Locale.ROOT, "error while compiling: \"%s\": %s", query, getLocalizedMessage());
                 throw new SQLiteException(outMessage, this);
