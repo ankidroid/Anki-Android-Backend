@@ -112,8 +112,13 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
         try {
             return new JSONArray(json);
         } catch (Exception e) {
-            // TODO: We have a protobuf-error
-            throw new RuntimeException(json, e);
+            Backend.BackendError pbError;
+            try {
+                pbError = Backend.BackendError.parseFrom(result);
+            } catch (InvalidProtocolBufferException invalidProtocolBufferException) {
+                throw BackendException.fromException(invalidProtocolBufferException);
+            }
+            throw BackendException.fromError(pbError);
         }
     }
 

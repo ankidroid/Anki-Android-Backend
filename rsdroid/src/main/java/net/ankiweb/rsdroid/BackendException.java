@@ -16,6 +16,12 @@
 
 package net.ankiweb.rsdroid;
 
+import android.database.sqlite.SQLiteConstraintException;
+import android.database.sqlite.SQLiteException;
+import android.database.sqlite.SQLiteFullException;
+
+import java.util.Locale;
+
 import BackendProto.Backend;
 
 public class BackendException extends RuntimeException {
@@ -27,10 +33,42 @@ public class BackendException extends RuntimeException {
     }
 
     public static BackendException fromError(Backend.BackendError error) {
+        if (error.hasDbError()) {
+            return new BackendDbException(error);
+        }
+
         return new BackendException(error);
     }
 
     public static RuntimeException fromException(Exception ex) {
         return new RuntimeException(ex);
+    }
+
+
+    public RuntimeException toSQLiteException(String query) {
+        String message = String.format(Locale.ROOT, "error while compiling: \"%s\": %s", query, this.getLocalizedMessage());
+        return new SQLiteException(message, this);
+    }
+
+    public static class BackendDbException extends BackendException {
+
+        public BackendDbException(Backend.BackendError error) {
+            // This is very simple for now and matches Anki Desktop (error is currently text)
+            // Later on, we may want to use structured error messages
+            // DBError { info: "SqliteFailure(Error { code: Unknown, extended_code: 1 }, Some(\"no such table: aa\"))", kind: Other }
+            super(error);
+        }
+
+        @Override
+        public RuntimeException toSQLiteException(String query) {
+            String message = this.getLocalizedMessage();
+
+            if (message.contains("ConstraintViolation")) {
+                throw new SQLiteConstraintException(message);
+            } else {
+                String outMessage = String.format(Locale.ROOT, "error while compiling: \"%s\": %s", query, getLocalizedMessage());
+                throw new SQLiteException(outMessage, this);
+            }
+        }
     }
 }

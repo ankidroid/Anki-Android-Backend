@@ -16,43 +16,17 @@
 
 package net.ankiweb.rsdroid;
 
-import androidx.annotation.NonNull;
-import androidx.sqlite.db.SupportSQLiteDatabase;
-import androidx.sqlite.db.SupportSQLiteOpenHelper;
-import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory;
+import net.ankiweb.rsdroid.database.testutils.DatabaseComparison;
 
-import net.ankiweb.rsdroid.database.RustSQLiteOpenHelperFactory;
-
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
-
-import java.util.Arrays;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 @RunWith(Parameterized.class)
-public class DatabaseTransactionTests extends InstrumentedTest {
-
-    @Parameter
-    public DatabaseType schedVersion;
-    private SupportSQLiteDatabase mDatabase;
-
-    @Parameters(name = "{0}")
-    public static java.util.Collection<Object[]> initParameters() {
-        // This does one run with schedVersion injected as 1, and one run as 2
-        return Arrays.asList(new Object[][] { { DatabaseType.FRAMEWORK }, { DatabaseType.RUST } });
-    }
-
-    @Before
-    public void setUp() {
-        mDatabase = getDatabase();
-        mDatabase.execSQL("create table nums (id int)");
-    }
+public class DatabaseTransactionTests extends DatabaseComparison {
 
     @Test
     public void nestedTransactionFailureInside() {
@@ -104,49 +78,5 @@ public class DatabaseTransactionTests extends InstrumentedTest {
 
     private int countNums() {
         return RustDatabaseUtil.queryScalar(mDatabase, "select count(*) from nums");
-    }
-
-    private SupportSQLiteDatabase getDatabase() {
-        SupportSQLiteOpenHelper.Configuration config = SupportSQLiteOpenHelper.Configuration.builder(getContext())
-                .callback(new DefaultCallback())
-                .name(null)
-                .build();
-
-        switch (schedVersion) {
-            case RUST:
-                BackendFactory mBackendFactory = new BackendFactory();
-                // TODO: Does this work?
-                try {
-                    BackendUtils.openAnkiDroidCollection(mBackendFactory.getInstance(), ":memory:");
-                } catch (Exception e) {
-
-                }
-                return new RustSQLiteOpenHelperFactory(mBackendFactory).create(config).getWritableDatabase();
-            case FRAMEWORK:
-                return new FrameworkSQLiteOpenHelperFactory().create(config).getWritableDatabase();
-        }
-        throw new IllegalStateException();
-    }
-
-
-    enum DatabaseType {
-        FRAMEWORK,
-        RUST
-    }
-
-    private static class DefaultCallback extends SupportSQLiteOpenHelper.Callback {
-        public DefaultCallback() {
-            super(1);
-        }
-
-        @Override
-        public void onCreate(@NonNull SupportSQLiteDatabase db) {
-
-        }
-
-        @Override
-        public void onUpgrade(@NonNull SupportSQLiteDatabase db, int oldVersion, int newVersion) {
-
-        }
     }
 }

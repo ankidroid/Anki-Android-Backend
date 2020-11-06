@@ -16,6 +16,8 @@
 
 package net.ankiweb.rsdroid.database;
 
+import net.ankiweb.rsdroid.BackendException;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -28,7 +30,11 @@ public class MemoryHeavySQLiteCursor extends AnkiDatabaseCursor {
     private String[] mColumnMapping;
 
     public MemoryHeavySQLiteCursor(Session backend, String query, Object[] bindArgs) {
-        mResults = backend.fullQuery(query, bindArgs);
+        try {
+            mResults = backend.fullQuery(query, bindArgs);
+        } catch (BackendException e) {
+            throw e.toSQLiteException(query);
+        }
         this.mBackend = backend;
         this.mQuery = query;
     }
