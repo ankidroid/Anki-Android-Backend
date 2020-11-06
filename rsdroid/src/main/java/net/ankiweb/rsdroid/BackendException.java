@@ -17,6 +17,7 @@
 package net.ankiweb.rsdroid;
 
 import android.database.sqlite.SQLiteConstraintException;
+import android.database.sqlite.SQLiteDatabaseCorruptException;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteFullException;
 
@@ -67,6 +68,9 @@ public class BackendException extends RuntimeException {
                 throw new SQLiteConstraintException(message);
             } else if (message.contains("DiskFull")) {
                 throw new SQLiteFullException(message);
+            } else if (message.contains("DatabaseCorrupt")) {
+                String outMessage = String.format(Locale.ROOT, "error while compiling: \"%s\": %s", query, getLocalizedMessage());
+                throw new SQLiteDatabaseCorruptException(outMessage);
             } else {
                 String outMessage = String.format(Locale.ROOT, "error while compiling: \"%s\": %s", query, getLocalizedMessage());
                 throw new SQLiteException(outMessage, this);

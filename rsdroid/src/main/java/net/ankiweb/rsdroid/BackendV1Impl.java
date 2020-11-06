@@ -66,6 +66,8 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
             byte[] result = NativeMethods.openCollection(backendPointer.toJni(), args.toByteArray());
             Backend.Empty message = Backend.Empty.parseFrom(result);
             validateMessage(result, message);
+        } catch (BackendException.BackendDbException ex) {
+            throw ex.toSQLiteException("openAnkiDroidCollection");
         } catch (InvalidProtocolBufferException ex) {
             throw BackendException.fromException(ex);
         }

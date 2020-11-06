@@ -19,6 +19,10 @@ package net.ankiweb.rsdroid;
 import BackendProto.Backend;
 
 public class BackendUtils {
+    /**
+     *
+     * @throws android.database.sqlite.SQLiteDatabaseCorruptException
+     */
     public static void openAnkiDroidCollection(BackendV1 backendV1, String path) {
         backendV1.openAnkiDroidCollection(Backend.OpenCollectionIn.newBuilder().setCollectionPath(path).build());
     }

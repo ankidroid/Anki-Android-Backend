@@ -108,5 +108,10 @@ public class DatabaseComparison extends InstrumentedTest {
         public void onUpgrade(@NonNull SupportSQLiteDatabase db, int oldVersion, int newVersion) {
 
         }
+
+        @Override
+        public void onCorruption(@NonNull SupportSQLiteDatabase db) {
+            // do nothing
+        }
     }
 }
