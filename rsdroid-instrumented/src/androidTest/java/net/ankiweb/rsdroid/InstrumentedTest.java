@@ -66,6 +66,10 @@ public class InstrumentedTest {
     }
 
     protected BackendV1 getClosedBackend() {
-        return new BackendFactory.getBackend();
+        try {
+            return BackendFactory.createInstance().getBackend();
+        } catch (RustBackendFailedException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

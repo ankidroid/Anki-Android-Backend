@@ -24,6 +24,7 @@ import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory;
 import net.ankiweb.rsdroid.BackendFactory;
 import net.ankiweb.rsdroid.BackendUtils;
 import net.ankiweb.rsdroid.InstrumentedTest;
+import net.ankiweb.rsdroid.RustBackendFailedException;
 import net.ankiweb.rsdroid.database.RustSQLiteOpenHelperFactory;
 
 import org.junit.Before;
@@ -67,10 +68,15 @@ public class DatabaseComparison extends InstrumentedTest {
 
         switch (schedVersion) {
             case RUST:
-                BackendFactory mBackendFactory = new BackendFactory();
+                BackendFactory mBackendFactory;
+                try {
+                    mBackendFactory = BackendFactory.createInstance();
+                } catch (RustBackendFailedException e) {
+                    throw new RuntimeException(e);
+                }
                 // This throws on corruption
                 // This doesn't
-                BackendUtils.openAnkiDroidCollection(mBackendFactory.getInstance(), getDatabasePath());
+                BackendUtils.openAnkiDroidCollection(mBackendFactory.getBackend(), getDatabasePath());
                 return new RustSQLiteOpenHelperFactory(mBackendFactory).create(config).getWritableDatabase();
             case FRAMEWORK:
                 return new FrameworkSQLiteOpenHelperFactory().create(config).getWritableDatabase();

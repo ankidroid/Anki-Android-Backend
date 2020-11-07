@@ -6,7 +6,6 @@ import android.database.Cursor;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-import net.ankiweb.rsdroid.BackendFactory;
 import net.ankiweb.rsdroid.BackendUtils;
 import net.ankiweb.rsdroid.BackendV1;
 import net.ankiweb.rsdroid.database.RustSupportSQLiteDatabase;
@@ -36,7 +35,7 @@ public class CollectionCreationTest {
         // We use this routine in AnkiDroid to create the collection, therefore we need to ensure
         // that the database is valid, open, and the values returned match how the Java used to work
 
-        BackendV1 backendV1 = new BackendFactory().getBackend();
+        BackendV1 backendV1 = TestUtil.getBackend();
 
         String collectionPath = new File(getTargetContext().getFilesDir(), "collection.anki2").getAbsolutePath();
 

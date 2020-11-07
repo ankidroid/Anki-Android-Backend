@@ -8,19 +8,32 @@ import androidx.annotation.Nullable;
 
 public class NativeMethods {
 
+    private static boolean hasSetUp = false;
+    private static RustBackendFailedException setupException;
+
     public static boolean isRoboUnitTest() {
         return "robolectric".equals(Build.FINGERPRINT);
     }
 
-    static {
+
+    public static synchronized void ensureSetup() throws RustBackendFailedException {
+        if (hasSetUp) {
+            if (setupException != null) {
+                throw setupException;
+            }
+            return;
+        }
         try {
             System.loadLibrary("rsdroid");
         } catch (UnsatisfiedLinkError e) {
             if (!isRoboUnitTest()) {
-                throw e;
+                setupException = new RustBackendFailedException(e);
+                throw setupException;
             }
+            // In Robolectric, assume setup works (setupException == null) if the library throws.
+            // As the library is loaded at a later time (or a failure will be quickly found).
         }
-
+        hasSetUp = true;
     }
 
     @CheckResult
@@ -55,5 +68,4 @@ public class NativeMethods {
     @Nullable
     @CheckResult
     static native String[] getColumnNames(long backendPointer, String sql);
-    //UnsatisfiedLinkError
 }

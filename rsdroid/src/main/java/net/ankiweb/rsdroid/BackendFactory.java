@@ -20,6 +20,21 @@ public class BackendFactory {
 
     private BackendV1 mBackend;
 
+    // Force users to go through getInstance - for now we need to handle the backend failure
+    private BackendFactory() {
+
+    }
+
+    /**
+     * Obtains an instance of BackendFactory which will connect to rsdroid.
+     * Each call will generate a separate instance which can handle a new Anki collection
+     */
+    @RustV1Cleanup("RustBackendFailedException may be moved to a more appropriate location")
+    public static BackendFactory createInstance() throws RustBackendFailedException {
+        NativeMethods.ensureSetup();
+        return new BackendFactory();
+    }
+
     public synchronized BackendV1 getBackend() {
         if (mBackend == null) {
             mBackend = new BackendMutex(new BackendV1Impl());
