@@ -45,12 +45,12 @@ public class RustSupportSQLiteOpenHelper implements SupportSQLiteOpenHelper {
     // TODO:
     @Override
     public SupportSQLiteDatabase getWritableDatabase() {
-        return new RustSupportSQLiteDatabase(mBackendFactory.getInstance(), mConfiguration.name);
+        return new RustSupportSQLiteDatabase(mBackendFactory.getBackend(), mConfiguration.name);
     }
 
     @Override
     public SupportSQLiteDatabase getReadableDatabase() {
-        return new RustSupportSQLiteDatabase(mBackendFactory.getInstance(), mConfiguration.name);
+        return new RustSupportSQLiteDatabase(mBackendFactory.getBackend(), mConfiguration.name);
     }
 
     @Override

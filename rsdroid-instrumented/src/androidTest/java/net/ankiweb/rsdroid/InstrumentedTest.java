@@ -66,6 +66,6 @@ public class InstrumentedTest {
     }
 
     protected BackendV1 getClosedBackend() {
-        return new BackendFactory().getInstance();
+        return new BackendFactory.getBackend();
     }
 }

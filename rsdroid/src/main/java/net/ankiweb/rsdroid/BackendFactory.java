@@ -20,7 +20,7 @@ public class BackendFactory {
 
     private BackendV1 mBackend;
 
-    public synchronized BackendV1 getInstance() {
+    public synchronized BackendV1 getBackend() {
         if (mBackend == null) {
             mBackend = new BackendMutex(new BackendV1Impl());
         }

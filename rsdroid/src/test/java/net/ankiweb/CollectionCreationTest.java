@@ -17,7 +17,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.File;
-import java.io.IOException;
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -37,7 +36,7 @@ public class CollectionCreationTest {
         // We use this routine in AnkiDroid to create the collection, therefore we need to ensure
         // that the database is valid, open, and the values returned match how the Java used to work
 
-        BackendV1 backendV1 = new BackendFactory().getInstance();
+        BackendV1 backendV1 = new BackendFactory().getBackend();
 
         String collectionPath = new File(getTargetContext().getFilesDir(), "collection.anki2").getAbsolutePath();
 
