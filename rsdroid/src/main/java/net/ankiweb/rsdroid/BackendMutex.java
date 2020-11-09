@@ -117,6 +117,16 @@ public class BackendMutex implements BackendV1 {
         }
     }
 
+    @Override
+    public void closeDatabase() {
+        try {
+            mLock.lock();
+            mBackend.closeDatabase();
+        } finally {
+            mLock.unlock();
+        }
+    }
+
     // RustBackend Implementation
 
     @Override

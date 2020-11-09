@@ -73,6 +73,11 @@ public class Session implements SQLHandler {
         return mBackend.getColumnNames(sql);
     }
 
+    @Override
+    public void closeDatabase() {
+        mBackend.closeDatabase();
+    }
+
 
     public void setTransactionSuccessful() {
         if (!inTransaction()) {

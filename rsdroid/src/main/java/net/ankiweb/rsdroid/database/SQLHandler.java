@@ -31,6 +31,8 @@ public interface SQLHandler {
 
     String[] getColumnNames(String sql);
 
+    void closeDatabase();
+
     // TODO
     // String getPath();
 }

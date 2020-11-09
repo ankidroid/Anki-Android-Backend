@@ -210,4 +210,9 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
     public String[] getColumnNames(String sql) {
         return NativeMethods.getColumnNames(ensureBackend().toJni(), sql);
     }
+
+    @Override
+    public void closeDatabase() {
+        super.closeCollection(false);
+    }
 }

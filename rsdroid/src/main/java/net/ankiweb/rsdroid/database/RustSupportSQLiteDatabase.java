@@ -250,7 +250,7 @@ public class RustSupportSQLiteDatabase implements SupportSQLiteDatabase {
 
     @Override
     public void close() throws IOException {
-        throw NotImplementedException.todo();
+        sessionFactory.get().closeDatabase();
     }
 
     /* Not part of interface */
