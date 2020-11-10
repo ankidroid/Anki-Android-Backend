@@ -33,6 +33,5 @@ public interface SQLHandler {
 
     void closeDatabase();
 
-    // TODO
-    // String getPath();
+    String getPath();
 }

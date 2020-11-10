@@ -75,8 +75,6 @@ public class DatabaseComparison extends InstrumentedTest {
                     throw new RuntimeException(e);
                 }
                 // This throws on corruption
-                // This doesn't
-                BackendUtils.openAnkiDroidCollection(mBackendFactory.getBackend(), getDatabasePath());
                 return new RustSQLiteOpenHelperFactory(mBackendFactory).create(config).getWritableDatabase();
             case FRAMEWORK:
                 return new FrameworkSQLiteOpenHelperFactory().create(config).getWritableDatabase();

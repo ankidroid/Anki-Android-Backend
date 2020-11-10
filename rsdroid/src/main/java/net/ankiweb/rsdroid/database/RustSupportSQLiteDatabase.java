@@ -60,13 +60,9 @@ public class RustSupportSQLiteDatabase implements SupportSQLiteDatabase {
     private static final String[] CONFLICT_VALUES = new String[]
             {"", " OR ROLLBACK ", " OR ABORT ", " OR FAIL ", " OR IGNORE ", " OR REPLACE "};
 
-    private final String mPath;
     private final ThreadLocal<Session> sessionFactory;
 
-    public RustSupportSQLiteDatabase(BackendV1 backend, String dbPath) {
-        // TODO: Pass this on through to the session and don't use the variable, it can be out-of-sync
-        // We need to reconsider this abstraction, as the
-        this.mPath = dbPath;
+    public RustSupportSQLiteDatabase(BackendV1 backend) {
         this.sessionFactory = new SessionThreadLocal(backend);
     }
 
@@ -224,7 +220,7 @@ public class RustSupportSQLiteDatabase implements SupportSQLiteDatabase {
 
     @Override
     public String getPath() {
-        return mPath;
+        return getSession().getPath();
     }
 
 

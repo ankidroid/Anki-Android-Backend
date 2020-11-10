@@ -3,12 +3,17 @@ package net.ankiweb;
 import android.content.Context;
 import android.database.Cursor;
 
+import androidx.annotation.NonNull;
+import androidx.sqlite.db.SupportSQLiteDatabase;
+import androidx.sqlite.db.SupportSQLiteOpenHelper;
+import androidx.sqlite.db.SupportSQLiteOpenHelper.Configuration;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-import net.ankiweb.rsdroid.BackendUtils;
+import net.ankiweb.rsdroid.BackendFactory;
 import net.ankiweb.rsdroid.BackendV1;
 import net.ankiweb.rsdroid.database.RustSupportSQLiteDatabase;
+import net.ankiweb.rsdroid.database.RustSupportSQLiteOpenHelper;
 import net.ankiweb.rsdroid.testing.ModuleLoader;
 
 import org.junit.Before;
@@ -35,12 +40,13 @@ public class CollectionCreationTest {
         // We use this routine in AnkiDroid to create the collection, therefore we need to ensure
         // that the database is valid, open, and the values returned match how the Java used to work
 
-        BackendV1 backendV1 = TestUtil.getBackend();
+        BackendFactory backendV1 = TestUtil.getBackendFactory();
 
-        String collectionPath = new File(getTargetContext().getFilesDir(), "collection.anki2").getAbsolutePath();
+        String path = new File(getTargetContext().getFilesDir(), "collection.anki2").getAbsolutePath();
 
-        BackendUtils.openAnkiDroidCollection(backendV1, collectionPath);
-        RustSupportSQLiteDatabase database = new RustSupportSQLiteDatabase(backendV1, collectionPath);
+        Configuration config = getConfiguration(path);
+
+        SupportSQLiteDatabase database = new RustSupportSQLiteOpenHelper(config, backendV1).getWritableDatabase();
 
         database.beginTransaction();
         try {
@@ -56,6 +62,23 @@ public class CollectionCreationTest {
         } catch (Exception e) {
             // OK
         }
+    }
+
+    private Configuration getConfiguration(String path) {
+        return Configuration.builder(getTargetContext())
+                    .name(path)
+                    .callback(new SupportSQLiteOpenHelper.Callback(1) {
+                        @Override
+                        public void onCreate(@NonNull SupportSQLiteDatabase db) {
+
+                        }
+
+                        @Override
+                        public void onUpgrade(@NonNull SupportSQLiteDatabase db, int oldVersion, int newVersion) {
+
+                        }
+                    })
+                    .build();
     }
 
 

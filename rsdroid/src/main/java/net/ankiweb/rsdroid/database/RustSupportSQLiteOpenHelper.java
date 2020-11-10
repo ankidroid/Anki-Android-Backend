@@ -21,10 +21,13 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 import androidx.sqlite.db.SupportSQLiteOpenHelper;
 
 import net.ankiweb.rsdroid.BackendFactory;
+import net.ankiweb.rsdroid.BackendUtils;
+import net.ankiweb.rsdroid.BackendV1;
 
 public class RustSupportSQLiteOpenHelper implements SupportSQLiteOpenHelper {
     private final Configuration mConfiguration;
     private BackendFactory mBackendFactory;
+    private RustSupportSQLiteDatabase mDatabase;
 
     public RustSupportSQLiteOpenHelper(Configuration configuration, BackendFactory backendFactory) {
         this.mConfiguration = configuration;
@@ -42,19 +45,30 @@ public class RustSupportSQLiteOpenHelper implements SupportSQLiteOpenHelper {
         throw new NotImplementedException();
     }
 
-    // TODO:
     @Override
     public SupportSQLiteDatabase getWritableDatabase() {
-        return new RustSupportSQLiteDatabase(mBackendFactory.getBackend(), mConfiguration.name);
+        if (mDatabase == null) {
+            this.mDatabase = createRustSupportSQLiteDatabase();
+        }
+        return mDatabase;
     }
 
     @Override
     public SupportSQLiteDatabase getReadableDatabase() {
-        return new RustSupportSQLiteDatabase(mBackendFactory.getBackend(), mConfiguration.name);
+        if (mDatabase == null) {
+            mDatabase = createRustSupportSQLiteDatabase();
+        }
+        return mDatabase;
     }
 
     @Override
     public void close() {
 
+    }
+
+    private RustSupportSQLiteDatabase createRustSupportSQLiteDatabase() {
+        BackendV1 backend = mBackendFactory.getBackend();
+        BackendUtils.openAnkiDroidCollection(backend, mConfiguration.name);
+        return new RustSupportSQLiteDatabase(backend);
     }
 }

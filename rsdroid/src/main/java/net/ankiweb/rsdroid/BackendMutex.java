@@ -127,6 +127,16 @@ public class BackendMutex implements BackendV1 {
         }
     }
 
+    @Override
+    public String getPath() {
+        try {
+            mLock.lock();
+            return mBackend.getPath();
+        } finally {
+            mLock.unlock();
+        }
+    }
+
     // RustBackend Implementation
 
     @Override

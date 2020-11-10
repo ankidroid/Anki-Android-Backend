@@ -39,6 +39,8 @@ import BackendProto.Backend;
 public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implements BackendV1 {
 
     private Pointer mBackEndPointer = null;
+    @Nullable
+    private String mCollectionPath;
 
     // intentionally package private - use BackendFactory
     BackendV1Impl() {
@@ -61,14 +63,17 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
     }
 
     public void openAnkiDroidCollection(Backend.OpenCollectionIn args) {
+        mCollectionPath = args.getCollectionPath();
         try {
             Pointer backendPointer = ensureBackend();
             byte[] result = NativeMethods.openCollection(backendPointer.toJni(), args.toByteArray());
             Backend.Empty message = Backend.Empty.parseFrom(result);
             validateMessage(result, message);
         } catch (BackendException.BackendDbException ex) {
+            mCollectionPath = null;
             throw ex.toSQLiteException("openAnkiDroidCollection");
         } catch (InvalidProtocolBufferException ex) {
+            mCollectionPath = null;
             throw BackendException.fromException(ex);
         }
     }
@@ -214,5 +219,10 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
     @Override
     public void closeDatabase() {
         super.closeCollection(false);
+    }
+
+    @Override
+    public String getPath() {
+        return mCollectionPath;
     }
 }

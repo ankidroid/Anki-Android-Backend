@@ -17,13 +17,12 @@
 package net.ankiweb;
 
 import net.ankiweb.rsdroid.BackendFactory;
-import net.ankiweb.rsdroid.BackendV1;
 import net.ankiweb.rsdroid.RustBackendFailedException;
 
 public class TestUtil {
-    public static BackendV1 getBackend() {
+    public static BackendFactory getBackendFactory() {
         try {
-            return BackendFactory.createInstance().getBackend();
+            return BackendFactory.createInstance();
         } catch (RustBackendFailedException e) {
             throw new RuntimeException(e);
         }

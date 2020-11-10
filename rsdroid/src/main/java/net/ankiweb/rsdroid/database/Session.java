@@ -78,6 +78,11 @@ public class Session implements SQLHandler {
         mBackend.closeDatabase();
     }
 
+    @Override
+    public String getPath() {
+        return mBackend.getPath();
+    }
+
 
     public void setTransactionSuccessful() {
         if (!inTransaction()) {
