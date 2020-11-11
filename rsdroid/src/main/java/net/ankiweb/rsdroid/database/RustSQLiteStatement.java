@@ -17,6 +17,7 @@
 package net.ankiweb.rsdroid.database;
 
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDoneException;
 
 import androidx.sqlite.db.SupportSQLiteStatement;
 
@@ -54,7 +55,7 @@ public class RustSQLiteStatement implements SupportSQLiteStatement {
     public long simpleQueryForLong() {
         try (Cursor query = mDatabase.query(mSql, getBindings())) {
             if (!query.moveToFirst()) {
-                throw new IllegalArgumentException("no rows returned"); // TODO: Check real return value
+                throw new SQLiteDoneException();
             }
             return query.getLong(0);
         }
@@ -64,7 +65,7 @@ public class RustSQLiteStatement implements SupportSQLiteStatement {
     public String simpleQueryForString() {
         try (Cursor query = mDatabase.query(mSql, getBindings())) {
             if (!query.moveToFirst()) {
-                throw new IllegalArgumentException("no rows returned"); // TODO: Check real return value
+                throw new SQLiteDoneException();
             }
             return query.getString(0);
         }
