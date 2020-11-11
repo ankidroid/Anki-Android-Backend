@@ -22,14 +22,25 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import org.apache.commons.exec.OS;
+
 public class ModuleLoader {
 
     private static boolean sLoaded;
 
     public static void init() {
         if (!sLoaded) {
-            // TODO: Mac & Linux are packaged - need to extract
-            load("rsdroid.dll");
+            if (OS.isFamilyWindows()) {
+                load("rsdroid.dll");
+            } else if (OS.isFamilyMac()) {
+                load("librsdroid.dylib");
+            } else if (OS.isFamilyUnix()) {
+                load("librsdroid.so");
+            } else {
+                String osName = System.getProperty("os.name");
+                throw new IllegalStateException(String.format("Could not determine OS Type for: '%s'", osName));
+            }
+
 
             sLoaded = true;
         }

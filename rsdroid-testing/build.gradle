@@ -18,6 +18,8 @@ apply plugin: 'java-library'
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    // obtaining the OS
+    implementation 'org.apache.commons:commons-exec:1.3'
 }
 
 jar {
