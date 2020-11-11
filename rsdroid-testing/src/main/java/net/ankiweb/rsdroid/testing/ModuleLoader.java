@@ -21,35 +21,36 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.HashMap;
 
 import org.apache.commons.exec.OS;
 
 public class ModuleLoader {
 
     private static boolean sLoaded;
+    private static final HashMap<String, String> sCache = new HashMap<>();
 
     public static void init() {
         if (!sLoaded) {
             if (OS.isFamilyWindows()) {
-                load("rsdroid.dll");
+                load("rsdroid", ".dll");
             } else if (OS.isFamilyMac()) {
-                load("librsdroid.dylib");
+                load("librsdroid", ".dylib");
             } else if (OS.isFamilyUnix()) {
-                load("librsdroid.so");
+                load("librsdroid", ".so");
             } else {
                 String osName = System.getProperty("os.name");
                 throw new IllegalStateException(String.format("Could not determine OS Type for: '%s'", osName));
             }
 
-
             sLoaded = true;
         }
     }
 
-    private static void load(String filename) {
+    private static void load(String filename, String extension) {
         String path;
         try {
-            path = getPathFromResourceStream(filename);
+            path = getPathFromResourceStream(filename, extension);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -63,17 +64,24 @@ public class ModuleLoader {
         }
     }
 
-    private static String getPathFromResourceStream(String filename) throws IOException {
-        // TODO: Hardcoded path
-        String path = "C:\\DevTmp\\" + filename;
+    private static String getPathFromResourceStream(String fileName, String extension) throws IOException {
+        // TODO: Ensure that this is reasonably handled without too much copying.
+        String fullFilename = fileName + extension;
+
+        if (sCache.containsKey(fullFilename)) {
+            return sCache.get(fullFilename);
+        }
+
+        // Note: this will leave some data in the temp folder.
+        String path = File.createTempFile(fileName, extension).getAbsolutePath();
         File targetFile = new File(path);
         if (targetFile.exists() && targetFile.length() > 0) {
             return path;
         }
 
-        InputStream rsdroid = ModuleLoader.class.getClassLoader().getResourceAsStream(filename);
+        InputStream rsdroid = ModuleLoader.class.getClassLoader().getResourceAsStream(fullFilename);
         if (rsdroid == null) {
-            throw new IllegalStateException("Could not find " + filename);
+            throw new IllegalStateException("Could not find " + fullFilename);
         }
 
 
@@ -92,6 +100,8 @@ public class ModuleLoader {
 
         rsdroid.close();
         outStream.close();
+
+        sCache.put(fullFilename, path);
 
         return path;
     }
