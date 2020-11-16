@@ -62,10 +62,12 @@ public class RustSupportSQLiteDatabase implements SupportSQLiteDatabase {
 
     private final ThreadLocal<Session> sessionFactory;
     private final boolean mReadOnly;
+    private boolean mOpen;
 
     public RustSupportSQLiteDatabase(BackendV1 backend, boolean readOnly) {
         this.sessionFactory = new SessionThreadLocal(backend);
         this.mReadOnly = readOnly;
+        this.mOpen = true;
     }
 
     @Override
@@ -75,7 +77,7 @@ public class RustSupportSQLiteDatabase implements SupportSQLiteDatabase {
 
     @Override
     public boolean isOpen() {
-        return true;
+        return mOpen;
     }
 
     @Override
@@ -247,6 +249,7 @@ public class RustSupportSQLiteDatabase implements SupportSQLiteDatabase {
 
     @Override
     public void close() throws IOException {
+        mOpen = false;
         sessionFactory.get().closeDatabase();
     }
 
