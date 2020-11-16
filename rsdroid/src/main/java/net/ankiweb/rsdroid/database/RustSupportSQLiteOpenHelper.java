@@ -48,17 +48,14 @@ public class RustSupportSQLiteOpenHelper implements SupportSQLiteOpenHelper {
     @Override
     public SupportSQLiteDatabase getWritableDatabase() {
         if (mDatabase == null) {
-            this.mDatabase = createRustSupportSQLiteDatabase();
+            this.mDatabase = createRustSupportSQLiteDatabase(false);
         }
         return mDatabase;
     }
 
     @Override
     public SupportSQLiteDatabase getReadableDatabase() {
-        if (mDatabase == null) {
-            mDatabase = createRustSupportSQLiteDatabase();
-        }
-        return mDatabase;
+        throw new NotImplementedException("Not supported by Rust - requires open collection");
     }
 
     @Override
@@ -66,9 +63,9 @@ public class RustSupportSQLiteOpenHelper implements SupportSQLiteOpenHelper {
 
     }
 
-    private RustSupportSQLiteDatabase createRustSupportSQLiteDatabase() {
+    private RustSupportSQLiteDatabase createRustSupportSQLiteDatabase(boolean readOnly) {
         BackendV1 backend = mBackendFactory.getBackend();
         BackendUtils.openAnkiDroidCollection(backend, mConfiguration.name);
-        return new RustSupportSQLiteDatabase(backend);
+        return new RustSupportSQLiteDatabase(backend, readOnly);
     }
 }

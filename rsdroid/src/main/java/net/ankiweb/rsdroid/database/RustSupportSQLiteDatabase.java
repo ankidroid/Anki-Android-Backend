@@ -61,15 +61,16 @@ public class RustSupportSQLiteDatabase implements SupportSQLiteDatabase {
             {"", " OR ROLLBACK ", " OR ABORT ", " OR FAIL ", " OR IGNORE ", " OR REPLACE "};
 
     private final ThreadLocal<Session> sessionFactory;
+    private final boolean mReadOnly;
 
-    public RustSupportSQLiteDatabase(BackendV1 backend) {
+    public RustSupportSQLiteDatabase(BackendV1 backend, boolean readOnly) {
         this.sessionFactory = new SessionThreadLocal(backend);
+        this.mReadOnly = readOnly;
     }
 
-    // TODO: These need to be accurate
     @Override
     public boolean isReadOnly() {
-        return false;
+        return mReadOnly;
     }
 
     @Override
