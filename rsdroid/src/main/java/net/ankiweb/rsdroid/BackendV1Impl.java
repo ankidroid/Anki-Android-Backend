@@ -202,8 +202,8 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
             String asString = new String(result);
 
             if (!"null".equals(asString)) {
-                // TODO: Handle as protobuf error
-                throw new RuntimeException(asString);
+                Backend.BackendError ex = Backend.BackendError.parseFrom(result);
+                throw BackendException.fromError(ex);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
