@@ -16,6 +16,7 @@
 
 package net.ankiweb.rsdroid.database;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 import androidx.sqlite.db.SupportSQLiteOpenHelper;
@@ -25,19 +26,35 @@ import net.ankiweb.rsdroid.BackendUtils;
 import net.ankiweb.rsdroid.BackendV1;
 
 public class RustSupportSQLiteOpenHelper implements SupportSQLiteOpenHelper {
+    @Nullable
     private final Configuration mConfiguration;
+    @Nullable
+    private final BackendV1 mBackend;
     private BackendFactory mBackendFactory;
     private RustSupportSQLiteDatabase mDatabase;
 
-    public RustSupportSQLiteOpenHelper(Configuration configuration, BackendFactory backendFactory) {
+    public RustSupportSQLiteOpenHelper(@NonNull Configuration configuration, BackendFactory backendFactory) {
         this.mConfiguration = configuration;
         this.mBackendFactory = backendFactory;
+        mBackend = null;
+    }
+
+    public RustSupportSQLiteOpenHelper(@NonNull BackendV1 backend) {
+        if (!backend.isOpen()) {
+            throw new IllegalStateException("Backend should be open");
+        }
+        this.mBackend = backend;
+        mConfiguration = null;
     }
 
     @Nullable
     @Override
     public String getDatabaseName() {
-        return mConfiguration.name;
+        if (mBackend != null) {
+            return mBackend.getPath();
+        } else {
+            return mConfiguration.name;
+        }
     }
 
     @Override
@@ -64,8 +81,12 @@ public class RustSupportSQLiteOpenHelper implements SupportSQLiteOpenHelper {
     }
 
     private RustSupportSQLiteDatabase createRustSupportSQLiteDatabase(boolean readOnly) {
-        BackendV1 backend = mBackendFactory.getBackend();
-        BackendUtils.openAnkiDroidCollection(backend, mConfiguration.name);
-        return new RustSupportSQLiteDatabase(backend, readOnly);
+        if (mConfiguration != null) {
+            BackendV1 backend = mBackendFactory.getBackend();
+            BackendUtils.openAnkiDroidCollection(backend, mConfiguration.name);
+            return new RustSupportSQLiteDatabase(backend, readOnly);
+        } else {
+            return new RustSupportSQLiteDatabase(mBackend, readOnly);
+        }
     }
 }

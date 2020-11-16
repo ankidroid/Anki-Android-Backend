@@ -65,6 +65,9 @@ public class RustSupportSQLiteDatabase implements SupportSQLiteDatabase {
     private boolean mOpen;
 
     public RustSupportSQLiteDatabase(BackendV1 backend, boolean readOnly) {
+        if (backend == null) {
+            throw new IllegalArgumentException("backend was null");
+        }
         this.sessionFactory = new SessionThreadLocal(backend);
         this.mReadOnly = readOnly;
         this.mOpen = true;

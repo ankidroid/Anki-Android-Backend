@@ -21,16 +21,24 @@ import android.database.sqlite.SQLiteDatabaseCorruptException;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteFullException;
 
+import androidx.annotation.Nullable;
+
 import java.util.Locale;
 
 import BackendProto.Backend;
 
 public class BackendException extends RuntimeException {
+    @Nullable
     private final Backend.BackendError mError;
 
     public BackendException(Backend.BackendError error)  {
         super(error.getLocalized());
         this.mError = error;
+    }
+
+    public BackendException(String message) {
+        super(message);
+        mError = null;
     }
 
     public static BackendException fromError(Backend.BackendError error) {
