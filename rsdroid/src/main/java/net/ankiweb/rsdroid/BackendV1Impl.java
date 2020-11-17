@@ -32,6 +32,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import BackendProto.Backend;
+import timber.log.Timber;
 
 /**
  * Do not use an instance of this class directly - it should be handled via BackendMutex
@@ -66,10 +67,17 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
         }
 
         if (mBackEndPointer == null) {
+            boolean isServer = false;
+            String langs = "en";
+            String localeFolderPath = "";
+
+            Timber.i("Opening rust backend. Server: %b. Langs: '%s', path: %s", isServer, langs, localeFolderPath);
+
             Backend.BackendInit.Builder builder = Backend.BackendInit.newBuilder()
-                    .setServer(false)
-                    .addPreferredLangs("en")
-                    .setLocaleFolderPath("");
+                    .setServer(isServer)
+                    .addPreferredLangs(langs)
+                    .setLocaleFolderPath(localeFolderPath);
+
             long backendPointer = NativeMethods.openBackend(builder.build().toByteArray());
 
             mBackEndPointer = new Pointer(backendPointer);
@@ -84,12 +92,15 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
 
     @Override
     public void close() {
+        Timber.i("Closing rust backend");
         if (mBackEndPointer != null) {
             try {
                 closeDatabase();
             } catch (BackendException ex) {
                 // Typically: CollectionNotOpen
+                Timber.w(ex, "Error while closing rust database");
             }
+            Timber.d("Executing close backend command");
             NativeMethods.closeBackend(mBackEndPointer.toJni());
         }
         this.mDisposed = true;
@@ -99,6 +110,7 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
         mCollectionPath = args.getCollectionPath();
         try {
             Pointer backendPointer = ensureBackend();
+            Timber.i("Opening Collection: '%s' '%s' '%s' '%s'", args.getCollectionPath(), args.getLogPath(), args.getMediaDbPath(), args.getMediaFolderPath());
             byte[] result = NativeMethods.openCollection(backendPointer.toJni(), args.toByteArray());
             Backend.Empty message = Backend.Empty.parseFrom(result);
             validateMessage(result, message);
@@ -127,6 +139,7 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
     @CheckResult
     public JSONArray fullQuery(String sql, @Nullable Object... args) {
         try {
+            Timber.i("Rust: SQL query: '%s'", sql);
             return fullQueryInternal(sql, args);
         } catch (JSONException e) {
             throw new RuntimeException(e);
@@ -164,6 +177,8 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
 
     public long insertForId(String sql, Object[] args) {
         try {
+            Timber.i("Rust: sql insert %s", sql);
+
             List<Object> asList = args == null ? new ArrayList<>() : Arrays.asList(args);
             JSONObject o = new JSONObject();
             o.put("sql", sql);
@@ -187,6 +202,8 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
 
     public int executeGetRowsAffected(String sql, Object[] bindArgs) {
         try {
+            Timber.i("Rust: executeGetRowsAffected %s", sql);
+
             List<Object> asList = bindArgs == null ? new ArrayList<>() : Arrays.asList(bindArgs);
             JSONObject o = new JSONObject();
             o.put("sql", sql);
@@ -223,6 +240,8 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
 
     private void performTransaction(String kind) {
         try {
+            Timber.i("Rust: transaction %s", kind);
+
             JSONObject o = new JSONObject();
 
             o.put("kind", kind);
@@ -246,6 +265,7 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
 
     @Override
     public String[] getColumnNames(String sql) {
+        Timber.i("Rust: getColumnNames %s", sql);
         return NativeMethods.getColumnNames(ensureBackend().toJni(), sql);
     }
 

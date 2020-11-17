@@ -47,6 +47,7 @@ dependencies {
     // Protobuf is part of the ABI, so include it as a compile/api dependency.
     api 'com.google.protobuf:protobuf-java:3.13.0'
     implementation 'androidx.sqlite:sqlite:2.1.0'
+    implementation 'com.jakewharton.timber:timber:4.7.1'
 
     testImplementation 'junit:junit:4.12'
     testImplementation "org.robolectric:robolectric:4.3.1"

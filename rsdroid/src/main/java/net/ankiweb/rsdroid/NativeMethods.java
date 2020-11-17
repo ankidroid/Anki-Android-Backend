@@ -6,6 +6,8 @@ import android.os.Build;
 import androidx.annotation.CheckResult;
 import androidx.annotation.Nullable;
 
+import timber.log.Timber;
+
 public class NativeMethods {
 
     private static boolean hasSetUp = false;
@@ -36,8 +38,14 @@ public class NativeMethods {
         hasSetUp = true;
     }
 
+    public static byte[] executeCommand(long backendPointer, final int command, byte[] args) {
+        Timber.i("ExecuteCommand: %s", net.ankiweb.rsdroid.RustBackendMethods.commandName(command));
+        return command(backendPointer, command, args);
+    }
+
     @CheckResult
-    static native byte[] command(long backendPointer, final int command, byte[] args);
+    private static native byte[] command(long backendPointer, final int command, byte[] args);
+
     @CheckResult
     static native long openBackend(byte[] data);
 

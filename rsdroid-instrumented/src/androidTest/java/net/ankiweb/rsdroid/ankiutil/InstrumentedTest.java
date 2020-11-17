@@ -18,6 +18,7 @@ package net.ankiweb.rsdroid.ankiutil;
 
 import android.content.Context;
 import android.os.Build;
+import android.util.Log;
 
 import androidx.test.platform.app.InstrumentationRegistry;
 
@@ -26,7 +27,23 @@ import net.ankiweb.rsdroid.BackendUtils;
 import net.ankiweb.rsdroid.BackendV1;
 import net.ankiweb.rsdroid.RustBackendFailedException;
 
+import org.junit.Before;
+
 public class InstrumentedTest {
+
+    static {
+        Log.e("InstrumentedTest", "Timber has been disabled.");
+    }
+
+    @Before
+    public void before() {
+        /*
+        Timber added 1 minute to the stress test (1m18 -> 2m30). Didn't seem worth it.
+        Timber.uprootAll();
+        Timber.plant(new Timber.DebugTree());
+        */
+    }
+
     protected String getAssetFilePath(String fileName) {
         try {
             return Shared.getTestFilePath(getContext(), fileName);

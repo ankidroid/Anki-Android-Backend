@@ -31,6 +31,8 @@ import org.junit.runner.RunWith;
 
 import java.io.IOException;
 
+import timber.log.Timber;
+
 @RunWith(AndroidJUnit4.class)
 public class BackendDisposalTests extends InstrumentedTest {
 
@@ -40,7 +42,7 @@ public class BackendDisposalTests extends InstrumentedTest {
     public void testDisposalDoesNotLeak() throws IOException {
         for (int i = 0; i < 10000; i++) {
 
-            Log.d("rsdroid", String.format("Iteration %d", i));
+            Timber.d("Iteration %d", i);
             try (BackendV1 backend = super.getBackend("initial_version_2_12_1.anki2")) {
                 SupportSQLiteDatabase db = new RustSupportSQLiteOpenHelper(backend).getWritableDatabase();
 

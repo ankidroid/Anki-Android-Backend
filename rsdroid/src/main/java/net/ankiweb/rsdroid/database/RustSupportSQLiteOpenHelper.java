@@ -25,6 +25,8 @@ import net.ankiweb.rsdroid.BackendFactory;
 import net.ankiweb.rsdroid.BackendUtils;
 import net.ankiweb.rsdroid.BackendV1;
 
+import timber.log.Timber;
+
 public class RustSupportSQLiteOpenHelper implements SupportSQLiteOpenHelper {
     @Nullable
     private final Configuration mConfiguration;
@@ -81,6 +83,7 @@ public class RustSupportSQLiteOpenHelper implements SupportSQLiteOpenHelper {
     }
 
     private RustSupportSQLiteDatabase createRustSupportSQLiteDatabase(boolean readOnly) {
+        Timber.d("createRustSupportSQLiteDatabase");
         if (mConfiguration != null) {
             BackendV1 backend = mBackendFactory.getBackend();
             BackendUtils.openAnkiDroidCollection(backend, mConfiguration.name);
