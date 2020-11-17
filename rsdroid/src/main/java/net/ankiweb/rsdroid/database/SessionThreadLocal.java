@@ -37,7 +37,7 @@ package net.ankiweb.rsdroid.database;
 import androidx.annotation.Nullable;
 
 public class SessionThreadLocal extends ThreadLocal<Session> {
-    private SQLHandler mBackend;
+    private final SQLHandler mBackend;
 
     public SessionThreadLocal(SQLHandler backend) {
         this.mBackend = backend;

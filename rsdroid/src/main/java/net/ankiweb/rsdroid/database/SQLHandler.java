@@ -18,8 +18,6 @@ package net.ankiweb.rsdroid.database;
 
 import org.json.JSONArray;
 
-import java.util.ArrayList;
-
 public interface SQLHandler {
     JSONArray fullQuery(String query, Object... bindArgs);
     int executeGetRowsAffected(String sql, Object... bindArgs);

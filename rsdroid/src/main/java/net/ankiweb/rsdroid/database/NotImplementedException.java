@@ -30,9 +30,4 @@ public class NotImplementedException extends RuntimeException {
     public static NotImplementedException todo() {
         return new NotImplementedException();
     }
-
-    /** A method which we should implement */
-    public static NotImplementedException todo(String message) {
-        return new NotImplementedException(message);
-    }
 }

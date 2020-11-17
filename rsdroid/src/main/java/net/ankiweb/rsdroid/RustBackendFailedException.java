@@ -27,6 +27,7 @@ public class RustBackendFailedException extends Exception {
         super(error);
     }
 
+    @SuppressWarnings({"unused", "RedundantSuppression"})
     public RustBackendFailedException(String message) {
         super(message);
     }

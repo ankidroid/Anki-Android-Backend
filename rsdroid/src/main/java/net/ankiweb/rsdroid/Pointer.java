@@ -1,7 +1,7 @@
 package net.ankiweb.rsdroid;
 
 public class Pointer {
-    private long mPointer;
+    private final long mPointer;
 
 
     public Pointer(long backendPointer) {

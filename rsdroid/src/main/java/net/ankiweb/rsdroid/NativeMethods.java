@@ -50,7 +50,6 @@ public class NativeMethods {
     static native long openBackend(byte[] data);
 
     @SuppressLint("CheckResult")
-    @SuppressWarnings("unused")
     static void execCommand(long backendPointer, final int command, byte[] args) {
         command(backendPointer, command, args);
     }

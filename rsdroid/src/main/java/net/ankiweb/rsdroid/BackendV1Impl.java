@@ -135,7 +135,6 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
         openAnkiDroidCollection(in);
     }
 
-    @SuppressWarnings("CharsetObjectCanBeUsed")
     @CheckResult
     public JSONArray fullQuery(String sql, @Nullable Object... args) {
         try {
@@ -155,7 +154,7 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
         o.put("args", new JSONArray(asList));
         o.put("first_row_only", false);
 
-        byte[] data = o.toString().getBytes(Charset.forName("UTF-8"));
+        byte[] data = jsonToBytes(o);
 
         Pointer backend = ensureBackend();
         byte[] result = NativeMethods.fullDatabaseCommand(backend.toJni(), data);
@@ -184,7 +183,7 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
             o.put("sql", sql);
             o.put("args", new JSONArray(asList));
 
-            byte[] data = o.toString().getBytes(Charset.forName("UTF-8"));
+            byte[] data = jsonToBytes(o);
 
             Pointer backend = ensureBackend();
             byte[] result = NativeMethods.sqlInsertForId(backend.toJni(), data);
@@ -209,7 +208,7 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
             o.put("sql", sql);
             o.put("args", new JSONArray(asList));
 
-            byte[] data = o.toString().getBytes(Charset.forName("UTF-8"));
+            byte[] data = jsonToBytes(o);
 
             Pointer backend = ensureBackend();
             byte[] result = NativeMethods.sqlQueryForAffected(backend.toJni(), data);
@@ -246,7 +245,7 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
 
             o.put("kind", kind);
 
-            byte[] data = o.toString().getBytes(Charset.forName("UTF-8"));
+            byte[] data = jsonToBytes(o);
 
             Pointer backend = ensureBackend();
             byte[] result = NativeMethods.fullDatabaseCommand(backend.toJni(), data);
@@ -277,5 +276,10 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
     @Override
     public String getPath() {
         return mCollectionPath;
+    }
+
+    @SuppressWarnings("CharsetObjectCanBeUsed")
+    private byte[] jsonToBytes(JSONObject o) {
+        return o.toString().getBytes(Charset.forName("UTF-8"));
     }
 }

@@ -21,7 +21,7 @@ import BackendProto.Backend;
 public class BackendUtils {
     /**
      *
-     * @throws android.database.sqlite.SQLiteDatabaseCorruptException
+     * @throws android.database.sqlite.SQLiteDatabaseCorruptException If database is corrupt
      */
     public static void openAnkiDroidCollection(BackendV1 backendV1, String path) {
         backendV1.openAnkiDroidCollection(Backend.OpenCollectionIn.newBuilder().setCollectionPath(path).build());

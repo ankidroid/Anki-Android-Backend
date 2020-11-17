@@ -28,6 +28,7 @@ import java.util.Locale;
 import BackendProto.Backend;
 
 public class BackendException extends RuntimeException {
+    @SuppressWarnings({"unused", "RedundantSuppression"})
     @Nullable
     private final Backend.BackendError mError;
 
@@ -72,15 +73,20 @@ public class BackendException extends RuntimeException {
         public RuntimeException toSQLiteException(String query) {
             String message = this.getLocalizedMessage();
 
+            if (message == null) {
+                String outMessage = String.format(Locale.ROOT, "Unknown error while compiling: \"%s\"", query);
+                throw new SQLiteException(outMessage, this);
+            }
+
             if (message.contains("ConstraintViolation")) {
                 throw new SQLiteConstraintException(message);
             } else if (message.contains("DiskFull")) {
                 throw new SQLiteFullException(message);
             } else if (message.contains("DatabaseCorrupt")) {
-                String outMessage = String.format(Locale.ROOT, "error while compiling: \"%s\": %s", query, getLocalizedMessage());
+                String outMessage = String.format(Locale.ROOT, "error while compiling: \"%s\": %s", query, message);
                 throw new SQLiteDatabaseCorruptException(outMessage);
             } else {
-                String outMessage = String.format(Locale.ROOT, "error while compiling: \"%s\": %s", query, getLocalizedMessage());
+                String outMessage = String.format(Locale.ROOT, "error while compiling: \"%s\": %s", query, message);
                 throw new SQLiteException(outMessage, this);
             }
         }

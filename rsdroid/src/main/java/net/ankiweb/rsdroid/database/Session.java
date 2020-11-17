@@ -40,8 +40,8 @@ import java.util.Stack;
 
 /** Handles transaction state management */
 public class Session implements SQLHandler {
-    private SQLHandler mBackend;
-    private Stack<SessionState> mSessions = new Stack<>();
+    private final SQLHandler mBackend;
+    private final Stack<SessionState> mSessions = new Stack<>();
 
     public Session(SQLHandler backend) {
         this.mBackend = backend;
@@ -65,7 +65,7 @@ public class Session implements SQLHandler {
 
     @Override
     public void rollbackTransaction() {
-        mBackend.rollbackTransaction();;
+        mBackend.rollbackTransaction();
     }
 
     @Override

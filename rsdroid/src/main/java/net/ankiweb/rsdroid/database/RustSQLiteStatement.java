@@ -21,15 +21,14 @@ import android.database.sqlite.SQLiteDoneException;
 
 import androidx.sqlite.db.SupportSQLiteStatement;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Set;
 
 public class RustSQLiteStatement implements SupportSQLiteStatement {
-    private RustSupportSQLiteDatabase mDatabase;
-    private String mSql;
+    private final RustSupportSQLiteDatabase mDatabase;
+    private final String mSql;
 
-    private HashMap<Integer, Object> mBindings = new HashMap<>();
+    private final HashMap<Integer, Object> mBindings = new HashMap<>();
 
     public RustSQLiteStatement(RustSupportSQLiteDatabase database, String sql) {
         mDatabase = database;
@@ -102,7 +101,7 @@ public class RustSQLiteStatement implements SupportSQLiteStatement {
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
 
     }
 

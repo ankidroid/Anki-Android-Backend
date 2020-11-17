@@ -20,8 +20,6 @@ import androidx.annotation.Nullable;
 
 import com.google.protobuf.ByteString;
 
-import net.ankiweb.rsdroid.database.SQLHandler;
-
 import org.json.JSONArray;
 
 import java.io.IOException;

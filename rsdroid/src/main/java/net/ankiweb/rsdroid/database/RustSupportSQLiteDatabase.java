@@ -49,7 +49,6 @@ import androidx.sqlite.db.SupportSQLiteStatement;
 
 import net.ankiweb.rsdroid.BackendV1;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -251,9 +250,9 @@ public class RustSupportSQLiteDatabase implements SupportSQLiteDatabase {
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         mOpen = false;
-        sessionFactory.get().closeDatabase();
+        getSession().closeDatabase();
     }
 
     /* Not part of interface */

@@ -26,7 +26,9 @@ import android.os.Bundle;
 
 /** Currently unused - less memory intensive cursor */
 public class RustSQLiteCursor implements Cursor {
+    @SuppressWarnings({"FieldCanBeLocal", "unused", "RedundantSuppression"})
     private final String mQuery;
+    @SuppressWarnings({"FieldCanBeLocal", "unused", "RedundantSuppression"})
     private final Object[] mBindArgs;
 
     private Integer mCount = null;

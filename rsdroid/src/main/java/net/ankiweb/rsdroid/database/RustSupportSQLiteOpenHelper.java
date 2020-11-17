@@ -54,8 +54,10 @@ public class RustSupportSQLiteOpenHelper implements SupportSQLiteOpenHelper {
     public String getDatabaseName() {
         if (mBackend != null) {
             return mBackend.getPath();
-        } else {
+        } else if (mConfiguration != null) {
             return mConfiguration.name;
+        } else {
+            throw new IllegalStateException("Class invalid: no config or backend");
         }
     }
 
@@ -82,7 +84,7 @@ public class RustSupportSQLiteOpenHelper implements SupportSQLiteOpenHelper {
 
     }
 
-    private RustSupportSQLiteDatabase createRustSupportSQLiteDatabase(boolean readOnly) {
+    private RustSupportSQLiteDatabase createRustSupportSQLiteDatabase(@SuppressWarnings("SameParameterValue") boolean readOnly) {
         Timber.d("createRustSupportSQLiteDatabase");
         if (mConfiguration != null) {
             BackendV1 backend = mBackendFactory.getBackend();

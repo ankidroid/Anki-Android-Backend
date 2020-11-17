@@ -25,7 +25,7 @@ import net.ankiweb.rsdroid.BackendFactory;
  * Implementation of {@link SupportSQLiteOpenHelper.Factory} using the Anki Desktop backend
  */
 public class RustSQLiteOpenHelperFactory implements SupportSQLiteOpenHelper.Factory {
-    private BackendFactory mBackendFactory;
+    private final BackendFactory mBackendFactory;
 
     public RustSQLiteOpenHelperFactory(BackendFactory mBackendFactory) {
         this.mBackendFactory = mBackendFactory;
