@@ -68,4 +68,6 @@ public class NativeMethods {
     @Nullable
     @CheckResult
     static native String[] getColumnNames(long backendPointer, String sql);
+
+    static native long closeBackend(long backendPointer);
 }

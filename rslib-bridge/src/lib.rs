@@ -29,7 +29,17 @@ pub unsafe extern "C" fn Java_net_ankiweb_rsdroid_NativeMethods_openBackend(
     Box::into_raw(Box::new(backend)) as jlong
 }
 
+#[no_mangle]
+pub unsafe extern "C" fn Java_net_ankiweb_rsdroid_NativeMethods_closeBackend(
+    env: JNIEnv,
+    _: JClass,
+    args: jlong) -> jlong {
 
+    let raw = args as *mut AnkiDroidBackend;
+    Box::from_raw(raw);
+
+    1
+}
 
 
 #[no_mangle]

@@ -24,6 +24,7 @@ import net.ankiweb.rsdroid.database.SQLHandler;
 
 import org.json.JSONArray;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -924,6 +925,26 @@ public class BackendMutex implements BackendV1 {
         try {
             mLock.lock();
             mBackend.openAnkiDroidCollection(args);
+        } finally {
+            mLock.unlock();
+        }
+    }
+
+    @Override
+    public boolean isOpen() {
+        try {
+            mLock.lock();
+            return mBackend.isOpen();
+        } finally {
+            mLock.unlock();
+        }
+    }
+
+    @Override
+    public void close() throws IOException {
+        try {
+            mLock.lock();
+            mBackend.close();
         } finally {
             mLock.unlock();
         }

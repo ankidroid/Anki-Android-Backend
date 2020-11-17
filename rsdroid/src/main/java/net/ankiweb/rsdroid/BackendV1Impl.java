@@ -25,6 +25,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Closeable;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,20 +37,34 @@ import BackendProto.Backend;
  * Do not use an instance of this class directly - it should be handled via BackendMutex
  * All public methods should be accessed via interface
  * */
-public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implements BackendV1 {
+public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implements BackendV1, Closeable {
 
     private Pointer mBackEndPointer = null;
     @Nullable
     private String mCollectionPath;
+    private boolean mDisposed;
 
     // intentionally package private - use BackendFactory
     BackendV1Impl() {
 
     }
 
+    /**
+     * Obtains a pointer to the Rust backend.
+     * This pointer is to a structure containing environment-level data such as the
+     * optional collection reference,
+     *
+     * Java is responsible for disposing of this pointer, or a memory leak will occur.
+     *
+     * TODO: This defines the locales, logging and translation files. We do not use these yet.
+     * */
     @Override
     @CheckResult
     public Pointer ensureBackend() {
+        if (mDisposed) {
+            throw new BackendException("Backend has been closed");
+        }
+
         if (mBackEndPointer == null) {
             Backend.BackendInit.Builder builder = Backend.BackendInit.newBuilder()
                     .setServer(false)
@@ -60,6 +75,24 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
             mBackEndPointer = new Pointer(backendPointer);
         }
         return mBackEndPointer;
+    }
+
+    @Override
+    public boolean isOpen() {
+        return mBackEndPointer != null;
+    }
+
+    @Override
+    public void close() {
+        if (mBackEndPointer != null) {
+            try {
+                closeDatabase();
+            } catch (BackendException ex) {
+                // Typically: CollectionNotOpen
+            }
+            NativeMethods.closeBackend(mBackEndPointer.toJni());
+        }
+        this.mDisposed = true;
     }
 
     public void openAnkiDroidCollection(Backend.OpenCollectionIn args) {
