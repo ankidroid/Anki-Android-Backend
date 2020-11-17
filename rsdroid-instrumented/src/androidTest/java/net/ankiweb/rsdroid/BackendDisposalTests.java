@@ -22,7 +22,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import net.ankiweb.rsdroid.ankiutil.InstrumentedTest;
-import net.ankiweb.rsdroid.ankiutil.RustDatabaseUtil;
+import net.ankiweb.rsdroid.ankiutil.DatabaseUtil;
 import net.ankiweb.rsdroid.database.RustSupportSQLiteOpenHelper;
 
 import org.junit.Ignore;
@@ -44,7 +44,7 @@ public class BackendDisposalTests extends InstrumentedTest {
             try (BackendV1 backend = super.getBackend("initial_version_2_12_1.anki2")) {
                 SupportSQLiteDatabase db = new RustSupportSQLiteOpenHelper(backend).getWritableDatabase();
 
-                int count = RustDatabaseUtil.queryScalar(db, "select count(*) from revlog");
+                int count = DatabaseUtil.queryScalar(db, "select count(*) from revlog");
             }
         }
     }

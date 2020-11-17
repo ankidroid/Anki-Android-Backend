@@ -20,12 +20,12 @@ import android.database.Cursor;
 
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
-public class RustDatabaseUtil {
-    public static int queryScalar(SupportSQLiteDatabase mDatabase, String query, Object... selectionArgs) {
+public class DatabaseUtil {
+    public static int queryScalar(SupportSQLiteDatabase database, String query, Object... selectionArgs) {
         Cursor cursor = null;
         int scalar;
         try {
-            cursor = mDatabase.query(query, selectionArgs);
+            cursor = database.query(query, selectionArgs);
             if (!cursor.moveToNext()) {
                 return 0;
             }

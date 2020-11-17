@@ -16,7 +16,7 @@
 
 package net.ankiweb.rsdroid;
 
-import net.ankiweb.rsdroid.ankiutil.RustDatabaseUtil;
+import net.ankiweb.rsdroid.ankiutil.DatabaseUtil;
 import net.ankiweb.rsdroid.database.testutils.DatabaseComparison;
 
 import org.junit.Test;
@@ -78,6 +78,6 @@ public class DatabaseTransactionTests extends DatabaseComparison {
     }
 
     private int countNums() {
-        return RustDatabaseUtil.queryScalar(mDatabase, "select count(*) from nums");
+        return DatabaseUtil.queryScalar(mDatabase, "select count(*) from nums");
     }
 }

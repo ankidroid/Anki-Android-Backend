@@ -22,7 +22,7 @@ import android.database.Cursor;
 import androidx.annotation.CheckResult;
 
 import net.ankiweb.rsdroid.ankiutil.InstrumentedTest;
-import net.ankiweb.rsdroid.ankiutil.RustDatabaseUtil;
+import net.ankiweb.rsdroid.ankiutil.DatabaseUtil;
 import net.ankiweb.rsdroid.database.RustSupportSQLiteDatabase;
 
 import org.junit.Test;
@@ -40,7 +40,7 @@ public class RustDatabaseIntegrationTests extends InstrumentedTest {
     public void testScalar() {
         RustSupportSQLiteDatabase database = getDatabase();
 
-        int returnValue = RustDatabaseUtil.queryScalar(database, "select 2");
+        int returnValue = DatabaseUtil.queryScalar(database, "select 2");
 
         assertThat(returnValue, is(2));
     }
@@ -49,7 +49,7 @@ public class RustDatabaseIntegrationTests extends InstrumentedTest {
     public void testArgs() {
         RustSupportSQLiteDatabase database = getDatabase();
 
-        int returnValue = RustDatabaseUtil.queryScalar(database, "select ?", 1);
+        int returnValue = DatabaseUtil.queryScalar(database, "select ?", 1);
 
         assertThat(returnValue, is(1));
     }
@@ -59,7 +59,7 @@ public class RustDatabaseIntegrationTests extends InstrumentedTest {
         // We really shouldn't pass in null here, but we do.
         RustSupportSQLiteDatabase database = getDatabase();
 
-        int returnValue = RustDatabaseUtil.queryScalar(database, "select 3", (Object[]) null);
+        int returnValue = DatabaseUtil.queryScalar(database, "select 3", (Object[]) null);
 
         assertThat(returnValue, is(3));
     }
@@ -68,7 +68,7 @@ public class RustDatabaseIntegrationTests extends InstrumentedTest {
     public void testNullArgValue() {
         RustSupportSQLiteDatabase database = getDatabase();
 
-        int returnValue = RustDatabaseUtil.queryScalar(database, "select 4", (Object) null);
+        int returnValue = DatabaseUtil.queryScalar(database, "select 4", (Object) null);
 
         assertThat(returnValue, is(3));
     }
@@ -78,7 +78,7 @@ public class RustDatabaseIntegrationTests extends InstrumentedTest {
         // now, we get into the nitty-gritty of SQLite
         RustSupportSQLiteDatabase database = getDatabase();
 
-        int returnValue = RustDatabaseUtil.queryScalar(database, "select null");
+        int returnValue = DatabaseUtil.queryScalar(database, "select null");
 
         assertThat(returnValue, is(0));
     }
@@ -88,7 +88,7 @@ public class RustDatabaseIntegrationTests extends InstrumentedTest {
         // now, we get into the nitty-gritty of SQLite
         RustSupportSQLiteDatabase database = getDatabase();
 
-        int returnValue = RustDatabaseUtil.queryScalar(database, "select null");
+        int returnValue = DatabaseUtil.queryScalar(database, "select null");
 
         assertThat(returnValue, is(0));
     }
@@ -136,7 +136,7 @@ public class RustDatabaseIntegrationTests extends InstrumentedTest {
         int ret2 = database.update("test", 0, values, "id <> 4", null);
         assertThat(ret2, is(2));
 
-        int result = RustDatabaseUtil.queryScalar(database, "select count(*) from test where id = 2");
+        int result = DatabaseUtil.queryScalar(database, "select count(*) from test where id = 2");
         assertThat(result, is(2));
     }
 
@@ -182,7 +182,7 @@ public class RustDatabaseIntegrationTests extends InstrumentedTest {
         }
 
         assertFalse("transaction should have ended", db.inTransaction());
-        assertThat(RustDatabaseUtil.queryScalar(db, "select count(*) from test"), is(1));
+        assertThat(DatabaseUtil.queryScalar(db, "select count(*) from test"), is(1));
     }
 
     @Test
@@ -207,7 +207,7 @@ public class RustDatabaseIntegrationTests extends InstrumentedTest {
         }
 
         assertFalse("transaction should be ended", db.inTransaction());
-        assertThat(RustDatabaseUtil.queryScalar(db, "select count(*) from test"), is(0));
+        assertThat(DatabaseUtil.queryScalar(db, "select count(*) from test"), is(0));
     }
 
 
