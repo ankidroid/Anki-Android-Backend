@@ -18,6 +18,8 @@ package net.ankiweb.rsdroid;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import net.ankiweb.rsdroid.ankiutil.InstrumentedTest;
+
 import org.json.JSONArray;
 import org.junit.Assert;
 import org.junit.Before;

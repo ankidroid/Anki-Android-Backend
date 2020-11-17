@@ -16,7 +16,7 @@
 
 package net.ankiweb.rsdroid.database.testutils;
 
-import net.ankiweb.rsdroid.Shared;
+import net.ankiweb.rsdroid.ankiutil.Shared;
 
 import org.hamcrest.Matchers;
 import org.junit.Test;

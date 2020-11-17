@@ -14,12 +14,17 @@
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.ankiweb.rsdroid;
+package net.ankiweb.rsdroid.ankiutil;
 
 import android.content.Context;
 import android.os.Build;
 
 import androidx.test.platform.app.InstrumentationRegistry;
+
+import net.ankiweb.rsdroid.BackendFactory;
+import net.ankiweb.rsdroid.BackendUtils;
+import net.ankiweb.rsdroid.BackendV1;
+import net.ankiweb.rsdroid.RustBackendFailedException;
 
 public class InstrumentedTest {
     protected String getAssetFilePath(String fileName) {

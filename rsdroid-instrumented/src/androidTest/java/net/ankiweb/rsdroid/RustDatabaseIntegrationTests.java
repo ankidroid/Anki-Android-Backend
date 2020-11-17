@@ -21,6 +21,8 @@ import android.database.Cursor;
 
 import androidx.annotation.CheckResult;
 
+import net.ankiweb.rsdroid.ankiutil.InstrumentedTest;
+import net.ankiweb.rsdroid.ankiutil.RustDatabaseUtil;
 import net.ankiweb.rsdroid.database.RustSupportSQLiteDatabase;
 
 import org.junit.Test;

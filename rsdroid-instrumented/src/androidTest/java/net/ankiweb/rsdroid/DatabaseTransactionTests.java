@@ -16,6 +16,7 @@
 
 package net.ankiweb.rsdroid;
 
+import net.ankiweb.rsdroid.ankiutil.RustDatabaseUtil;
 import net.ankiweb.rsdroid.database.testutils.DatabaseComparison;
 
 import org.junit.Test;

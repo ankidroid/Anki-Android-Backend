@@ -22,8 +22,7 @@ import androidx.sqlite.db.SupportSQLiteOpenHelper;
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory;
 
 import net.ankiweb.rsdroid.BackendFactory;
-import net.ankiweb.rsdroid.BackendUtils;
-import net.ankiweb.rsdroid.InstrumentedTest;
+import net.ankiweb.rsdroid.ankiutil.InstrumentedTest;
 import net.ankiweb.rsdroid.RustBackendFailedException;
 import net.ankiweb.rsdroid.database.RustSQLiteOpenHelperFactory;
 

@@ -21,6 +21,8 @@ import android.util.Log;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import net.ankiweb.rsdroid.ankiutil.InstrumentedTest;
+import net.ankiweb.rsdroid.ankiutil.RustDatabaseUtil;
 import net.ankiweb.rsdroid.database.RustSupportSQLiteOpenHelper;
 
 import org.junit.Ignore;
