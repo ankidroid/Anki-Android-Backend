@@ -46,6 +46,10 @@ public class BackendException extends RuntimeException {
         if (error.hasDbError()) {
             return new BackendDbException(error);
         }
+        // This should have produced a hasFatalError property?
+        if (error.getValueCase() == Backend.BackendError.ValueCase.FATAL_ERROR) {
+            throw new BackendFatalError(error.getFatalError());
+        }
 
         return new BackendException(error);
     }
