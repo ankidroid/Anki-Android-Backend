@@ -3,6 +3,9 @@ buildscript {
     repositories {
         google()
         jcenter()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
     }
     dependencies {
         classpath "com.android.tools.build:gradle:4.0.1"
@@ -11,8 +14,8 @@ buildscript {
         // in the individual module build.gradle files
         classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.12'
 
-        // classpath 'gradle.plugin.org.mozilla.rust-android-gradle:plugin:0.8.3'
-        classpath files("C:\\GitHub\\rust-android-gradle\\plugin\\build\\libs\\plugin-0.9.0.jar")
+        // Remove this and use the official rust version after we target API 21
+        classpath "gradle.plugin.io.github.david-allison-1.rust-android-gradle:plugin:0.9.0"
     }
 }
 

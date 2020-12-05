@@ -28,7 +28,8 @@ android {
     }
 }
 
-apply plugin: 'org.mozilla.rust-android-gradle.rust-android'
+// Consider upgrade to DSL: https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
+apply plugin: "io.github.david-allison-1.rust-android-gradle.rust-android"
 
 cargo {
     module = "../rslib-bridge"
