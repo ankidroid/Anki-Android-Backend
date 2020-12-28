@@ -5,6 +5,7 @@ apply plugin: 'com.google.protobuf'
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.1"
+    ndkVersion "21.3.6528147" // Older version, but used by GitHub actions
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8

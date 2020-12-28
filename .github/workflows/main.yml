@@ -18,6 +18,12 @@ jobs:
     - uses: actions/checkout@v2
       with:
           submodules: 'true' # anki is a submodule
+          
+    # We specify 21.3.6528147 which is installed already, so this is not necessary
+    # - name: Install NDK
+    #  uses: nttld/setup-ndk@v1
+    #  with:
+    #      ndk-version: '21.3.6528147' # currently installed on GitHub Actions
 
     # install cargo
     - name: Install Rust
