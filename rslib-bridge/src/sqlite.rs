@@ -94,7 +94,10 @@ pub(crate) fn open_or_create_no_update(path: &Path, i18n: &I18n, server: bool) -
     let db = anki::storage::sqlite::open_or_create_collection_db(path)?;
 
     let (create, ver) = anki::storage::sqlite::schema_version(&db)?;
-    db.pragma_update(None, "journal_mode", &"wal")?;
+    // Requery uses "TRUNCATE" by default if WAL is not enabled.
+    // We copy this behaviour here. See https://github.com/ankidroid/Anki-Android/pull/7977 for
+    // analysis. We may be able to enable WAL at a later time.
+    db.pragma_update(None, "journal_mode", &"TRUNCATE")?;
 
     const SCHEMA_ANKIDROID_VERSION: u8 = 11;
     let err = match ver {
