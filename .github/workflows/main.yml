@@ -16,6 +16,8 @@ jobs:
       # ANDROID_HOME: /usr/lib/android/sdk
     steps:
     - uses: actions/checkout@v2
+      with:
+          submodules: 'true' # anki is a submodule
 
     # install cargo
     - name: Install Rust
