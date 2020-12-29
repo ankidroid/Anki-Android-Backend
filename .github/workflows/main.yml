@@ -18,7 +18,7 @@ jobs:
     - uses: actions/checkout@v2
       with:
           submodules: 'true' # anki is a submodule
-          
+
     # i18n did not seem to be handled
     - name: Init i18n submodule
       run: git submodule update --init --recursive
@@ -44,6 +44,12 @@ jobs:
    # Attempt to get "act" working on a local VM
    # - name: Install Android SDK
    #   run: sudo apt update && sudo apt install android-sdk
-      
+
+    - name: Install google protobuf compiler
+      run: >
+              sudo apt-get install python3-setuptools &&
+              pip3 install protobuf-compiler &&
+              .github/scripts/protoc_gen_deps.py
+
     - name: Build
       run: ./gradlew clean assembleDebug -DtestBuildType=debug -Dorg.gradle.daemon=false -Dorg.gradle.console=plain # assembleAndroidTest 

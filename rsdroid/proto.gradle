@@ -1,3 +1,5 @@
+import org.gradle.internal.os.OperatingSystem
+
 def protobufFolder = new File(rootDir, "anki/proto").getAbsolutePath()
 
 android {
@@ -16,9 +18,15 @@ android {
 }
 
 protobuf {
+    String protocGenPath = OperatingSystem.current().isWindows() ? 'tools\\protoc-gen\\protoc-gen.bat' : 'tools/protoc-gen/protoc-gen.sh'
+    File f = new File(project.rootDir, protocGenPath)
+    if (!f.exists()) {
+        throw new IllegalStateException("'${f.absolutePath}' does not exist")
+    }
+    System.out.println("protoc-gen: '${f.absolutePath}'")
     plugins {
         // Define a plugin with name 'anki'.
-        anki { path = 'tools\\protoc-gen\\protoc-gen.bat' }
+        anki { path = f.absolutePath }
     }
     protoc {
         artifact = 'com.google.protobuf:protoc:3.8.0'

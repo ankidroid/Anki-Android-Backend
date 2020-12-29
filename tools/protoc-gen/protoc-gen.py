@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Generates BackendService.java from backend.proto
 # This is the serialization mechanism/calling conventions for protobufs between rslib and rsdroid
