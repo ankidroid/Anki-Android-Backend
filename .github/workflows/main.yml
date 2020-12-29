@@ -19,6 +19,10 @@ jobs:
       with:
           submodules: 'true' # anki is a submodule
           
+    # i18n did not seem to be handled
+    - name: Init i18n submodule
+      run: git submodule update --init --recursive
+          
     # We specify 21.3.6528147 which is installed already, so this is not necessary
     # - name: Install NDK
     #  uses: nttld/setup-ndk@v1
