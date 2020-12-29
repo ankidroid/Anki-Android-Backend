@@ -13,7 +13,7 @@ android {
     }
 
     defaultConfig {
-        minSdkVersion 16
+        minSdkVersion 21
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
@@ -30,14 +30,14 @@ android {
 }
 
 // Consider upgrade to DSL: https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
-apply plugin: "io.github.david-allison-1.rust-android-gradle.rust-android"
+apply plugin: "org.mozilla.rust-android-gradle.rust-android"
 
 cargo {
     module = "../rslib-bridge"
     libname = "rsdroid"
     targets = ["arm", "x86"]
     profile = 'release'
-    apiLevel = 16
+    apiLevel = 21
     verbose = true
 }
 
