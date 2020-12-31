@@ -58,6 +58,8 @@ def toWindowsCommandLine(String command) {
 }
 
 def toCommandLine(Platform targetPlatform) {
+    // the --out-dir flag requires -Z unstable-options
+    // -Z unstable-options requires a 'nightly' toolchain
     def standardArg = "cargo build --release -Z unstable-options --features no-android"
     def assetsPath = new File("${project.sourceSets.main.java.srcDirs[0]}/../../../assets").getCanonicalPath()
     def outDir = "--out-dir /mnt/c/GitHub/Rust-Test/rsdroid-testing/assets"
