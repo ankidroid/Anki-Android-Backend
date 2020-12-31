@@ -1,0 +1,35 @@
+name: Build JAR for Robolectric Testing
+on: push
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+          submodules: 'true' # anki is a submodule
+
+    # i18n did not seem to be handled
+    - name: Init i18n submodule
+      run: git submodule update --init --recursive
+
+    # install cargo
+    - name: Install Rust
+      uses: actions-rs/toolchain@v1.0.6
+      with:
+        toolchain: 1.45.1 # arbitrary - known working version
+        override: true
+        components: rustfmt, clippy
+
+    # actions-rs only accepts "target" (although a "targets" param to be added in v2). We need 7 targets.
+    - name: Install Rust Targets
+      run: .github/scripts/install_rust_robolectric_targets.sh
+
+    - name: Install google protobuf compiler
+      run: >
+              sudo apt-get install python3-setuptools &&
+              pip3 install protobuf-compiler &&
+              .github/scripts/protoc_gen_deps.py
+
+    - name: Build JAR
+      run: ./gradlew clean rsdroid-testing:build -DtestBuildType=debug -Dorg.gradle.daemon=false -Dorg.gradle.console=plain
