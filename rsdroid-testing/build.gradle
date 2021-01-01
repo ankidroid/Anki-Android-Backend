@@ -26,7 +26,9 @@ jar {
     sourceSets {
         main {
             resources {
-                srcDirs "assets"
+                def assetsPath = new File("${project.rootDir}", "rsdroid-testing/assets")
+                println "assets path: ${assetsPath.absolutePath}"
+                srcDirs assetsPath.absolutePath
             }
         }
     }
@@ -61,7 +63,7 @@ def toCommandLine(Platform targetPlatform) {
     // the --out-dir flag requires -Z unstable-options
     // -Z unstable-options requires a 'nightly' toolchain
     // TODO: Explain how to select the version
-    def standardArg = "cargo build --release -Z unstable-options --features no-android"
+    def standardArg = "cargo  +nightly build --release -Z unstable-options --features no-android"
     def assetsPath = new File("${project.sourceSets.main.java.srcDirs[0]}/../../../assets").getCanonicalPath()
 
     // TODO: This may need to be turned into a unix style path for Windows:
@@ -88,18 +90,35 @@ task preBuildWindows(type: Exec) {
 }
 
 task preBuildMac(type: Exec) {
+    if (!org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
+        return
+    }
     workingDir(getInputDir())
+    def macCC = System.getenv("ANKIDROID_MACOS_CC")
+    println "ANKIDROID_MACOS_CC: ${System.getenv("ANKIDROID_MACOS_CC")}"
+    if (macCC == null || macCC == "") {
+        throw new IllegalStateException("ANKIDROID_MACOS_CC not set.\n" +
+                "Please install a MacOS toolchain.\n" +
+                "See folder: rsdroid-testing/tools and https://wapl.es/rust/2019/02/17/rust-cross-compile-linux-to-macos.html")
+    }
+
     commandLine(toCommandLine(Platform.MACOS))
 }
+
 task preBuildLinux(type: Exec) {
     workingDir(getInputDir())
     commandLine(toCommandLine(Platform.LINUX))
 }
 
 // TODO: check for cargo
-// check for osxcross compiler and linker
 // check for targets: x86_64-apple-darwin, x86_64-pc-windows-gnu, TODO: Linux
 
-build.dependsOn preBuildWindows
-build.dependsOn preBuildMac
-build.dependsOn preBuildLinux
+processResources.dependsOn preBuildWindows
+processResources.dependsOn preBuildLinux
+
+if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
+    // due to restrictions on downloading the MacOS SDK, we can only build for MacOS on MacOS
+    // > Install a reasonable number of copies of the Apple Software on Apple-branded computers
+    // https://www.apple.com/legal/sla/docs/xcode.pdf
+    processResources.dependsOn preBuildMac
+}
