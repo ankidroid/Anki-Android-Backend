@@ -2,7 +2,7 @@ name: Build JAR for Robolectric Testing
 on: push
 
 jobs:
-  test:
+  build:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2
@@ -30,6 +30,7 @@ jobs:
 
     - name: Install x86_64-unknown-linux-gnu
       run: >
+           brew tap SergioBenitez/osxct &&
            brew install x86_64-unknown-linux-gnu &&
            x86_64-unknown-linux-gnu-gcc -v
 
@@ -51,3 +52,34 @@ jobs:
         name: rsdroid-testing
         if-no-files-found: error
         path: rsdroid-testing/build/libs/rsdroid-testing.jar
+
+  test:
+    needs: build
+    runs-on: ${{matrix.os}}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+      fail-fast: false
+    steps:
+    - uses: actions/checkout@v2
+      with:
+          submodules: 'true' # we need the .proto files, but not the i18n files in the recursive submodule (yet).
+      
+    # I don't think this is necessary, before we got:
+    #    > protoc: stdout: . stderr: fluent.proto: File not found.
+    #    backend.proto:3:1: Import "fluent.proto" was not found or had errors.
+    #    backend.proto:658:5: "FluentString" is not defined."
+    - name: Init i18n submodule
+      run: git submodule update --init --recursive
+      
+    - uses: actions/download-artifact@v2
+      name: Download Artifact
+      with:
+        name: rsdroid-testing
+        path: rsdroid-testing/build/libs
+    
+    - name: Run Tests
+    # jar: disable building the jar (as we copied it from the artifact)
+    # cargoBuild: disable as we're using the jar and do not need the Android libraries
+    # TODO: We need to ensure that tests are executed
+      run: ./gradlew rsdroid:test -x jar -x cargoBuildArm -x cargoBuildX86
