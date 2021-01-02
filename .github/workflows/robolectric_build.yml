@@ -1,10 +1,20 @@
 name: Build JAR for Robolectric Testing
-on: push
+on: workflow_dispatch
 
 jobs:
   build:
     runs-on: macos-latest
     steps:
+#    - name: Configure Mac OS environment variables
+        # gnu tar for cache issue: https://github.com/actions/cache/issues/403
+        # error[E0463]: can't find crate for `serde_derive` which `serde` depends on
+        # --> /Users/runner/work/Anki-Android-Backend/Anki-Android-Backend/anki/rslib/src/decks/schema11.rs:30:9
+
+        # ::add-path has now been deprectated
+        # echo "::add-path::/usr/local/opt/gnu-tar/libexec/gnubin"
+
+#      run: |
+#          echo "/usr/local/opt/gnu-tar/libexec/gnubin" >> $GITHUB_PATH
     - uses: actions/checkout@v2
       with:
           submodules: 'true' # anki is a submodule
@@ -12,6 +22,16 @@ jobs:
     # i18n did not seem to be handled
     - name: Init i18n submodule
       run: git submodule update --init --recursive
+
+# TODO: Needs investigation. This seemed to work before adding gnubin/v1, just with serde broken.
+# Now it doesn't seem to be picked up by rust.
+#    - name: Cache Rust dependencies
+#      uses: actions/cache@v1.0.1
+#      with:
+#        path: rslib-bridge/target
+#        key: ${{ runner.OS }}-build-v1-${{ hashFiles('**/Cargo.lock') }}
+#        restore-keys: |
+#          ${{ runner.OS }}-build-v1-
 
     # install cargo
     - name: Install Rust
@@ -29,29 +49,36 @@ jobs:
       run: brew install mingw-w64 && x86_64-w64-mingw32-gcc -v
 
     - name: Install x86_64-unknown-linux-gnu
-      run: >
-           brew tap SergioBenitez/osxct &&
-           brew install x86_64-unknown-linux-gnu &&
+      run: |
+           brew tap SergioBenitez/osxct
+           brew install x86_64-unknown-linux-gnu
            x86_64-unknown-linux-gnu-gcc -v
 
     - name: Build JAR
-      run: >
-              export ANKIDROID_LINUX_CC=x86_64-unknown-linux-gnu-gcc &&
-              export ANKIDROID_MACOS_CC=cc &&
+      run: |
+              export ANKIDROID_LINUX_CC=x86_64-unknown-linux-gnu-gcc
+              export ANKIDROID_MACOS_CC=cc
               ./gradlew clean rsdroid-testing:build rsdroid-testing:build -Dorg.gradle.project.macCC=$ANKIDROID_MACOS_CC -DtestBuildType=debug -Dorg.gradle.daemon=false -Dorg.gradle.console=plain
-              
+
     - name: Check Compiled Libraries
       run: >
               cd rsdroid-testing/assets &&
               ../../.github/scripts/check_robolectric_assets.sh
-              
-              
+
+
     - name: Upload rsdroid-testing JAR as artifact
       uses: actions/upload-artifact@v2
       with:
         name: rsdroid-testing
         if-no-files-found: error
         path: rsdroid-testing/build/libs/rsdroid-testing.jar
+
+    - name: Upload fluent.proto
+      uses: actions/upload-artifact@v2
+      with:
+        name: anki-proto
+        if-no-files-found: error
+        path: anki/proto/
 
   test:
     needs: build
@@ -64,22 +91,66 @@ jobs:
     - uses: actions/checkout@v2
       with:
           submodules: 'true' # we need the .proto files, but not the i18n files in the recursive submodule (yet).
-      
-    # I don't think this is necessary, before we got:
-    #    > protoc: stdout: . stderr: fluent.proto: File not found.
-    #    backend.proto:3:1: Import "fluent.proto" was not found or had errors.
-    #    backend.proto:658:5: "FluentString" is not defined."
-    - name: Init i18n submodule
-      run: git submodule update --init --recursive
-      
+
     - uses: actions/download-artifact@v2
       name: Download Artifact
       with:
         name: rsdroid-testing
         path: rsdroid-testing/build/libs
-    
+
+    - uses: actions/download-artifact@v2
+      name: Download fluent.proto
+      with:
+        name: anki-proto
+        path: anki/proto/
+
+    - name: Ensure fluent.proto exists
+      if: matrix.os != 'windows-latest'
+      run: |
+              if [ ! -f anki/proto/fluent.proto ]; then
+                  echo "fluent.proto not generated"
+                  exit 1
+              fi
+
+    - name: Install Pyenv
+      if: matrix.os == 'macos-latest'
+      run: .github/scripts/macos_install_pyenv.sh
+
+    # pyenv requires bash_profile, so we need the -l (login) arg for bash from now on on macOS
+    # TODO: find a better way to disambiguate the "shell" variable - we need it for bash being laucnhed with --noprofile while using pyenv
+    - name: Setup Pyenv
+      if: matrix.os == 'macos-latest'
+      shell: bash -l {0}
+      run: |
+             pyenv install 3.7.9
+             pyenv shell 3.7.9
+             pyenv global 3.7.9
+
+    - name: Install Python Setuptools
+      if: matrix.os == 'ubuntu-latest'
+      run: sudo apt-get install python3-setuptools
+
+    - name: Install & Test Protobuf Compiler
+      if: matrix.os != 'windows-latest'
+      shell: bash -l {0} 
+      run: |
+              pip3 install protobuf
+              pip3 install protobuf-compiler
+              python3 .github/scripts/protoc_gen_deps.py
+              
+    - name: Install & Test Protobuf Compiler (win)
+      if: matrix.os == 'windows-latest'
+      run: |
+              Set-Alias -Name "python3" -Value "python"
+              pip3 install protobuf
+              pip3 install protobuf-compiler
+              python3 .github/scripts/protoc_gen_deps.py
+              
     - name: Run Tests
-    # jar: disable building the jar (as we copied it from the artifact)
-    # cargoBuild: disable as we're using the jar and do not need the Android libraries
-    # TODO: We need to ensure that tests are executed
+      if: matrix.os != 'windows-latest'
+      shell: bash -l {0} 
+      run: ./gradlew rsdroid:test -x jar -x cargoBuildArm -x cargoBuildX86
+      
+    - name: Run Tests (win)
+      if: matrix.os == 'windows-latest'
       run: ./gradlew rsdroid:test -x jar -x cargoBuildArm -x cargoBuildX86
