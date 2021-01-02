@@ -3,3 +3,7 @@
 # So cross-compilation is only required for Linux/Windows, which have more sensible toolchains
 # linker = "x86_64-apple-darwin14-clang"
 # ar = "x86_64-apple-darwin14-ar"
+
+[target.x86_64-unknown-linux-gnu]
+linker = "x86_64-unknown-linux-gnu-gcc"
+ar = "x86_64-unknown-linux-gnu-ar"

@@ -28,6 +28,11 @@ jobs:
     #  uses: nttld/setup-ndk@v1
     #  with:
     #      ndk-version: '21.3.6528147' # currently installed on GitHub Actions
+    
+    - name: Install linker
+      run: |
+              sudo ln -s /usr/bin/cc /usr/local/bin/x86_64-unknown-linux-gnu-gcc
+              x86_64-unknown-linux-gnu-gcc -v
 
     # install cargo
     - name: Install Rust

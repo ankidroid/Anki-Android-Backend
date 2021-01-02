@@ -75,7 +75,7 @@ def toCommandLine(Platform targetPlatform) {
     System.out.println(assetsPath)
     def mainArg = standardArg + " " + outDir
     switch (targetPlatform) {
-        case Platform.LINUX: return toWindowsCommandLine("${mainArg}")
+        case Platform.LINUX: return toWindowsCommandLine("CC=\$ANKIDROID_LINUX_CC ${mainArg} --target x86_64-unknown-linux-gnu")
         case Platform.MACOS:
             /// x86_64-apple-darwin14-cc
             return toWindowsCommandLine("CC=\$ANKIDROID_MACOS_CC ${mainArg} --target x86_64-apple-darwin")
@@ -92,16 +92,17 @@ task preBuildWindows(type: Exec) {
 task preBuildMac(type: Exec) {
     if (!org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
         return
+
+/*        def macCC = System.getenv("ANKIDROID_MACOS_CC")
+        println "ANKIDROID_MACOS_CC: ${System.getenv("ANKIDROID_MACOS_CC")}"
+        if (macCC == null || macCC == "") {
+            throw new IllegalStateException("ANKIDROID_MACOS_CC not set.\n" +
+                    "Please install a MacOS toolchain.\n" +
+                    "See folder: rsdroid-testing/tools and https://wapl.es/rust/2019/02/17/rust-cross-compile-linux-to-macos.html")
+        }*/
+
     }
     workingDir(getInputDir())
-    def macCC = System.getenv("ANKIDROID_MACOS_CC")
-    println "ANKIDROID_MACOS_CC: ${System.getenv("ANKIDROID_MACOS_CC")}"
-    if (macCC == null || macCC == "") {
-        throw new IllegalStateException("ANKIDROID_MACOS_CC not set.\n" +
-                "Please install a MacOS toolchain.\n" +
-                "See folder: rsdroid-testing/tools and https://wapl.es/rust/2019/02/17/rust-cross-compile-linux-to-macos.html")
-    }
-
     commandLine(toCommandLine(Platform.MACOS))
 }
 
