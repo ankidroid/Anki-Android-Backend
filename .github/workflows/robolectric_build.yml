@@ -41,10 +41,11 @@ jobs:
               export ANKIDROID_MACOS_CC=cc &&
               ./gradlew clean rsdroid-testing:build rsdroid-testing:build -Dorg.gradle.project.macCC=$ANKIDROID_MACOS_CC -DtestBuildType=debug -Dorg.gradle.daemon=false -Dorg.gradle.console=plain
               
-    - name: List compiled assets
+    - name: Check Compiled Libraries
       run: >
               cd rsdroid-testing/assets &&
-              ls -l
+              ../../.github/scripts/check_robolectric_assets.sh
+              
               
     - name: Upload rsdroid-testing JAR as artifact
       uses: actions/upload-artifact@v2
