@@ -1,5 +1,5 @@
 name: CI
-on: push
+on: workflow_dispatch
 
 # Some of the commands here were added to attempt to get a build on a local Ubuntu VirtualBox
 # using https://github.com/nektos/act/

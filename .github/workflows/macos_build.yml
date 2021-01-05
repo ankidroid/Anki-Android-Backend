@@ -1,0 +1,48 @@
+name: rsdroid (macOS)
+on: push
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+          submodules: 'true' # anki is a submodule
+
+    # i18n did not seem to be handled
+    - name: Init i18n submodule
+      run: git submodule update --init --recursive
+
+    - name: Install Rust
+      uses: actions-rs/toolchain@v1.0.6
+      with:
+        toolchain: 1.45.1 # arbitrary - known working version
+        override: true
+        components: rustfmt, clippy
+
+    # actions-rs only accepts "target" (although a "targets" param to be added in v2). We need 7 targets.
+    - name: Install Rust Targets
+      run: .github/scripts/install_rust_targets.sh
+
+    - name: Install Pyenv
+      run: .github/scripts/macos_install_pyenv.sh
+
+    # pyenv requires bash_profile, so we need the -l (login) arg for bash from now on on macOS
+    - name: Setup Pyenv
+      shell: bash -l {0}
+      run: |
+             pyenv install 3.7.9
+             pyenv shell 3.7.9
+             pyenv global 3.7.9
+
+
+    - name: Install & Test Protobuf Compiler
+      shell: bash -l {0} 
+      run: |
+              pip3 install protobuf
+              pip3 install protobuf-compiler
+              python3 .github/scripts/protoc_gen_deps.py
+
+    - name: Build
+      shell: bash -l {0}
+      run: ./gradlew clean assembleDebug -DtestBuildType=debug -Dorg.gradle.daemon=false -Dorg.gradle.console=plain # assembleAndroidTest 
