@@ -1,0 +1,73 @@
+name: rsdroid (Windows)
+on: push
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    
+    # bzip2-sys does not build when the value of CC_armv7-linux-androideabi contains a space
+    # Setting this variable is a pain, as it contains a dash
+    # It's easier to just move the directory and fix the environment variables to point to the new NDK
+    # we change Program Files (x86) to "ProgramFiles"
+    # environment variables were obtained by "shell: cmd, run: env"
+    # TODO: Move the setting of environment variables here (permanently)
+    - name: Move SDK to directory with no spaces
+      run: |
+             New-Item -ItemType directory -Path 'C:\ProgramFiles\Android'
+
+             Get-ChildItem 'C:\Program Files (x86)\Android\android-sdk'
+
+             Move-Item -Path 'C:\Program Files (x86)\Android\android-sdk' -Destination 'C:\ProgramFiles\Android' -ErrorAction Stop -Force
+
+             Get-ChildItem 'C:\ProgramFiles\Android\android-sdk'
+
+             $directoryInfo = Get-ChildItem 'C:\ProgramFiles\Android\android-sdk\ndk-bundle' | Measure-Object
+             if ( $directoryInfo.count -eq 0 ) {  exit 1 }
+
+
+    - name: Debug Env
+      run: |
+            $Env:ANDROID_HOME
+      
+    - uses: actions/checkout@v2
+      with:
+          submodules: 'true' # anki is a submodule
+    
+    # i18n did not seem to be handled
+    - name: Init i18n submodule
+      run: git submodule update --init --recursive
+
+    - name: Install Rust
+      uses: actions-rs/toolchain@v1.0.6
+      with:
+        toolchain: 1.45.1 # arbitrary - known working version
+        override: true
+        components: rustfmt, clippy
+
+    # actions-rs only accepts "target" (although a "targets" param to be added in v2). We need 4 targets.
+    - name: Install Rust Targets
+      run: .github/scripts/install_rust_targets.sh
+
+    - name: Install & Test Protobuf Compiler
+      run: |
+              Set-Alias -Name "python3" -Value "python"
+              pip3 install protobuf
+              pip3 install protobuf-compiler
+              python3 .github/scripts/protoc_gen_deps.py
+
+    # -Dorg.gradle.daemon=false has been removed
+    # -Dorg.gradle.console=plain has been removed
+    #      env:
+    #     ANDROID_HOME: "C:\\ProgramFiles\\Android\\android-sdk"
+    #     ANDROID_NDK_HOME: "C:\\ProgramFiles\\Android\\android-sdk\\ndk-bundle"
+    #     ANDROID_NDK_PATH: "C:\\ProgramFiles\\Android\\android-sdk\\ndk-bundle"
+    #     ANDROID_SDK_ROOT: "C:\\ProgramFiles\\Android\\android-sdk"
+    - name: Build
+      run: |
+             $Env:ANDROID_HOME = "C:\ProgramFiles\Android\android-sdk"
+             $Env:ANDROID_NDK_HOME =  "C:\ProgramFiles\Android\android-sdk\ndk-bundle"
+             $Env:ANDROID_NDK_PATH =  "C:\ProgramFiles\Android\android-sdk\ndk-bundle"
+             $Env:ANDROID_SDK_ROOT =  "C:\ProgramFiles\Android\android-sdk"
+             $env:ANDROID_HOME
+             ./gradlew clean assembleDebug -DtestBuildType=debug # assembleAndroidTest
