@@ -1,0 +1,38 @@
+# Many of our rust dependencies won't build for Android on Windows if the NDK path contains a space
+# This CI should list the issues that occur so we can iteratively fix them downstream
+name: rsdroid (Windows - Path with spaces)
+on: workflow_dispatch
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    
+    - uses: actions/checkout@v2
+      with:
+          submodules: 'true' # anki is a submodule
+    
+    # i18n did not seem to be handled
+    - name: Init i18n submodule
+      run: git submodule update --init --recursive
+
+    - name: Install Rust
+      uses: actions-rs/toolchain@v1.0.6
+      with:
+        toolchain: 1.45.1 # arbitrary - known working version
+        override: true
+        components: rustfmt, clippy
+
+    # actions-rs only accepts "target" (although a "targets" param to be added in v2). We need 4 targets.
+    - name: Install Rust Targets
+      run: .github/scripts/install_rust_targets.sh
+
+    - name: Install & Test Protobuf Compiler
+      run: |
+              Set-Alias -Name "python3" -Value "python"
+              pip3 install protobuf
+              pip3 install protobuf-compiler
+              python3 .github/scripts/protoc_gen_deps.py
+
+    - name: Build
+      run: ./gradlew clean assembleDebug -DtestBuildType=debug # assembleAndroidTest
