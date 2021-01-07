@@ -90,7 +90,7 @@ pub fn open_collection_ankidroid(backend : &Backend, input: pb::OpenCollectionIn
 }
 
 
-pub(crate) fn open_or_create_no_update(path: &Path, i18n: &I18n, server: bool) -> AnkiResult<SqliteStorage> {
+pub(crate) fn open_or_create_no_update(path: &Path, _i18n: &I18n, _server: bool) -> AnkiResult<SqliteStorage> {
     let db = anki::storage::sqlite::open_or_create_collection_db(path)?;
 
     let (create, ver) = anki::storage::sqlite::schema_version(&db)?;

@@ -1,6 +1,6 @@
 use jni::JNIEnv;
 use jni::objects::{JClass, JString, JObject};
-use jni::sys::{jbyteArray, jint, jlong, jstring, jobjectArray, jarray};
+use jni::sys::{jbyteArray, jint, jlong, jobjectArray, jarray};
 
 use anki::backend_proto as pb;
 use pb::OpenCollectionIn;
@@ -13,10 +13,7 @@ use crate::ankidroid::AnkiDroidBackend;
 use prost::Message;
 use std::panic::{catch_unwind, AssertUnwindSafe};
 use std::any::Any;
-use anki::backend_proto::BackendError;
 use anki::err::AnkiError;
-use std::borrow::Borrow;
-use std::ops::Deref;
 use anki::i18n::I18n;
 
 mod sqlite;
@@ -40,7 +37,7 @@ pub unsafe extern "C" fn Java_net_ankiweb_rsdroid_NativeMethods_openBackend(
 
 #[no_mangle]
 pub unsafe extern "C" fn Java_net_ankiweb_rsdroid_NativeMethods_closeBackend(
-    env: JNIEnv,
+    _env: JNIEnv,
     _: JClass,
     args: jlong) -> jlong {
     // TODO: This does not handle panics - we currently return a pointer - convert to protobuf
