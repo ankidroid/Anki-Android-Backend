@@ -1418,7 +1418,6 @@ version = "0.1.0"
 dependencies = [
  "anki",
  "jni",
- "libc",
  "prost",
  "rusqlite",
  "serde",
