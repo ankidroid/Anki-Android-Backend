@@ -19,7 +19,6 @@ use std::borrow::Borrow;
 use std::ops::Deref;
 use anki::i18n::I18n;
 
-mod mmap64;
 mod sqlite;
 mod ankidroid;
 
