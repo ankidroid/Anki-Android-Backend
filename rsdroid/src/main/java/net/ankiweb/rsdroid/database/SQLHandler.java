@@ -16,9 +16,12 @@
 
 package net.ankiweb.rsdroid.database;
 
+import androidx.annotation.CheckResult;
+
 import org.json.JSONArray;
 
 public interface SQLHandler {
+    @CheckResult
     JSONArray fullQuery(String query, Object... bindArgs);
     int executeGetRowsAffected(String sql, Object... bindArgs);
     long insertForId(String sql, Object... bindArgs);
@@ -27,9 +30,11 @@ public interface SQLHandler {
     void commitTransaction();
     void rollbackTransaction();
 
+    @CheckResult
     String[] getColumnNames(String sql);
 
     void closeDatabase();
 
+    @CheckResult
     String getPath();
 }
