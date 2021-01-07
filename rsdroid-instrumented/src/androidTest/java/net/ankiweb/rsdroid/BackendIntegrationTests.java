@@ -21,6 +21,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import net.ankiweb.rsdroid.ankiutil.InstrumentedTest;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -67,14 +68,20 @@ public class BackendIntegrationTests extends InstrumentedTest {
         int elapsed = ret.getDaysElapsed();
         long nextDayAt = ret.getNextDayAt();
     }
+
     @Test
-    public void collectionIsVersion11AfterOpen() {
-        // This test will be decomissioned, but before we get an upgrade stategy, we need to ensure we're not upgrading the database.
+    public void collectionIsVersion11AfterOpen() throws JSONException {
+        // This test will be decomissioned, but before we get an upgrade strategy, we need to ensure we're not upgrading the database.
 
         BackendV1 backendV1 = getBackend("initial_version_2_12_1.anki2");
+
+        JSONArray array = backendV1.fullQuery("select ver from col");
+
         backendV1.closeCollection(false);
 
-        assertThat("Needs assertion", false, is(true));
+        JSONArray firstResultRow = array.getJSONArray(0);
+
+        assertThat("Needs assertion", firstResultRow.getInt(0), is(11));
     }
 
     @Test
