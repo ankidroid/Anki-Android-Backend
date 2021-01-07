@@ -1,5 +1,5 @@
 name: rsdroid (macOS)
-on: workflow_dispatch
+on: push
 
 jobs:
   build:
@@ -45,4 +45,25 @@ jobs:
 
     - name: Build
       shell: bash -l {0}
-      run: ./gradlew clean assembleDebug -DtestBuildType=debug -Dorg.gradle.daemon=false -Dorg.gradle.console=plain # assembleAndroidTest 
+      run: ./gradlew clean assembleDebug -DtestBuildType=debug -Dorg.gradle.daemon=false -Dorg.gradle.console=plain # assembleAndroidTest
+
+  test:
+    needs: build
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        api-level: [21, 30]
+        arch: [x86, x86_64]
+    steps:
+    - name: checkout
+      uses: actions/checkout@v2
+
+    - name: run tests
+      uses: reactivecircus/android-emulator-runner@v2
+      with:
+        api-level: ${{ matrix.api-level }}
+        target: default
+        arch: ${{ matrix.arch }}
+        profile: Nexus 6
+        script: ./gradlew rsdroid-instrumented:connectedCheck
