@@ -75,13 +75,12 @@ public class DatabaseIntegrationTests extends DatabaseComparison {
     }
 
     @Test
-    public void testNullFloatIsCastToZero() {
+    public void testNullDoubleIsCastToZero() {
         // now, we get into the nitty-gritty of SQLite
 
-        // TODO: This is not correct - not a float
-        int returnValue = DatabaseUtil.queryScalar(mDatabase, "select null");
+        double returnValue = DatabaseUtil.queryScalarFloat(mDatabase, "select null");
 
-        assertThat(returnValue, is(0));
+        assertThat(returnValue, is(0d));
     }
 
     @Test

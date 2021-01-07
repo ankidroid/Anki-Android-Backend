@@ -37,4 +37,21 @@ public class DatabaseUtil {
         }
         return scalar;
     }
+
+    public static double queryScalarFloat(SupportSQLiteDatabase database, String query, Object... selectionArgs) {
+        Cursor cursor = null;
+        double scalar;
+        try {
+            cursor = database.query(query, selectionArgs);
+            if (!cursor.moveToNext()) {
+                return 0;
+            }
+            scalar = cursor.getDouble(0);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return scalar;
+    }
 }
