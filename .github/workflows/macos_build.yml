@@ -68,7 +68,7 @@ jobs:
       fail-fast: false
       matrix:
         api-level: [21]
-        arch: [x86, x86_64]
+        arch: [x86, x86_64, arm, arm64]
     steps:
     - uses: actions/checkout@v2
       name: Checkout
