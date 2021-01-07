@@ -47,7 +47,19 @@ jobs:
 
     - name: Build
       shell: bash -l {0}
-      run: ./gradlew clean assembleDebug -DtestBuildType=debug -Dorg.gradle.daemon=false -Dorg.gradle.console=plain # assembleAndroidTest
+      run: ./gradlew clean assembleDebug -DtestBuildType=debug -Dorg.gradle.daemon=false -Dorg.gradle.console=plain
+
+    - name: Build Instrumented Test APKs
+      shell: bash -l {0}
+      run: ./gradlew rsdroid-instrumented:assembleDebug rsdroid-instrumented:assembleAndroidTest -DtestBuildType=debug -Dorg.gradle.daemon=false -Dorg.gradle.console=plain
+
+    - name: Upload APKs as Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: rsdroid-instrumented
+        if-no-files-found: error
+        path: rsdroid-instrumented/build/outputs/apk
+
 
   test:
     needs: build
@@ -55,11 +67,23 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        api-level: [21, 30]
+        api-level: [21]
         arch: [x86, x86_64]
     steps:
-    - name: checkout
-      uses: actions/checkout@v2
+    - uses: actions/checkout@v2
+      name: Checkout
+      with:
+          submodules: 'true' # anki is a submodule - and this is currently required by all gradle builds.
+
+    # COULD_BE_BETTER: This may not be needed - tiny speed penalty
+    - name: Init i18n submodule
+      run: git submodule update --init --recursive
+
+    - name: Download APKs
+      uses: actions/download-artifact@v2
+      with:
+        name: rsdroid-instrumented
+        path: rsdroid-instrumented/build/outputs/apk
 
     - name: run tests
       uses: reactivecircus/android-emulator-runner@v2
@@ -68,4 +92,4 @@ jobs:
         target: default
         arch: ${{ matrix.arch }}
         profile: Nexus 6
-        script: ./gradlew rsdroid-instrumented:connectedCheck
+        script: ./gradlew rsdroid-instrumented:connectedCheck -x rsdroid-instrumented:packageDebugAndroidTest -x rsdroid-instrumented:packageDebug
