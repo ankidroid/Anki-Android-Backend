@@ -83,10 +83,14 @@ public class DatabaseComparison extends InstrumentedTest {
 
     protected String getDatabasePath() {
         // TODO: look into this - null should work
-        switch (schedVersion) {
-            case RUST: return ":memory:";
-            case FRAMEWORK: return null;
-            default: return null;
+        try {
+            switch (schedVersion) {
+                case RUST: return ":memory:";
+                case FRAMEWORK: return null;
+                default: return null;
+            }
+        } catch (NullPointerException ex) {
+            throw new IllegalStateException("Class is not annotated with @RunWith(Parameterized.class)", ex);
         }
     }
 
