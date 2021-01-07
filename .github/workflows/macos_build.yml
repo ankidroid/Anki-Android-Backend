@@ -28,7 +28,9 @@ jobs:
       run: .github/scripts/macos_install_pyenv.sh
 
     # pyenv requires bash_profile, so we need the -l (login) arg for bash from now on on macOS
+    # should only require 3.5 mins to setup, but can be at least 6.5 on occasion.
     - name: Setup Pyenv
+      timeout-minutes: 10
       shell: bash -l {0}
       run: |
              pyenv install 3.7.9
