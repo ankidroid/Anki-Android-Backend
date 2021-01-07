@@ -52,6 +52,7 @@ public class BackendDisposalTests extends InstrumentedTest {
     }
 
     @Test
+    @Ignore("Run under profiler")
     public void getAssetFilePathFileLeak() {
         // testDisposalDoesNotLeak had a failure: open failed: EMFILE (Too many open files)
         // This determines if it is our file handling, or rust implementation which has the issue.
