@@ -24,6 +24,8 @@ import android.database.sqlite.SQLiteFullException;
 import androidx.annotation.Nullable;
 
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import BackendProto.Backend;
 
@@ -82,17 +84,25 @@ public class BackendException extends RuntimeException {
                 throw new SQLiteException(outMessage, this);
             }
 
-            if (message.contains("ConstraintViolation")) {
+            if (message.contains("InvalidParameterCount")) {
+                Matcher p = Pattern.compile("InvalidParameterCount\\((\\d*), (\\d*)\\)").matcher(this.getMessage());
+                if (p.find()) {
+                    int paramCount = Integer.parseInt(p.group(1));
+                    int index = Integer.parseInt(p.group(2));
+                    String errorMessage = String.format(Locale.ROOT, "Cannot bind argument at index %d because the index is out of range.  The statement has %d parameters.", index, paramCount);
+                    throw new IllegalArgumentException(errorMessage, this);
+                }
+            } else if (message.contains("ConstraintViolation")) {
                 throw new SQLiteConstraintException(message);
             } else if (message.contains("DiskFull")) {
                 throw new SQLiteFullException(message);
             } else if (message.contains("DatabaseCorrupt")) {
                 String outMessage = String.format(Locale.ROOT, "error while compiling: \"%s\": %s", query, message);
                 throw new SQLiteDatabaseCorruptException(outMessage);
-            } else {
-                String outMessage = String.format(Locale.ROOT, "error while compiling: \"%s\": %s", query, message);
-                throw new SQLiteException(outMessage, this);
             }
+
+            String outMessage = String.format(Locale.ROOT, "error while compiling: \"%s\": %s", query, message);
+            throw new SQLiteException(outMessage, this);
         }
     }
 }
