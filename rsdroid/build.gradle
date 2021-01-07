@@ -35,7 +35,7 @@ apply plugin: "org.mozilla.rust-android-gradle.rust-android"
 cargo {
     module = "../rslib-bridge"
     libname = "rsdroid"
-    targets = ["arm", "x86"]
+    targets = ["x86"] //"arm",
     profile = 'release'
     apiLevel = 21
     verbose = true
