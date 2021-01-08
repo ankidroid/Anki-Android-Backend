@@ -145,16 +145,12 @@ jobs:
               pip3 install protobuf
               pip3 install protobuf-compiler
               python3 .github/scripts/protoc_gen_deps.py
-
-    - name: Install x86_64-unknown-linux-gnu
-      if: matrix.os == 'ubuntu-latest'
-      run: .github/scripts/linux_install_x86_64-unknown-linux-gnu-gcc.sh
               
     - name: Run Tests
       if: matrix.os != 'windows-latest'
       shell: bash -l {0} 
-      run: ./gradlew rsdroid:test -x jar -x cargoBuildArm -x cargoBuildX86
+      run: ./gradlew rsdroid:test -x jar -x cargoBuildArm -x cargoBuildX86 -x cargoBuildArm64 -x cargoBuildX86_64
       
     - name: Run Tests (win)
       if: matrix.os == 'windows-latest'
-      run: ./gradlew rsdroid:test -x jar -x cargoBuildArm -x cargoBuildX86
+      run: ./gradlew rsdroid:test -x jar -x cargoBuildArm -x cargoBuildX86 -x cargoBuildArm64 -x cargoBuildX86_64
