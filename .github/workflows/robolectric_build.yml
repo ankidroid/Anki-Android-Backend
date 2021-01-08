@@ -1,5 +1,5 @@
 name: Build JAR for Robolectric Testing
-on: workflow_dispatch
+on: push
 
 jobs:
   build:
