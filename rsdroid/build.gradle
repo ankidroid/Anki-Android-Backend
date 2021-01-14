@@ -1,8 +1,6 @@
 apply plugin: 'com.android.library' // required for aar generation to link to from AnkiDroid
 apply plugin: 'com.google.protobuf'
-apply plugin: 'maven-publish'
-
-// TODO: Extract versionName/version for publishing to variable
+apply plugin: 'com.vanniktech.maven.publish'
 
 android {
     compileSdkVersion 30
@@ -18,7 +16,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 30
         versionCode 1
-        versionName "0.0.1"
+        versionName VERSION_NAME
 
         consumerProguardFiles "consumer-rules.pro"
     }
@@ -62,20 +60,3 @@ dependencies {
 }
 
 preBuild.dependsOn "cargoBuild"
-
-// Because the components are created only during the afterEvaluate phase, you must
-// configure your publications using the afterEvaluate() lifecycle method.
-afterEvaluate {
-    publishing {
-        publications {
-            // Creates a Maven publication called "release".
-            release(MavenPublication) {
-                // Applies the component for the release build variant.
-                from components.release
-                groupId = 'com.github.david-allison-1'
-                artifactId = 'anki-android-backend'
-                version = "0.0.1"
-            }
-        }
-    }
-}

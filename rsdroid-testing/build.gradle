@@ -15,6 +15,7 @@
  */
 
 apply plugin: 'java-library'
+apply plugin: 'com.vanniktech.maven.publish'
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
