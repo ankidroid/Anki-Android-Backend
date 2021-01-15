@@ -70,4 +70,4 @@ jobs:
              $Env:ANDROID_NDK_PATH =  "C:\ProgramFiles\Android\android-sdk\ndk-bundle"
              $Env:ANDROID_SDK_ROOT =  "C:\ProgramFiles\Android\android-sdk"
              $env:ANDROID_HOME
-             ./gradlew clean assembleDebug -DtestBuildType=debug # assembleAndroidTest
+             ./gradlew clean assembleRelease -DtestBuildType=release # assembleAndroidTest

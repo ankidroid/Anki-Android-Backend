@@ -54,4 +54,4 @@ jobs:
               .github/scripts/protoc_gen_deps.py
 
     - name: Build
-      run: ./gradlew clean assembleDebug -DtestBuildType=debug -Dorg.gradle.daemon=false -Dorg.gradle.console=plain # assembleAndroidTest 
+      run: ./gradlew clean assembleRelease -DtestBuildType=release -Dorg.gradle.daemon=false -Dorg.gradle.console=plain # assembleAndroidTest

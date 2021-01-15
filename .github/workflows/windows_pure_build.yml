@@ -35,4 +35,4 @@ jobs:
               python3 .github/scripts/protoc_gen_deps.py
 
     - name: Build
-      run: ./gradlew clean assembleDebug -DtestBuildType=debug # assembleAndroidTest
+      run: ./gradlew clean assembleRelease -DtestBuildType=release
