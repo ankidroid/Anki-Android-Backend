@@ -71,7 +71,7 @@ jobs:
       with:
         name: rsdroid-testing
         if-no-files-found: error
-        path: rsdroid-testing/build/libs/rsdroid-testing.jar
+        path: rsdroid-testing/build/libs/
 
     - name: Upload fluent.proto
       uses: actions/upload-artifact@v2
