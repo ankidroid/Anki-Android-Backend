@@ -8,7 +8,7 @@ on: push
 # https://github.com/david-allison-1/Anki-Android-Backend/issues/7
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
     # env:
       # required for "act": https://github.com/nektos/act/issues/265
