@@ -15,6 +15,7 @@
  */
 
 apply plugin: 'java-library'
+apply plugin: 'signing'
 apply plugin: 'com.vanniktech.maven.publish'
 
 dependencies {
@@ -127,4 +128,15 @@ if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
     // > Install a reasonable number of copies of the Apple Software on Apple-branded computers
     // https://www.apple.com/legal/sla/docs/xcode.pdf
     processResources.dependsOn preBuildMac
+}
+
+signing {
+    // We can set these in GitHub Actions via:
+    // env:
+    //   ORG_GRADLE_PROJECT_SIGNING_PRIVATE_KEY: ${{ secrets.SIGNING_PRIVATE_KEY }}
+    //   ORG_GRADLE_PROJECT_SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+
+    if (project.hasProperty('SIGNING_PRIVATE_KEY') && project.hasProperty('SIGNING_PASSWORD')) {
+        useInMemoryPgpKeys(project.getProperty('SIGNING_PRIVATE_KEY'), project.getProperty('SIGNING_PASSWORD'))
+    }
 }

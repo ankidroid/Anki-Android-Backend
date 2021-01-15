@@ -1,5 +1,6 @@
 apply plugin: 'com.android.library' // required for aar generation to link to from AnkiDroid
 apply plugin: 'com.google.protobuf'
+apply plugin: 'signing'
 apply plugin: 'com.vanniktech.maven.publish'
 
 android {
@@ -60,3 +61,14 @@ dependencies {
 }
 
 preBuild.dependsOn "cargoBuild"
+
+signing {
+    // We can set these in GitHub Actions via:
+    // env:
+    //   ORG_GRADLE_PROJECT_SIGNING_PRIVATE_KEY: ${{ secrets.SIGNING_PRIVATE_KEY }}
+    //   ORG_GRADLE_PROJECT_SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+
+    if (project.hasProperty('SIGNING_PRIVATE_KEY') && project.hasProperty('SIGNING_PASSWORD')) {
+        useInMemoryPgpKeys(project.getProperty('SIGNING_PRIVATE_KEY'), project.getProperty('SIGNING_PASSWORD'))
+    }
+}
