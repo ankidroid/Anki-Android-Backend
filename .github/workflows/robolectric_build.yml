@@ -112,6 +112,10 @@ jobs:
                   exit 1
               fi
 
+    - name: Install NDK (silent)
+      if: matrix.os == 'ubuntu-latest'
+      run: .github/scripts/install_ndk.sh 21.3.6528147
+
     - name: Install Pyenv
       if: matrix.os == 'macos-latest'
       run: .github/scripts/macos_install_pyenv.sh

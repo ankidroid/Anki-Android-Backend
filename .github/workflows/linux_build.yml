@@ -23,12 +23,11 @@ jobs:
     - name: Init i18n submodule
       run: git submodule update --init --recursive
 
-    # We specify 21.3.6528147 which is installed already, so this is not necessary
-    # - name: Install NDK
-    #  uses: nttld/setup-ndk@v1
-    #  with:
-    #      ndk-version: '21.3.6528147' # currently installed on GitHub Actions
-    
+    # COULD_BE_BETTER: Consider turning this into a GitHub action - help the wider community
+    # NDK install (unzipping) is really noisy - silence the log spam with grep, while keeping errors
+    - name: Install NDK (silent)
+      run: .github/scripts/install_ndk.sh 21.3.6528147
+
     - name: Install linker
       run: .github/scripts/linux_install_x86_64-unknown-linux-gnu-gcc.sh
 
