@@ -1,6 +1,8 @@
 name: rsdroid (macOS)
 on: push
 
+# TODO: consider assembleRelease if possible
+
 jobs:
   build:
     runs-on: macos-latest
@@ -46,11 +48,11 @@ jobs:
 
     - name: Build
       shell: bash -l {0}
-      run: ./gradlew clean assembleRelease -DtestBuildType=release -Dorg.gradle.daemon=false -Dorg.gradle.console=plain
+      run: ./gradlew clean assembleDebug -DtestBuildType=debug -Dorg.gradle.daemon=false -Dorg.gradle.console=plain
 
     - name: Build Instrumented Test APKs
       shell: bash -l {0}
-      run: ./gradlew rsdroid-instrumented:assembleRelease rsdroid-instrumented:assembleAndroidTest -DtestBuildType=release -Dorg.gradle.daemon=false -Dorg.gradle.console=plain
+      run: ./gradlew rsdroid-instrumented:assembleDebug rsdroid-instrumented:assembleAndroidTest -DtestBuildType=debug -Dorg.gradle.daemon=false -Dorg.gradle.console=plain
 
     - name: Upload APKs as Artifact
       uses: actions/upload-artifact@v2
