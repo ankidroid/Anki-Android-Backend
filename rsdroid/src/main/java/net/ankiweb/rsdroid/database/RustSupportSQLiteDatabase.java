@@ -43,6 +43,8 @@ import android.database.sqlite.SQLiteTransactionListener;
 import android.os.CancellationSignal;
 import android.util.Pair;
 
+import androidx.annotation.CheckResult;
+import androidx.annotation.VisibleForTesting;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 import androidx.sqlite.db.SupportSQLiteQuery;
 import androidx.sqlite.db.SupportSQLiteStatement;
@@ -124,7 +126,21 @@ public class RustSupportSQLiteDatabase implements SupportSQLiteDatabase {
 
     @Override
     public Cursor query(String query, Object[] bindArgs) {
+        if (shouldUseLimitOffsetQuery(query)) {
+            return new LimitOffsetSQLiteCursor(getSession(), query, bindArgs);
+        }
+
         return new MemoryHeavySQLiteCursor(getSession(), query, bindArgs);
+    }
+
+    @CheckResult
+    @VisibleForTesting
+    static boolean shouldUseLimitOffsetQuery(String query) {
+        String lowerQuery = query.toLowerCase(Locale.ROOT);
+        // Note: this is slightly flaky (for example: skips if there is a limit in a CTE).
+        // If this isn't hit, all the data is loaded into memory.
+
+        return lowerQuery.startsWith("select") && !lowerQuery.contains(" limit ");
     }
 
     @Override

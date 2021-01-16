@@ -32,7 +32,7 @@ import static org.hamcrest.Matchers.is;
 
 public class RustDatabaseIntegrationTests extends InstrumentedTest {
 
-    private static String fileName = "initial_version_2_12_1.anki2";
+    public static final String fileName = "initial_version_2_12_1.anki2";
 
     @Test
     public void testMoveToFirst() {
