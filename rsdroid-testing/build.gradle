@@ -68,12 +68,15 @@ def toCommandLine(Platform targetPlatform) {
     def standardArg = "cargo  +nightly build --release -Z unstable-options --features no-android"
     def assetsPath = new File("${project.sourceSets.main.java.srcDirs[0]}/../../../assets").getCanonicalPath()
 
-    // TODO: This may need to be turned into a unix style path for Windows:
-    // --out-dir /mnt/c/GitHub/Rust-Test/rsdroid-testing/assets
     String assetsSubPath = "/rsdroid-testing/assets"
     File f = new File(project.rootDir, assetsSubPath)
-    println "Outputting to: ${f.absolutePath}"
-    def outDir = "--out-dir ${f.absolutePath}"
+    // As we're running through WSL, we need a Unix path for windows:
+    // C:\GitHub\Rust-Test\rsdroid-testing\assets -> /mnt/c/GitHub/Rust-Test/rsdroid-testing/assets
+    String path = !org.gradle.internal.os.OperatingSystem.current().isWindows() ? f.absolutePath :
+            "/mnt/" + f.absolutePath[0].toLowerCase() + f.absolutePath.substring(1).replace(":\\", "\\").replace("\\", "/")
+
+    println "Outputting to: ${path}"
+    def outDir = "--out-dir ${path}"
     System.out.println(assetsPath)
     def mainArg = standardArg + " " + outDir
     switch (targetPlatform) {
