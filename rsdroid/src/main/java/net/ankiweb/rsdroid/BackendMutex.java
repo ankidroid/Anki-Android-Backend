@@ -31,7 +31,7 @@ import BackendProto.Backend;
 /**
  * Ensures that a single thread accesses RustBackend at the same time.
  * This is because rslib-bridge currently has no distinction between threads, and handles the state of
- * transactions. Parallel
+ * transactions.
  */
 public class BackendMutex implements BackendV1 {
     // This class exists as the Rust backend uses a single connection for SQLite, rather than a connection pool
