@@ -6,7 +6,7 @@ apply plugin: 'com.vanniktech.maven.publish'
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.1"
-    ndkVersion "21.3.6528147" // Older version, but used by GitHub actions
+    ndkVersion "22.0.7026061" // Used by GitHub actions - avoids an install step on some machines
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8

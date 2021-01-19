@@ -15,6 +15,12 @@ jobs:
     - name: Init i18n submodule
       run: git submodule update --init --recursive
 
+    - name: Install NDK
+      run: .github/scripts/install_ndk_macos.sh r22 22.0.7026061
+
+    - name: Test NDK
+      run: echo "NDK set to $ANDROID_NDK_HOME"
+
     - name: Install Rust
       uses: actions-rs/toolchain@v1.0.6
       with:
@@ -85,6 +91,9 @@ jobs:
       with:
         name: rsdroid-instrumented
         path: rsdroid-instrumented/build/outputs/apk
+
+    - name: Install NDK
+      run: .github/scripts/install_ndk_macos.sh r22 22.0.7026061
 
     - name: run tests
       uses: reactivecircus/android-emulator-runner@v2

@@ -14,7 +14,7 @@ jobs:
       run: git submodule update --init --recursive
 
     - name: Install NDK
-      run: .github/scripts/install_ndk.sh 21.3.6528147
+      run: .github/scripts/install_ndk.sh 22.0.7026061
          
     - name: Install linker
       run: .github/scripts/linux_install_x86_64-unknown-linux-gnu-gcc.sh

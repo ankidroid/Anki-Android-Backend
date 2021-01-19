@@ -23,6 +23,9 @@ jobs:
     - name: Init i18n submodule
       run: git submodule update --init --recursive
 
+    - name: Install NDK (r22 - 22.0.7026061)
+      run: .github/scripts/install_ndk_macos.sh r22 22.0.7026061
+
 # TODO: Needs investigation. This seemed to work before adding gnubin/v1, just with serde broken.
 # Now it doesn't seem to be picked up by rust.
 #    - name: Cache Rust dependencies
@@ -114,7 +117,11 @@ jobs:
 
     - name: Install NDK (silent)
       if: matrix.os == 'ubuntu-latest'
-      run: .github/scripts/install_ndk.sh 21.3.6528147
+      run: .github/scripts/install_ndk.sh 22.0.7026061
+
+    - name: Install NDK (macOS) (r22 - 22.0.7026061)
+      if: matrix.os == 'macos-latest'
+      run: .github/scripts/install_ndk_macos.sh r22 22.0.7026061
 
     - name: Install Pyenv
       if: matrix.os == 'macos-latest'
