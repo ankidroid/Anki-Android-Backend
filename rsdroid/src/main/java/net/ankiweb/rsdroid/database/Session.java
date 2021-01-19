@@ -38,6 +38,8 @@ import org.json.JSONArray;
 
 import java.util.Stack;
 
+import BackendProto.Sqlite;
+
 /** Handles transaction state management */
 public class Session implements SQLHandler {
     private final SQLHandler mBackend;
@@ -81,6 +83,26 @@ public class Session implements SQLHandler {
     @Override
     public String getPath() {
         return mBackend.getPath();
+    }
+
+    @Override
+    public Sqlite.DBResponse getPage(int page) {
+        return mBackend.getPage(page);
+    }
+
+    @Override
+    public Sqlite.DBResponse fullQueryProto(String query, Object... bindArgs) {
+        return mBackend.fullQueryProto(query, bindArgs);
+    }
+
+    @Override
+    public int getCurrentRowCount() {
+        return mBackend.getCurrentRowCount();
+    }
+
+    @Override
+    public void cancelCurrentProtoQuery() {
+        mBackend.cancelCurrentProtoQuery();
     }
 
 

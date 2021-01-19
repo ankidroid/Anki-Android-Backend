@@ -17,6 +17,8 @@
 package net.ankiweb.rsdroid;
 
 import android.database.Cursor;
+import android.database.CursorIndexOutOfBoundsException;
+import android.database.sqlite.SQLiteException;
 
 import net.ankiweb.rsdroid.ankiutil.DatabaseUtil;
 import net.ankiweb.rsdroid.database.testutils.DatabaseComparison;
@@ -134,5 +136,136 @@ public class DatabaseIntegrationTests extends DatabaseComparison {
 
         assertFalse("transaction should be ended", mDatabase.inTransaction());
         assertThat(DatabaseUtil.queryScalar(mDatabase, "select count(*) from test"), is(0));
+    }
+
+    @Test
+    public void testCursorIndexException() {
+        mDatabase.execSQL("create table tmp (id int)");
+
+        mDatabase.execSQL("insert into tmp (id) VALUES (?)", new Object[] { 1 } );
+
+        try (Cursor c = mDatabase.query("select * from tmp")) {
+            try {
+                c.getString(0);
+                fail("no exception thrown");
+            } catch (CursorIndexOutOfBoundsException e) {
+                assertThat(e.getMessage(), is("Index -1 requested, with a size of 1"));
+            }
+        }
+    }
+
+    @Test
+    public void testStringConversions() {
+        testStringConversion("int", "1");
+        testStringConversion("double", "1.6");
+        testStringConversion("string", "hi");
+        testStringConversion("null", null);
+    }
+
+    @Test
+    public void testFailingStringConversions() {
+        try {
+            testStringConversion("byte", "?");
+        } catch (SQLiteException e) {
+           assertThat(e.getMessage(), is("unknown error (code 0): Unable to convert BLOB to string"));
+        }
+    }
+
+    @Test
+    public void testIntConversions() {
+        testIntConversion("int", 1);
+        testIntConversion("double", 1); // this is a .floor
+        testIntConversion("string", 0);
+        testIntConversion("null", 0);
+    }
+
+    @Test
+    public void testFailingIntConversions() {
+        try {
+            testIntConversion("byte", 42);
+        } catch (SQLiteException e) {
+            assertThat(e.getMessage(), is("unknown error (code 0): Unable to convert BLOB to long"));
+        }
+    }
+
+    @Test
+    public void testFloatConversions() {
+        testFloatConversion("int", 1.0f);
+        testFloatConversion("double", 1.6f);
+        testFloatConversion("string", 0.0f); // yes - really?
+        testFloatConversion("null", 0.0f);
+    }
+
+    @Test
+    public void testFailingFloatConversions() {
+        try {
+            testFloatConversion("byte", 42);
+        } catch (SQLiteException e) {
+            assertThat(e.getMessage(), is("unknown error (code 0): Unable to convert BLOB to double"));
+        }
+    }
+
+    @Test
+    public void testDoubleConversions() {
+        testDoubleConversion("int", 1.0d);
+        testDoubleConversion("double", 1.6d);
+        testDoubleConversion("string", 0.0d); // yes - really?
+        testDoubleConversion("null", 0);
+    }
+
+    @Test
+    public void testFailingDoubleConversions() {
+        try {
+            testDoubleConversion("byte", 42);
+        } catch (SQLiteException e) {
+            assertThat(e.getMessage(), is("unknown error (code 0): Unable to convert BLOB to double"));
+        }
+    }
+
+    public void testStringConversion(String type, String expected) {
+        testConversion(c -> c.getString(0), type, expected);
+    }
+
+    public void testIntConversion(String type, int expected) {
+        testConversion(c -> c.getInt(0), type, expected);
+    }
+
+    public void testDoubleConversion(String type, double expected) {
+        testConversion(c -> c.getDouble(0), type, expected);
+    }
+
+    public void testFloatConversion(String type, float expected) {
+        testConversion(c -> c.getFloat(0), type, expected);
+    }
+
+    // Note: We don't test null or blob - blob is unused, didn't feel worth testing null
+
+    public void testConversion(Function<Cursor, Object> f, String type, Object expected) {
+        mDatabase.execSQL("DROP TABLE IF EXISTS tmp");
+
+        String sqlType = type.equals("null") ? "string" : type;
+        mDatabase.execSQL(String.format("create table tmp (val %s)", sqlType));
+
+        Object result;
+        switch (type) {
+            case "int" : result = 1; break;
+            case "double" : result = 1.6d; break; // we select 1.6 as the op is a .floor
+            case "string" : result = "hi"; break;
+            case "byte" : result = new byte[] { 1, 3, 3, 7 }; break;
+            case "null": result = null; break;
+            default: throw new IllegalStateException("test fail: unknown type: " + type);
+        }
+
+        mDatabase.execSQL("insert into tmp (val) VALUES (?)", new Object[] { result } );
+
+        try (Cursor c = mDatabase.query("select * from tmp")) {
+            c.moveToFirst();
+            assertThat(f.apply(c), is(expected));
+        }
+    }
+
+
+    private interface Function<T, R> {
+        R apply(T t);
     }
 }

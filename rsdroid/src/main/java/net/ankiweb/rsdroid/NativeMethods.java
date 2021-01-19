@@ -62,6 +62,23 @@ public class NativeMethods {
     @CheckResult
     static native byte[] fullDatabaseCommand(long backendPointer, byte[] data);
 
+    /** Input: JSON serialized request
+     * @return DbResult object */
+    @CheckResult
+    static native byte[] databaseCommand(long backendPointer, byte[] data);
+
+    /** Returns the next page of results after a databaseCommand.
+     * @return DbResult object */
+    @CheckResult
+    static native byte[] databaseGetNextResultPage(long backendPointer, int page);
+
+    /** Returns the count of elements in the result set from the current query */
+    static native int databaseGetCount(long toJni);
+
+
+    /** Clears the memory from the current protobuf query. */
+    static native int cancelCurrentProtoQuery(long toJni);
+
     /**
      * Performs an insert and returns the last inserted row id.
      * data: json encoded data

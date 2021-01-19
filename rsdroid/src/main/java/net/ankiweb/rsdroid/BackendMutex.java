@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 import BackendProto.Backend;
+import BackendProto.Sqlite;
 
 /**
  * Ensures that a single thread accesses RustBackend at the same time.
@@ -131,6 +132,46 @@ public class BackendMutex implements BackendV1 {
         try {
             mLock.lock();
             return mBackend.getPath();
+        } finally {
+            mLock.unlock();
+        }
+    }
+
+    @Override
+    public Sqlite.DBResponse getPage(int page) {
+        try {
+            mLock.lock();
+            return mBackend.getPage(page);
+        } finally {
+            mLock.unlock();
+        }
+    }
+
+    @Override
+    public Sqlite.DBResponse fullQueryProto(String query, Object... bindArgs) {
+        try {
+            mLock.lock();
+            return mBackend.fullQueryProto(query, bindArgs);
+        } finally {
+            mLock.unlock();
+        }
+    }
+
+    @Override
+    public int getCurrentRowCount() {
+        try {
+            mLock.lock();
+            return mBackend.getCurrentRowCount();
+        } finally {
+            mLock.unlock();
+        }
+    }
+
+    @Override
+    public void cancelCurrentProtoQuery() {
+        try {
+            mLock.lock();
+            mBackend.cancelCurrentProtoQuery();
         } finally {
             mLock.unlock();
         }

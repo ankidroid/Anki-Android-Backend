@@ -27,6 +27,7 @@ import net.ankiweb.rsdroid.RustDatabaseIntegrationTests;
 import net.ankiweb.rsdroid.ankiutil.InstrumentedTest;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -79,6 +80,7 @@ public class LimitOffsetSQLiteCursorTest extends InstrumentedTest {
     }
 
     @Test
+    @Ignore("Not currently using LimitOffsetSQLiteCursor")
     public void changingPageSizeDoesNotAffectClass() {
         addRows(5);
 

@@ -30,6 +30,7 @@ import static org.junit.Assert.assertTrue;
 public class RustSupportSQLiteDatabaseTests {
 
     @Test
+    @Ignore("Requires #14")
     public void limitOffsetTests() {
         assertTrue(shouldUseLimitOffsetQuery("select * from cards"));
         assertFalse(shouldUseLimitOffsetQuery("select * from cards limit 1"));

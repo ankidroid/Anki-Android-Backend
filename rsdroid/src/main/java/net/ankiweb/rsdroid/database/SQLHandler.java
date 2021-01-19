@@ -20,6 +20,8 @@ import androidx.annotation.CheckResult;
 
 import org.json.JSONArray;
 
+import BackendProto.Sqlite;
+
 public interface SQLHandler {
     @CheckResult
     JSONArray fullQuery(String query, Object... bindArgs);
@@ -37,4 +39,11 @@ public interface SQLHandler {
 
     @CheckResult
     String getPath();
+
+    /* Protobuf-related (#6) */
+    Sqlite.DBResponse getPage(int page);
+    Sqlite.DBResponse fullQueryProto(String query, Object... bindArgs);
+    int getCurrentRowCount();
+
+    void cancelCurrentProtoQuery();
 }

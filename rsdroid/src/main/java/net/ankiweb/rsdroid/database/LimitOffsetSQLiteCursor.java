@@ -17,6 +17,7 @@
 package net.ankiweb.rsdroid.database;
 
 import net.ankiweb.rsdroid.BackendException;
+import net.ankiweb.rsdroid.RustV1Cleanup;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,6 +33,7 @@ import timber.log.Timber;
  *
  * We assume that the provided query does not have a limit/offset and is a select query.
  */
+@RustV1Cleanup("Not currently used. Convert to use protobuf instead of JSON")
 public class LimitOffsetSQLiteCursor extends AnkiJsonDatabaseCursor {
 
     /**

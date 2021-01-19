@@ -32,6 +32,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import BackendProto.Backend;
+import BackendProto.Sqlite;
 import timber.log.Timber;
 
 /**
@@ -39,6 +40,11 @@ import timber.log.Timber;
  * All public methods should be accessed via interface
  * */
 public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implements BackendV1, Closeable {
+
+    /*
+    Note: java.lang.RuntimeException: com.google.protobuf.InvalidProtocolBufferException: Protocol message end-group tag did not match expected tag.
+    Implies that ?
+     */
 
     private Pointer mBackEndPointer = null;
     @Nullable
@@ -223,6 +229,72 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
         }
     }
 
+    /* Begin Protobuf-based database streaming methods (#6) */
+
+    @Override
+    public Sqlite.DBResponse fullQueryProto(String query, Object... args) {
+        byte[] result = null;
+        try {
+            Timber.d("Rust: fullQueryProto %s", query);
+
+            List<Object> asList = args == null ? new ArrayList<>() : Arrays.asList(args);
+            JSONObject o = new JSONObject();
+
+            o.put("kind", "query");
+            o.put("sql", query);
+            o.put("args", new JSONArray(asList));
+            o.put("first_row_only", false);
+
+            byte[] data = jsonToBytes(o);
+
+            Pointer backend = ensureBackend();
+            result = NativeMethods.databaseCommand(backend.toJni(), data);
+
+            Sqlite.DBResponse message = Sqlite.DBResponse.parseFrom(result);
+            validateMessage(result, message);
+            return message;
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        } catch (InvalidProtocolBufferException e) {
+            validateResult(result);
+            throw BackendException.fromException(e);
+        }
+    }
+
+    @Override
+    public Sqlite.DBResponse getPage(int page) {
+        byte[] result = null;
+        try {
+            Timber.d("Rust: getPage %d", page);
+
+            Pointer backend = ensureBackend();
+            result = NativeMethods.databaseGetNextResultPage(backend.toJni(), page);
+
+            Sqlite.DBResponse message = Sqlite.DBResponse.parseFrom(result);
+            validateMessage(result, message);
+            return message;
+        } catch (InvalidProtocolBufferException e) {
+            validateResult(result);
+            throw BackendException.fromException(e);
+        }
+    }
+
+
+    @Override
+    public int getCurrentRowCount() {
+        return NativeMethods.databaseGetCount(ensureBackend().toJni());
+    }
+
+
+
+    @Override
+    public void cancelCurrentProtoQuery() {
+        Timber.d("cancelCurrentProtoQuery");
+        NativeMethods.cancelCurrentProtoQuery(ensureBackend().toJni());
+    }
+
+    /* End protobuf-based database streaming methods */
+
     public void beginTransaction() {
         // Note: Casing is important here.
         performTransaction("begin");
@@ -281,5 +353,18 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
     @SuppressWarnings("CharsetObjectCanBeUsed")
     private byte[] jsonToBytes(JSONObject o) {
         return o.toString().getBytes(Charset.forName("UTF-8"));
+    }
+
+    protected void validateResult(@Nullable byte[] result) {
+        if (result == null) {
+            return;
+        }
+
+        try {
+            Backend.BackendError ex = Backend.BackendError.parseFrom(result);
+            throw BackendException.fromError(ex);
+        } catch (InvalidProtocolBufferException e) {
+            // ignore
+        }
     }
 }

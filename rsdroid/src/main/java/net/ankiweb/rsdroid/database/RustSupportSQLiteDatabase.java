@@ -130,17 +130,25 @@ public class RustSupportSQLiteDatabase implements SupportSQLiteDatabase {
             return new LimitOffsetSQLiteCursor(getSession(), query, bindArgs);
         }
 
-        return new MemoryHeavySQLiteCursor(getSession(), query, bindArgs);
+        return new StreamingProtobufSQLiteCursor(getSession(), query, bindArgs);
     }
 
     @CheckResult
     @VisibleForTesting
     static boolean shouldUseLimitOffsetQuery(String query) {
+        // TODO: #14 For now, this unconditionally returns false
+        if (!isLowMemory()) {
+            return false;
+        }
+
         String lowerQuery = query.toLowerCase(Locale.ROOT);
         // Note: this is slightly flaky (for example: skips if there is a limit in a CTE).
-        // If this isn't hit, all the data is loaded into memory.
-
         return lowerQuery.startsWith("select") && !lowerQuery.contains(" limit ");
+    }
+
+    private static boolean isLowMemory() {
+        // TODO: #14 We need a Context object here
+        return false;
     }
 
     @Override

@@ -34,7 +34,7 @@ import static org.hamcrest.Matchers.is;
 public class BackendSlowTests extends InstrumentedTest {
 
     @Test
-    // @Ignore("Run manually - 38 seconds (and fails)")
+    @Ignore("Run manually - slow test")
     public void ensureSQLIsStreamed() throws IOException {
         // Issue #6 - commentary there.
         // We need to ensure that the SQL is streamed so we don't OOM the Java.
@@ -44,11 +44,9 @@ public class BackendSlowTests extends InstrumentedTest {
 
 
         // Testing was done on an API 21 emulator - 1536 RAM, 256MB VM Heap
-
-        int numberOfElements = 5000;
-        int numberOfAppends = 10;
-
-        // This raised two stack traces. One was upsetting (
+        // using JSON, these parameters crashed the app, this does not happen with protobuf
+        int numberOfElements = 10000;
+        int numberOfAppends = 10; // multiply by (2^n)
 
         /*
          *
@@ -149,6 +147,7 @@ public class BackendSlowTests extends InstrumentedTest {
             db.query("create table tmp (id varchar)");
 
             StringBuilder longString = new StringBuilder("VeryLongStringWhich Will MaybeCauseAnOOM IfWeDoItWrong");
+            // double the string length on each iteration
             for (int i = 0; i < numberOfAppends; i++) {
                 longString.append(longString);
             }

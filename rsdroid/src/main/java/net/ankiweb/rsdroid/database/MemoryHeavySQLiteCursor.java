@@ -17,10 +17,12 @@
 package net.ankiweb.rsdroid.database;
 
 import net.ankiweb.rsdroid.BackendException;
+import net.ankiweb.rsdroid.RustV1Cleanup;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 
+@RustV1Cleanup("To be deleted once protobuf-based cursors are confirmed to be stable")
 public class MemoryHeavySQLiteCursor extends AnkiJsonDatabaseCursor {
 
     private int mPosition = -1;

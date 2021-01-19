@@ -1,3 +1,6 @@
+#[macro_use]
+extern crate lazy_static;
+
 use jni::JNIEnv;
 use jni::objects::{JClass, JString, JObject};
 use jni::sys::{jbyteArray, jint, jlong, jobjectArray, jarray};
@@ -16,10 +19,20 @@ use std::any::Any;
 use anki::err::AnkiError;
 use anki::i18n::I18n;
 
+use anki::backend_proto::{DbResult, DbResponse};
+
+mod dbcommand;
 mod sqlite;
 mod ankidroid;
 
 // TODO: Use a macro to handle panics to reduce code duplication
+
+// FUTURE_EXTENSION: Allow DB_COMMAND_NUM_ROWS to be variable to allow tuning of memory usage
+// Maybe also change this to a per-MB value if it's easy to stream-serialise to protobuf until a
+// memory limit is hit.
+
+// MAINTENANCE: This must manually be kept in sync with the Java
+const DB_COMMAND_NUM_ROWS: usize = 1000;
 
 #[no_mangle]
 pub unsafe extern "C" fn Java_net_ankiweb_rsdroid_NativeMethods_openBackend(
@@ -134,6 +147,86 @@ pub unsafe extern "C" fn Java_net_ankiweb_rsdroid_NativeMethods_fullDatabaseComm
 
         match out_res {
             Ok(_s) => env.byte_array_from_slice(&_s).unwrap(),
+            Err(_err) => env.byte_array_from_slice(&_err).unwrap(),
+        }
+    }));
+
+    match result {
+        Ok(_s) => _s,
+        Err(err) => panic_to_bytes(env,err.as_ref(), &backend.backend.i18n)
+    }
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn Java_net_ankiweb_rsdroid_NativeMethods_databaseGetNextResultPage(
+    env: JNIEnv,
+    _: JClass,
+    backend_ptr : jlong,
+    page: i32
+) -> jbyteArray {
+
+    let backend = to_backend(backend_ptr);
+
+    let result = catch_unwind(AssertUnwindSafe(|| {
+
+        let next_page = dbcommand::get_next(backend_ptr, (page as usize) * DB_COMMAND_NUM_ROWS as usize, DB_COMMAND_NUM_ROWS).unwrap();
+
+
+        let mut out_bytes = Vec::new();
+        next_page.encode(&mut out_bytes).unwrap();
+        env.byte_array_from_slice(&out_bytes).unwrap()
+    }));
+
+    match result {
+        Ok(_s) => _s,
+        Err(err) => panic_to_bytes(env,err.as_ref(), &backend.backend.i18n)
+    }
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn Java_net_ankiweb_rsdroid_NativeMethods_databaseGetCount(
+    _: JNIEnv,
+    _: JClass,
+    backend_ptr : jlong
+) -> i32 {
+    dbcommand::get_count(backend_ptr).unwrap_or(-1)
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn Java_net_ankiweb_rsdroid_NativeMethods_cancelCurrentProtoQuery(
+    _: JNIEnv,
+    _: JClass,
+    backend_ptr : jlong
+) {
+    dbcommand::flush_cache(&backend_ptr);
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn Java_net_ankiweb_rsdroid_NativeMethods_databaseCommand(
+    env: JNIEnv,
+    _: JClass,
+    backend_ptr : jlong,
+    input : jbyteArray
+) -> jbyteArray {
+
+    dbcommand::flush_cache(&backend_ptr);
+
+    let backend = to_backend(backend_ptr);
+
+    let result = catch_unwind(AssertUnwindSafe(|| {
+        let in_bytes =  env.convert_byte_array(input).unwrap();
+
+        // Normally we'd want this as a Vec<u8>, but 
+        let out_res = backend.backend.run_db_command_proto(&in_bytes);
+
+        match out_res {
+            Ok(db_result) => {
+                let trimmed = trim_and_cache_remaining(backend_ptr, db_result, dbcommand::next_sequence_number());
+
+                let mut out_bytes = Vec::new();
+                trimmed.encode(&mut out_bytes).unwrap();
+                env.byte_array_from_slice(&out_bytes).unwrap()
+            }
             Err(_err) => env.byte_array_from_slice(&_err).unwrap(),
         }
     }));
@@ -270,6 +363,22 @@ fn panic_to_bytes(env: JNIEnv , s: &(dyn Any + Send), i18n: &I18n) -> jbyteArray
     let mut bytes = Vec::new();
     backend_err.encode(&mut bytes).unwrap();
     env.byte_array_from_slice(bytes.as_slice()).unwrap()
+}
+
+/**
+Store the data in the cache if there's more than DB_COMMAND_NUM_ROWS.<br/>
+Returns: The data capped to DB_COMMAND_NUM_ROWS
+*/
+fn trim_and_cache_remaining(backend_ptr: i64, values: DbResult, sequence_number: i32) -> DbResponse {
+    if values.rows.len() > DB_COMMAND_NUM_ROWS {
+        let result = values.rows.iter().take(DB_COMMAND_NUM_ROWS).cloned().collect();
+        let to_store = DbResponse { result: Some(values), sequence_number };
+        dbcommand::insert_cache(backend_ptr, to_store);
+
+        DbResponse { result: Some(DbResult { rows: result }), sequence_number }
+    } else {
+        DbResponse { result: Some(values), sequence_number }
+    }
 }
 
 fn panic_to_anki_error(s: &(dyn Any + Send)) -> AnkiError {
