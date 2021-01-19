@@ -90,11 +90,18 @@ def toCommandLine(Platform targetPlatform) {
 }
 
 task preBuildWindows(type: Exec) {
+    doFirst {
+        logger.lifecycle(toCommandLine(Platform.WINDOWS).join(" "))
+    }
     workingDir(getInputDir())
     commandLine(toCommandLine(Platform.WINDOWS))
 }
 
 task preBuildMac(type: Exec) {
+    doFirst {
+        logger.lifecycle(toCommandLine(Platform.MACOS).join(" "))
+    }
+
     if (!org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
         return
 
@@ -112,6 +119,9 @@ task preBuildMac(type: Exec) {
 }
 
 task preBuildLinux(type: Exec) {
+    doFirst {
+        logger.lifecycle(toCommandLine(Platform.LINUX).join(" "))
+    }
     workingDir(getInputDir())
     commandLine(toCommandLine(Platform.LINUX))
 }
