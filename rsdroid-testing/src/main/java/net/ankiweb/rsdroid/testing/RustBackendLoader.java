@@ -114,30 +114,32 @@ public class RustBackendLoader {
             return path;
         }
 
-        InputStream rsdroid = RustBackendLoader.class.getClassLoader().getResourceAsStream(fullFilename);
-        if (rsdroid == null) {
-            throw new IllegalStateException("Could not find " + fullFilename);
+        try (InputStream rsdroid = RustBackendLoader.class.getClassLoader().getResourceAsStream(fullFilename)) {
+            if (rsdroid == null) {
+                throw new IllegalStateException("Could not find " + fullFilename);
+            }
+
+            try (OutputStream outStream = convertToOutputStream(targetFile)) {
+                byte[] buffer = new byte[8 * 1024];
+                int bytesRead;
+                while ((bytesRead = rsdroid.read(buffer)) != -1) {
+                    outStream.write(buffer, 0, bytesRead);
+                }
+            }
         }
-
-
-        OutputStream outStream;
-        try {
-            outStream = new FileOutputStream(targetFile);
-        } catch (Exception e) {
-            throw new IOException("Could not open output file", e);
-        }
-
-        byte[] buffer = new byte[8 * 1024];
-        int bytesRead;
-        while ((bytesRead = rsdroid.read(buffer)) != -1) {
-            outStream.write(buffer, 0, bytesRead);
-        }
-
-        rsdroid.close();
-        outStream.close();
 
         sCache.put(fullFilename, path);
 
         return path;
+    }
+
+    private static OutputStream convertToOutputStream(File targetFile) throws IOException {
+        OutputStream outStream;
+        try {
+            outStream = new FileOutputStream(targetFile);
+        } catch (Exception e) {
+            throw new IOException("Could not open output file: {}", e);
+        }
+        return outStream;
     }
 }
