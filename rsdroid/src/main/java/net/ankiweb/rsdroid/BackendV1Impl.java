@@ -354,17 +354,4 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
     private byte[] jsonToBytes(JSONObject o) {
         return o.toString().getBytes(Charset.forName("UTF-8"));
     }
-
-    protected void validateResult(@Nullable byte[] result) {
-        if (result == null) {
-            return;
-        }
-
-        try {
-            Backend.BackendError ex = Backend.BackendError.parseFrom(result);
-            throw BackendException.fromError(ex);
-        } catch (InvalidProtocolBufferException e) {
-            // ignore
-        }
-    }
 }

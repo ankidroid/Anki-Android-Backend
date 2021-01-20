@@ -158,13 +158,15 @@ class RPC:
             k = self.method.input_type.replace(".BackendProto.", "")
             if k in self.method_lookup:
                 return "    public {out} {name}{inv} {{ \n" \
+                       "        byte[] result = null;\n" \
                        "        try {{\n" \
                        "            {deser}\n" \
                        "            Pointer backendPointer = ensureBackend();\n" \
-                       "            byte[] result = NativeMethods.executeCommand(backendPointer.toJni(), {num}, protobuf.toByteArray());\n" \
+                       "            result = NativeMethods.executeCommand(backendPointer.toJni(), {num}, protobuf.toByteArray());\n" \
                        "            Backend.Empty message = Backend.Empty.parseFrom(result);\n" \
                        "            validateMessage(result, message);\n" \
                        "        }} catch (InvalidProtocolBufferException ex) {{\n" \
+                       "            validateResult(result);\n" \
                        "            throw BackendException.fromException(ex);\n" \
                        "        }}\n" \
                        "    }}".format(out=self.get_output(), name=self.method_name(), inv="({})".format(self.method_lookup[k].as_params()),
@@ -172,12 +174,14 @@ class RPC:
                                        deser=self.method_lookup[k].as_builder())
             else:
                 return "    public {out} {name}{inv} {{ \n" \
+                       "        byte[] result = null;\n" \
                        "        try {{\n" \
                        "            Pointer backendPointer = ensureBackend();\n" \
-                       "            byte[] result = NativeMethods.executeCommand(backendPointer.toJni(), {num}, {args});\n" \
+                       "            result = NativeMethods.executeCommand(backendPointer.toJni(), {num}, {args});\n" \
                        "            Backend.Empty message = Backend.Empty.parseFrom(result);\n" \
                        "            validateMessage(result, message);\n" \
                        "        }} catch (InvalidProtocolBufferException ex) {{\n" \
+                       "            validateResult(result);\n" \
                        "            throw BackendException.fromException(ex);\n" \
                        "        }}\n" \
                        "    }}".format(out=self.get_output(), name=self.method_name(), inv=self.get_input(),
@@ -187,14 +191,16 @@ class RPC:
             k = self.method.input_type.replace(".BackendProto.", "")
             if k in self.method_lookup:
                 return "    public {out} {name}{inv} {{ \n" \
+                       "        byte[] result = null;\n" \
                        "        try {{\n" \
                        "            {deser}\n" \
                        "            Pointer backendPointer = ensureBackend();\n" \
-                       "            byte[] result = NativeMethods.executeCommand(backendPointer.toJni(), {num}, protobuf.toByteArray());\n" \
+                       "            result = NativeMethods.executeCommand(backendPointer.toJni(), {num}, protobuf.toByteArray());\n" \
                        "            {out} message = {out}.parseFrom(result);\n" \
                        "            validateMessage(result, message);\n" \
                        "            return message;\n" \
                        "        }} catch (InvalidProtocolBufferException ex) {{\n" \
+                       "            validateResult(result);\n" \
                        "            throw BackendException.fromException(ex);\n" \
                        "        }}\n" \
                        "    }}".format(out=self.get_output(), name=self.method_name(), inv="({})".format(self.method_lookup[k].as_params()),
@@ -203,13 +209,15 @@ class RPC:
             else:
                 # Definitely empty - and TranslateStringIn (manually ignored)
                 return "    public {out} {name}{inv} {{ \n" \
+                       "        byte[] result = null;\n" \
                        "        try {{\n" \
                        "            Pointer backendPointer = ensureBackend();\n" \
-                       "            byte[] result = NativeMethods.executeCommand(backendPointer.toJni(), {num}, {args});\n" \
+                       "            result = NativeMethods.executeCommand(backendPointer.toJni(), {num}, {args});\n" \
                        "            {out} message = {out}.parseFrom(result);\n" \
                        "            validateMessage(result, message);\n" \
                        "            return message;\n" \
                        "        }} catch (InvalidProtocolBufferException ex) {{\n" \
+                       "            validateResult(result);\n" \
                        "            throw BackendException.fromException(ex);\n" \
                        "        }}\n" \
                        "    }}".format(out=self.get_output(), name=self.method_name(), inv=self.get_input(),
@@ -288,6 +296,18 @@ def generate_code(request, response):
                          "        }}\n"
                          "        Backend.BackendError ex = Backend.BackendError.parseFrom(result);\n"
                          "        throw BackendException.fromError(ex);\n"
+                         "    }}"
+                         "\n"
+                         "    protected void validateResult(@Nullable byte[] result) {{\n"
+                         "        if (result == null) {{\n"
+                         "            return;\n"
+                         "        }}\n"
+                         "        try {{\n"
+                         "            Backend.BackendError ex = Backend.BackendError.parseFrom(result);\n"
+                         "            throw BackendException.fromError(ex);\n"
+                         "        }} catch (InvalidProtocolBufferException e) {{\n"
+                         "            // ignore - throw the original exception\n"
+                         "        }}\n"
                          "    }}".format(proto_file.name, __file__, cls=class_name)]
 
         for method in service_methods:
