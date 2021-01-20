@@ -25,11 +25,24 @@ import java.util.HashMap;
 
 import org.apache.commons.exec.OS;
 
-public class ModuleLoader {
+/**
+ * Loads a librsdroid.so alternative to allow testing of rsdroid under a Robolectric-based environment
+ */
+public class RustBackendLoader {
 
     private static boolean sLoaded;
     private static final HashMap<String, String> sCache = new HashMap<>();
 
+    /**
+     * Allows unit testing rsdroid under Robolectric <br/>
+     * Loads (via {@link Runtime#load(String)}) a librsdroid.so alternative compiled for the current operating system.<br/><br/>
+     *
+     * This call is cached and is a no-op if called multiple times.
+     *
+     * @throws IllegalStateException OS is not Windows, Linux or macOS
+     * @throws RuntimeException Failure when extracting library to load
+     * @throws UnsatisfiedLinkError The library could not be loaded
+     */
     public static void init() {
         if (!sLoaded) {
             if (OS.isFamilyWindows()) {
@@ -47,10 +60,19 @@ public class ModuleLoader {
         }
     }
 
-    private static void load(String filename, String extension) {
+    /**
+     * loads a named file in the jar via {@link Runtime#load(String)}
+     *
+     * @param fileName The name of the file in the jar
+     * @param extension The extension of the file in the jar
+     *
+     * @throws UnsatisfiedLinkError The library could not be loaded
+     * @throws RuntimeException Failure when extracting library to load
+     */
+    private static void load(String fileName, String extension) {
         String path;
         try {
-            path = getPathFromResourceStream(filename, extension);
+            path = getPathFromResourceStream(fileName, extension);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -64,22 +86,35 @@ public class ModuleLoader {
         }
     }
 
+    /**
+     * Extracts a named file from a JAR and saves it to a temp folder
+     *
+     * @param fileName The name of the file in the jar
+     * @param extension The extension of the file in the jar
+     * @return A path (on disk) to the extracted file from the JAR
+     * @throws IllegalStateException The named file did not exist in the jar.
+     * @throws IOException Error copying the file to the filesystem
+     */
     private static String getPathFromResourceStream(String fileName, String extension) throws IOException {
         // TODO: Ensure that this is reasonably handled without too much copying.
+        // Note: this will leave some data in the temp folder.
         String fullFilename = fileName + extension;
 
+        // maintain a cache to the files so we reduce IO activity if a file has already been extracted.
         if (sCache.containsKey(fullFilename)) {
             return sCache.get(fullFilename);
         }
 
-        // Note: this will leave some data in the temp folder.
         String path = File.createTempFile(fileName, extension).getAbsolutePath();
         File targetFile = new File(path);
+
+        // If our temp file already exists, return it
+        // Likely a logical impossibility due to the implementation of createTempFile
         if (targetFile.exists() && targetFile.length() > 0) {
             return path;
         }
 
-        InputStream rsdroid = ModuleLoader.class.getClassLoader().getResourceAsStream(fullFilename);
+        InputStream rsdroid = RustBackendLoader.class.getClassLoader().getResourceAsStream(fullFilename);
         if (rsdroid == null) {
             throw new IllegalStateException("Could not find " + fullFilename);
         }

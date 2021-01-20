@@ -11,10 +11,8 @@ import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import net.ankiweb.rsdroid.BackendFactory;
-import net.ankiweb.rsdroid.BackendV1;
-import net.ankiweb.rsdroid.database.RustSupportSQLiteDatabase;
 import net.ankiweb.rsdroid.database.RustSupportSQLiteOpenHelper;
-import net.ankiweb.rsdroid.testing.ModuleLoader;
+import net.ankiweb.rsdroid.testing.RustBackendLoader;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -32,7 +30,7 @@ public class CollectionCreationTest {
 
     @Before
     public void loadLibrary() {
-        ModuleLoader.init();
+        RustBackendLoader.init();
     }
 
     @Test
