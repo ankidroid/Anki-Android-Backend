@@ -30,3 +30,8 @@ This is defined as an application to allow instrumented tests to be run against 
    * Implements `android.database.sqlite`, redirecting SQL to the rust library
    * Exposes RPC calls to Rust via a clean Java interface (`net.ankiweb.rsdroid.RustBackend`)
 * Testing library to allow the above to be usable under Robolectric
+
+
+## Additional Information
+
+See `/docs` for more in-depth information.
