@@ -123,6 +123,15 @@ jobs:
       if: matrix.os == 'macos-latest'
       run: .github/scripts/install_ndk_macos.sh r22 22.0.7026061
 
+    - name: Install NDK (Windows - silent)
+      if: matrix.os == 'windows-latest'
+      run: |
+            Write-Host "NDK Install Started"
+
+            (. "$Env:ANDROID_HOME\tools\bin\sdkmanager.bat" --install "ndk;22.0.7026061" --sdk_root="$Env:ANDROID_SDK_ROOT") | out-null
+
+            Write-Host "NDK Install Completed"
+
     - name: Install Pyenv
       if: matrix.os == 'macos-latest'
       run: .github/scripts/macos_install_pyenv.sh
