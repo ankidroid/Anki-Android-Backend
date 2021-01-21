@@ -15,7 +15,7 @@ class Method:
         self.method = method
         self.fields = method.field
 
-
+    # https://developers.google.com/protocol-buffers/docs/reference/cpp/google.protobuf.descriptor
     def to_java_type(self, type, field):
         ### Converts a given protobuf type to the Java Equivalent: (int, or List<Double> for example) ###
         primitive_list = {
@@ -27,7 +27,9 @@ class Method:
                 8 : "boolean",
                 9 : "java.lang.String",
                 12 : "com.google.protobuf.ByteString",
-                13: "int" #"uint32"
+                13: "int", #"uint32"
+                17: "int",
+                18: "long"
                  }
 
         def fix_namespace(f):
@@ -230,7 +232,8 @@ class RPC:
 
 def traverse(proto_file):
     classes = []
-    methods = [Method(m) for m in proto_file.message_type if m.name.endswith("In")]
+    allowed_params = {"NoteTypeID", "NoteID", "CardID", "DeckID", "DeckConfigID", "String", "Bool", "Int32", "Int64"}
+    methods = [Method(m) for m in proto_file.message_type if m.name.endswith("In") or m.name in allowed_params]
 
     method_lookup = {item.method.name: item for item in set(methods) if item.method.name not in ignore_methods_accepting}
 

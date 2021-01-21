@@ -250,7 +250,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.String stripAVTags(Backend.String args) {
+    public Backend.String stripAVTags(String args) {
         try {
             mLock.lock();
             return mBackend.stripAVTags(args);
@@ -290,7 +290,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.Int32 localMinutesWest(Backend.Int64 args) {
+    public Backend.Int32 localMinutesWest(long args) {
         try {
             mLock.lock();
             return mBackend.localMinutesWest(args);
@@ -300,7 +300,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public void setLocalMinutesWest(Backend.Int32 args) {
+    public void setLocalMinutesWest(int args) {
         try {
             mLock.lock();
             mBackend.setLocalMinutesWest(args);
@@ -360,20 +360,20 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.CountsForDeckTodayOut countsForDeckToday(Backend.DeckID args) {
+    public Backend.CountsForDeckTodayOut countsForDeckToday(long did) {
         try {
             mLock.lock();
-            return mBackend.countsForDeckToday(args);
+            return mBackend.countsForDeckToday(did);
         } finally {
             mLock.unlock();
         }
     }
 
     @Override
-    public Backend.String cardStats(Backend.CardID args) {
+    public Backend.String cardStats(long cid) {
         try {
             mLock.lock();
-            return mBackend.cardStats(args);
+            return mBackend.cardStats(cid);
         } finally {
             mLock.unlock();
         }
@@ -480,20 +480,20 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.DeckID getDeckIDByName(Backend.String args) {
+    public Backend.DeckID getDeckIDByName(String name) {
         try {
             mLock.lock();
-            return mBackend.getDeckIDByName(args);
+            return mBackend.getDeckIDByName(name);
         } finally {
             mLock.unlock();
         }
     }
 
     @Override
-    public Backend.Json getDeckLegacy(Backend.DeckID args) {
+    public Backend.Json getDeckLegacy(long did) {
         try {
             mLock.lock();
-            return mBackend.getDeckLegacy(args);
+            return mBackend.getDeckLegacy(did);
         } finally {
             mLock.unlock();
         }
@@ -510,7 +510,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.Json newDeckLegacy(Backend.Bool args) {
+    public Backend.Json newDeckLegacy(boolean args) {
         try {
             mLock.lock();
             return mBackend.newDeckLegacy(args);
@@ -520,7 +520,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public void removeDeck(Backend.DeckID args) {
+    public void removeDeck(long args) {
         try {
             mLock.lock();
             mBackend.removeDeck(args);
@@ -550,10 +550,10 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.Json getDeckConfigLegacy(Backend.DeckConfigID args) {
+    public Backend.Json getDeckConfigLegacy(long dConfId) {
         try {
             mLock.lock();
-            return mBackend.getDeckConfigLegacy(args);
+            return mBackend.getDeckConfigLegacy(dConfId);
         } finally {
             mLock.unlock();
         }
@@ -570,20 +570,20 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public void removeDeckConfig(Backend.DeckConfigID args) {
+    public void removeDeckConfig(long dConfId) {
         try {
             mLock.lock();
-            mBackend.removeDeckConfig(args);
+            mBackend.removeDeckConfig(dConfId);
         } finally {
             mLock.unlock();
         }
     }
 
     @Override
-    public Backend.Card getCard(Backend.CardID args) {
+    public Backend.Card getCard(long cid) {
         try {
             mLock.lock();
-            return mBackend.getCard(args);
+            return mBackend.getCard(cid);
         } finally {
             mLock.unlock();
         }
@@ -620,10 +620,10 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.Note newNote(Backend.NoteTypeID args) {
+    public Backend.Note newNote(long noteTypidId) {
         try {
             mLock.lock();
-            return mBackend.newNote(args);
+            return mBackend.newNote(noteTypidId);
         } finally {
             mLock.unlock();
         }
@@ -650,10 +650,10 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.Note getNote(Backend.NoteID args) {
+    public Backend.Note getNote(long nid) {
         try {
             mLock.lock();
-            return mBackend.getNote(args);
+            return mBackend.getNote(nid);
         } finally {
             mLock.unlock();
         }
@@ -750,10 +750,10 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.Json getNotetypeLegacy(Backend.NoteTypeID args) {
+    public Backend.Json getNotetypeLegacy(long noteTypeId) {
         try {
             mLock.lock();
-            return mBackend.getNotetypeLegacy(args);
+            return mBackend.getNotetypeLegacy(noteTypeId);
         } finally {
             mLock.unlock();
         }
@@ -780,20 +780,20 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.NoteTypeID getNotetypeIDByName(Backend.String args) {
+    public Backend.NoteTypeID getNotetypeIDByName(String name) {
         try {
             mLock.lock();
-            return mBackend.getNotetypeIDByName(args);
+            return mBackend.getNotetypeIDByName(name);
         } finally {
             mLock.unlock();
         }
     }
 
     @Override
-    public void removeNotetype(Backend.NoteTypeID args) {
+    public void removeNotetype(long noteTypeId) {
         try {
             mLock.lock();
-            mBackend.removeNotetype(args);
+            mBackend.removeNotetype(noteTypeId);
         } finally {
             mLock.unlock();
         }
@@ -890,7 +890,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Backend.Json getConfigJson(Backend.String args) {
+    public Backend.Json getConfigJson(String args) {
         try {
             mLock.lock();
             return mBackend.getConfigJson(args);
@@ -910,7 +910,7 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public void removeConfig(Backend.String args) {
+    public void removeConfig(String args) {
         try {
             mLock.lock();
             mBackend.removeConfig(args);
