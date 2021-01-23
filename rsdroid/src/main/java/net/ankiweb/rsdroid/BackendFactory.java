@@ -47,6 +47,7 @@ public class BackendFactory {
             return;
         }
 
+        backend.cancelCurrentProtoQuery();
         // we could swallow the exception here, most of the time it will be "collection is already closed"
         backend.closeCollection(false);
     }
