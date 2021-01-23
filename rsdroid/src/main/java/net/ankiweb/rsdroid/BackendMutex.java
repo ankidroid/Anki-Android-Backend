@@ -46,134 +46,134 @@ public class BackendMutex implements BackendV1 {
     // * If a transaction is held by a thread, have the thread keep the mutex until the transaction is closed
     // * Only one Rust command can run at a time - already true as with_col in rust uses a mutex, but we'll lock on the Java side
 
-    private final ReentrantLock mLock = new ReentrantLock();
-    private final BackendV1 mBackend;
+    private final ReentrantLock lock = new ReentrantLock();
+    private final BackendV1 backend;
 
-    public BackendMutex(BackendV1 mWrapped) {
-        this.mBackend = mWrapped;
+    public BackendMutex(BackendV1 backend) {
+        this.backend = backend;
     }
 
     @Override
     public void beginTransaction() {
-        mLock.lock();
-        mBackend.beginTransaction();
+        lock.lock();
+        backend.beginTransaction();
     }
 
     @Override
     public void commitTransaction() {
         try {
-            mBackend.commitTransaction();
+            backend.commitTransaction();
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public void rollbackTransaction() {
         try {
-            mBackend.rollbackTransaction();
+            backend.rollbackTransaction();
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public JSONArray fullQuery(String query, Object... bindArgs) {
         try {
-            mLock.lock();
-            return mBackend.fullQuery(query, bindArgs);
+            lock.lock();
+            return backend.fullQuery(query, bindArgs);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public int executeGetRowsAffected(String sql, Object... bindArgs) {
         try {
-            mLock.lock();
-            return mBackend.executeGetRowsAffected(sql, bindArgs);
+            lock.lock();
+            return backend.executeGetRowsAffected(sql, bindArgs);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public long insertForId(String sql, Object... bindArgs) {
         try {
-            mLock.lock();
-            return mBackend.insertForId(sql, bindArgs);
+            lock.lock();
+            return backend.insertForId(sql, bindArgs);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public String[] getColumnNames(String sql) {
         try {
-            mLock.lock();
-            return mBackend.getColumnNames(sql);
+            lock.lock();
+            return backend.getColumnNames(sql);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public void closeDatabase() {
         try {
-            mLock.lock();
-            mBackend.closeDatabase();
+            lock.lock();
+            backend.closeDatabase();
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public String getPath() {
         try {
-            mLock.lock();
-            return mBackend.getPath();
+            lock.lock();
+            return backend.getPath();
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Sqlite.DBResponse getPage(int page) {
         try {
-            mLock.lock();
-            return mBackend.getPage(page);
+            lock.lock();
+            return backend.getPage(page);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Sqlite.DBResponse fullQueryProto(String query, Object... bindArgs) {
         try {
-            mLock.lock();
-            return mBackend.fullQueryProto(query, bindArgs);
+            lock.lock();
+            return backend.fullQueryProto(query, bindArgs);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public int getCurrentRowCount() {
         try {
-            mLock.lock();
-            return mBackend.getCurrentRowCount();
+            lock.lock();
+            return backend.getCurrentRowCount();
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public void cancelCurrentProtoQuery() {
         try {
-            mLock.lock();
-            mBackend.cancelCurrentProtoQuery();
+            lock.lock();
+            backend.cancelCurrentProtoQuery();
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
@@ -182,810 +182,810 @@ public class BackendMutex implements BackendV1 {
     @Override
     public Backend.Progress latestProgress() {
         try {
-            mLock.lock();
-            return mBackend.latestProgress();
+            lock.lock();
+            return backend.latestProgress();
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public void setWantsAbort() {
         try {
-            mLock.lock();
-            mBackend.setWantsAbort();
+            lock.lock();
+            backend.setWantsAbort();
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.ExtractAVTagsOut extractAVTags(@Nullable String text, boolean questionSide) {
         try {
-            mLock.lock();
-            return mBackend.extractAVTags(text, questionSide);
+            lock.lock();
+            return backend.extractAVTags(text, questionSide);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.ExtractLatexOut extractLatex(@Nullable String text, boolean svg, boolean expandClozes) {
         try {
-            mLock.lock();
-            return mBackend.extractLatex(text, svg, expandClozes);
+            lock.lock();
+            return backend.extractLatex(text, svg, expandClozes);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.EmptyCardsReport getEmptyCards() {
         try {
-            mLock.lock();
-            return mBackend.getEmptyCards();
+            lock.lock();
+            return backend.getEmptyCards();
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.RenderCardOut renderExistingCard(long cardId, boolean browser) {
         try {
-            mLock.lock();
-            return mBackend.renderExistingCard(cardId, browser);
+            lock.lock();
+            return backend.renderExistingCard(cardId, browser);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.RenderCardOut renderUncommittedCard(@Nullable Backend.Note note, int cardOrd, @Nullable ByteString template, boolean fillEmpty) {
         try {
-            mLock.lock();
-            return mBackend.renderUncommittedCard(note, cardOrd, template, fillEmpty);
+            lock.lock();
+            return backend.renderUncommittedCard(note, cardOrd, template, fillEmpty);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.String stripAVTags(String args) {
         try {
-            mLock.lock();
-            return mBackend.stripAVTags(args);
+            lock.lock();
+            return backend.stripAVTags(args);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.SearchCardsOut searchCards(@Nullable String search, @Nullable Backend.SortOrder order) {
         try {
-            mLock.lock();
-            return mBackend.searchCards(search, order);
+            lock.lock();
+            return backend.searchCards(search, order);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.SearchNotesOut searchNotes(@Nullable String search) {
         try {
-            mLock.lock();
-            return mBackend.searchNotes(search);
+            lock.lock();
+            return backend.searchNotes(search);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.UInt32 findAndReplace(List<Long> nids, @Nullable String search, @Nullable String replacement, boolean regex, boolean matchCase, @Nullable String fieldName) {
         try {
-            mLock.lock();
-            return mBackend.findAndReplace(nids, search, replacement, regex, matchCase, fieldName);
+            lock.lock();
+            return backend.findAndReplace(nids, search, replacement, regex, matchCase, fieldName);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.Int32 localMinutesWest(long args) {
         try {
-            mLock.lock();
-            return mBackend.localMinutesWest(args);
+            lock.lock();
+            return backend.localMinutesWest(args);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public void setLocalMinutesWest(int args) {
         try {
-            mLock.lock();
-            mBackend.setLocalMinutesWest(args);
+            lock.lock();
+            backend.setLocalMinutesWest(args);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.SchedTimingTodayOut schedTimingToday() {
         try {
-            mLock.lock();
-            return mBackend.schedTimingToday();
+            lock.lock();
+            return backend.schedTimingToday();
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.String studiedToday(int cards, double seconds) {
         try {
-            mLock.lock();
-            return mBackend.studiedToday(cards, seconds);
+            lock.lock();
+            return backend.studiedToday(cards, seconds);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.String congratsLearnMessage(float nextDue, int remaining) {
         try {
-            mLock.lock();
-            return mBackend.congratsLearnMessage(nextDue, remaining);
+            lock.lock();
+            return backend.congratsLearnMessage(nextDue, remaining);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public void updateStats(long deckId, int newDelta, int reviewDelta, int millisecondDelta) {
         try {
-            mLock.lock();
-            mBackend.updateStats(deckId, newDelta, reviewDelta, millisecondDelta);
+            lock.lock();
+            backend.updateStats(deckId, newDelta, reviewDelta, millisecondDelta);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public void extendLimits(long deckId, int newDelta, int reviewDelta) {
         try {
-            mLock.lock();
-            mBackend.extendLimits(deckId, newDelta, reviewDelta);
+            lock.lock();
+            backend.extendLimits(deckId, newDelta, reviewDelta);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.CountsForDeckTodayOut countsForDeckToday(long did) {
         try {
-            mLock.lock();
-            return mBackend.countsForDeckToday(did);
+            lock.lock();
+            return backend.countsForDeckToday(did);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.String cardStats(long cid) {
         try {
-            mLock.lock();
-            return mBackend.cardStats(cid);
+            lock.lock();
+            return backend.cardStats(cid);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.GraphsOut graphs(@Nullable String search, int days) {
         try {
-            mLock.lock();
-            return mBackend.graphs(search, days);
+            lock.lock();
+            return backend.graphs(search, days);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.CheckMediaOut checkMedia() {
         try {
-            mLock.lock();
-            return mBackend.checkMedia();
+            lock.lock();
+            return backend.checkMedia();
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public void trashMediaFiles(List<String> fnames) {
         try {
-            mLock.lock();
-            mBackend.trashMediaFiles(fnames);
+            lock.lock();
+            backend.trashMediaFiles(fnames);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.String addMediaFile(@Nullable String desiredName, @Nullable ByteString data) {
         try {
-            mLock.lock();
-            return mBackend.addMediaFile(desiredName, data);
+            lock.lock();
+            return backend.addMediaFile(desiredName, data);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public void emptyTrash() {
         try {
-            mLock.lock();
-            mBackend.emptyTrash();
+            lock.lock();
+            backend.emptyTrash();
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public void restoreTrash() {
         try {
-            mLock.lock();
-            mBackend.restoreTrash();
+            lock.lock();
+            backend.restoreTrash();
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.DeckID addOrUpdateDeckLegacy(@Nullable ByteString deck, boolean preserveUsnAndMtime) {
         try {
-            mLock.lock();
-            return mBackend.addOrUpdateDeckLegacy(deck, preserveUsnAndMtime);
+            lock.lock();
+            return backend.addOrUpdateDeckLegacy(deck, preserveUsnAndMtime);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.DeckTreeNode deckTree(long now, long topDeckId) {
         try {
-            mLock.lock();
-            return mBackend.deckTree(now, topDeckId);
+            lock.lock();
+            return backend.deckTree(now, topDeckId);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.Json deckTreeLegacy() {
         try {
-            mLock.lock();
-            return mBackend.deckTreeLegacy();
+            lock.lock();
+            return backend.deckTreeLegacy();
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.Json getAllDecksLegacy() {
         try {
-            mLock.lock();
-            return mBackend.getAllDecksLegacy();
+            lock.lock();
+            return backend.getAllDecksLegacy();
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.DeckID getDeckIDByName(String name) {
         try {
-            mLock.lock();
-            return mBackend.getDeckIDByName(name);
+            lock.lock();
+            return backend.getDeckIDByName(name);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.Json getDeckLegacy(long did) {
         try {
-            mLock.lock();
-            return mBackend.getDeckLegacy(did);
+            lock.lock();
+            return backend.getDeckLegacy(did);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.DeckNames getDeckNames(boolean skipEmptyDefault, boolean includeFiltered) {
         try {
-            mLock.lock();
-            return mBackend.getDeckNames(skipEmptyDefault, includeFiltered);
+            lock.lock();
+            return backend.getDeckNames(skipEmptyDefault, includeFiltered);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.Json newDeckLegacy(boolean args) {
         try {
-            mLock.lock();
-            return mBackend.newDeckLegacy(args);
+            lock.lock();
+            return backend.newDeckLegacy(args);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public void removeDeck(long args) {
         try {
-            mLock.lock();
-            mBackend.removeDeck(args);
+            lock.lock();
+            backend.removeDeck(args);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.DeckConfigID addOrUpdateDeckConfigLegacy(@Nullable ByteString config, boolean preserveUsnAndMtime) {
         try {
-            mLock.lock();
-            return mBackend.addOrUpdateDeckConfigLegacy(config, preserveUsnAndMtime);
+            lock.lock();
+            return backend.addOrUpdateDeckConfigLegacy(config, preserveUsnAndMtime);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.Json allDeckConfigLegacy() {
         try {
-            mLock.lock();
-            return mBackend.allDeckConfigLegacy();
+            lock.lock();
+            return backend.allDeckConfigLegacy();
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.Json getDeckConfigLegacy(long dConfId) {
         try {
-            mLock.lock();
-            return mBackend.getDeckConfigLegacy(dConfId);
+            lock.lock();
+            return backend.getDeckConfigLegacy(dConfId);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.Json newDeckConfigLegacy() {
         try {
-            mLock.lock();
-            return mBackend.newDeckConfigLegacy();
+            lock.lock();
+            return backend.newDeckConfigLegacy();
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public void removeDeckConfig(long dConfId) {
         try {
-            mLock.lock();
-            mBackend.removeDeckConfig(dConfId);
+            lock.lock();
+            backend.removeDeckConfig(dConfId);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.Card getCard(long cid) {
         try {
-            mLock.lock();
-            return mBackend.getCard(cid);
+            lock.lock();
+            return backend.getCard(cid);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public void updateCard(Backend.Card args) {
         try {
-            mLock.lock();
-            mBackend.updateCard(args);
+            lock.lock();
+            backend.updateCard(args);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.CardID addCard(Backend.Card args) {
         try {
-            mLock.lock();
-            return mBackend.addCard(args);
+            lock.lock();
+            return backend.addCard(args);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public void removeCards(List<Long> cardIds) {
         try {
-            mLock.lock();
-            mBackend.removeCards(cardIds);
+            lock.lock();
+            backend.removeCards(cardIds);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.Note newNote(long noteTypidId) {
         try {
-            mLock.lock();
-            return mBackend.newNote(noteTypidId);
+            lock.lock();
+            return backend.newNote(noteTypidId);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.NoteID addNote(@Nullable Backend.Note note, long deckId) {
         try {
-            mLock.lock();
-            return mBackend.addNote(note, deckId);
+            lock.lock();
+            return backend.addNote(note, deckId);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public void updateNote(Backend.Note args) {
         try {
-            mLock.lock();
-            mBackend.updateNote(args);
+            lock.lock();
+            backend.updateNote(args);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.Note getNote(long nid) {
         try {
-            mLock.lock();
-            return mBackend.getNote(nid);
+            lock.lock();
+            return backend.getNote(nid);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public void removeNotes(List<Long> noteIds, List<Long> cardIds) {
         try {
-            mLock.lock();
-            mBackend.removeNotes(noteIds, cardIds);
+            lock.lock();
+            backend.removeNotes(noteIds, cardIds);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.UInt32 addNoteTags(List<Long> nids, @Nullable String tags) {
         try {
-            mLock.lock();
-            return mBackend.addNoteTags(nids, tags);
+            lock.lock();
+            return backend.addNoteTags(nids, tags);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.UInt32 updateNoteTags(List<Long> nids, @Nullable String tags, @Nullable String replacement, boolean regex) {
         try {
-            mLock.lock();
-            return mBackend.updateNoteTags(nids, tags, replacement, regex);
+            lock.lock();
+            return backend.updateNoteTags(nids, tags, replacement, regex);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.ClozeNumbersInNoteOut clozeNumbersInNote(Backend.Note args) {
         try {
-            mLock.lock();
-            return mBackend.clozeNumbersInNote(args);
+            lock.lock();
+            return backend.clozeNumbersInNote(args);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public void afterNoteUpdates(List<Long> nids, boolean markNotesModified, boolean generateCards) {
         try {
-            mLock.lock();
-            mBackend.afterNoteUpdates(nids, markNotesModified, generateCards);
+            lock.lock();
+            backend.afterNoteUpdates(nids, markNotesModified, generateCards);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.FieldNamesForNotesOut fieldNamesForNotes(List<Long> nids) {
         try {
-            mLock.lock();
-            return mBackend.fieldNamesForNotes(nids);
+            lock.lock();
+            return backend.fieldNamesForNotes(nids);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.NoteIsDuplicateOrEmptyOut noteIsDuplicateOrEmpty(Backend.Note args) {
         try {
-            mLock.lock();
-            return mBackend.noteIsDuplicateOrEmpty(args);
+            lock.lock();
+            return backend.noteIsDuplicateOrEmpty(args);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.NoteTypeID addOrUpdateNotetype(@Nullable ByteString json, boolean preserveUsnAndMtime) {
         try {
-            mLock.lock();
-            return mBackend.addOrUpdateNotetype(json, preserveUsnAndMtime);
+            lock.lock();
+            return backend.addOrUpdateNotetype(json, preserveUsnAndMtime);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.Json getStockNotetypeLegacy(@Nullable Backend.StockNoteType kind) {
         try {
-            mLock.lock();
-            return mBackend.getStockNotetypeLegacy(kind);
+            lock.lock();
+            return backend.getStockNotetypeLegacy(kind);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.Json getNotetypeLegacy(long noteTypeId) {
         try {
-            mLock.lock();
-            return mBackend.getNotetypeLegacy(noteTypeId);
+            lock.lock();
+            return backend.getNotetypeLegacy(noteTypeId);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.NoteTypeNames getNotetypeNames() {
         try {
-            mLock.lock();
-            return mBackend.getNotetypeNames();
+            lock.lock();
+            return backend.getNotetypeNames();
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.NoteTypeUseCounts getNotetypeNamesAndCounts() {
         try {
-            mLock.lock();
-            return mBackend.getNotetypeNamesAndCounts();
+            lock.lock();
+            return backend.getNotetypeNamesAndCounts();
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.NoteTypeID getNotetypeIDByName(String name) {
         try {
-            mLock.lock();
-            return mBackend.getNotetypeIDByName(name);
+            lock.lock();
+            return backend.getNotetypeIDByName(name);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public void removeNotetype(long noteTypeId) {
         try {
-            mLock.lock();
-            mBackend.removeNotetype(noteTypeId);
+            lock.lock();
+            backend.removeNotetype(noteTypeId);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public void openCollection(@Nullable String collectionPath, @Nullable String mediaFolderPath, @Nullable String mediaDbPath, @Nullable String logPath) {
         try {
-            mLock.lock();
-            mBackend.openCollection(collectionPath, mediaFolderPath, mediaDbPath, logPath);
+            lock.lock();
+            backend.openCollection(collectionPath, mediaFolderPath, mediaDbPath, logPath);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public void closeCollection(boolean downgradeToSchema11) {
         try {
-            mLock.lock();
-            mBackend.closeCollection(downgradeToSchema11);
+            lock.lock();
+            backend.closeCollection(downgradeToSchema11);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.CheckDatabaseOut checkDatabase() {
         try {
-            mLock.lock();
-            return mBackend.checkDatabase();
+            lock.lock();
+            return backend.checkDatabase();
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public void beforeUpload() {
         try {
-            mLock.lock();
-            mBackend.beforeUpload();
+            lock.lock();
+            backend.beforeUpload();
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.String translateString(Backend.TranslateStringIn args) {
         try {
-            mLock.lock();
-            return mBackend.translateString(args);
+            lock.lock();
+            return backend.translateString(args);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.String formatTimespan(float seconds, @Nullable Backend.FormatTimespanIn.Context context) {
         try {
-            mLock.lock();
-            return mBackend.formatTimespan(seconds, context);
+            lock.lock();
+            return backend.formatTimespan(seconds, context);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.Json i18nResources() {
         try {
-            mLock.lock();
-            return mBackend.i18nResources();
+            lock.lock();
+            return backend.i18nResources();
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.Bool registerTags(@Nullable String tags, boolean preserveUsn, int usn, boolean clearFirst) {
         try {
-            mLock.lock();
-            return mBackend.registerTags(tags, preserveUsn, usn, clearFirst);
+            lock.lock();
+            return backend.registerTags(tags, preserveUsn, usn, clearFirst);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.AllTagsOut allTags() {
         try {
-            mLock.lock();
-            return mBackend.allTags();
+            lock.lock();
+            return backend.allTags();
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.Json getConfigJson(String args) {
         try {
-            mLock.lock();
-            return mBackend.getConfigJson(args);
+            lock.lock();
+            return backend.getConfigJson(args);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public void setConfigJson(@Nullable String key, @Nullable ByteString valueJson) {
         try {
-            mLock.lock();
-            mBackend.setConfigJson(key, valueJson);
+            lock.lock();
+            backend.setConfigJson(key, valueJson);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public void removeConfig(String args) {
         try {
-            mLock.lock();
-            mBackend.removeConfig(args);
+            lock.lock();
+            backend.removeConfig(args);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public void setAllConfig(Backend.Json args) {
         try {
-            mLock.lock();
-            mBackend.setAllConfig(args);
+            lock.lock();
+            backend.setAllConfig(args);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.Json getAllConfig() {
         try {
-            mLock.lock();
-            return mBackend.getAllConfig();
+            lock.lock();
+            return backend.getAllConfig();
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Backend.Preferences getPreferences() {
         try {
-            mLock.lock();
-            return mBackend.getPreferences();
+            lock.lock();
+            return backend.getPreferences();
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public void setPreferences(Backend.Preferences args) {
         try {
-            mLock.lock();
-            mBackend.setPreferences(args);
+            lock.lock();
+            backend.setPreferences(args);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public void openAnkiDroidCollection(Backend.OpenCollectionIn args) {
         try {
-            mLock.lock();
-            mBackend.openAnkiDroidCollection(args);
+            lock.lock();
+            backend.openAnkiDroidCollection(args);
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public boolean isOpen() {
         try {
-            mLock.lock();
-            return mBackend.isOpen();
+            lock.lock();
+            return backend.isOpen();
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public void close() throws IOException {
         try {
-            mLock.lock();
-            mBackend.close();
+            lock.lock();
+            backend.close();
         } finally {
-            mLock.unlock();
+            lock.unlock();
         }
     }
 }

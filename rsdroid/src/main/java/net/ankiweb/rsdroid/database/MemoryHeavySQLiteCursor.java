@@ -25,12 +25,12 @@ import org.json.JSONException;
 @RustV1Cleanup("To be deleted once protobuf-based cursors are confirmed to be stable")
 public class MemoryHeavySQLiteCursor extends AnkiJsonDatabaseCursor {
 
-    private int mPosition = -1;
+    private int position = -1;
 
     public MemoryHeavySQLiteCursor(Session backend, String query, Object[] bindArgs) {
         super(backend, query, bindArgs);
         try {
-            mResults = backend.fullQuery(query, bindArgs);
+            results = backend.fullQuery(query, bindArgs);
         } catch (BackendException e) {
             throw e.toSQLiteException(query);
         }
@@ -38,27 +38,27 @@ public class MemoryHeavySQLiteCursor extends AnkiJsonDatabaseCursor {
 
     @Override
     public int getCount() {
-        return mResults.length();
+        return results.length();
     }
 
     @Override
     public boolean moveToFirst() {
-        if (mResults.length() == 0) {
+        if (results.length() == 0) {
             return false;
         }
-        mPosition = 0;
+        position = 0;
         return true;
     }
 
     @Override
     public boolean moveToNext() {
-        mPosition++;
-        return mPosition < mResults.length();
+        position++;
+        return position < results.length();
     }
 
     @Override
     public int getPosition() {
-        return mPosition;
+        return position;
     }
 
     @Override
@@ -68,6 +68,6 @@ public class MemoryHeavySQLiteCursor extends AnkiJsonDatabaseCursor {
 
     @Override
     protected JSONArray getRowAtCurrentPosition() throws JSONException {
-        return mResults.getJSONArray(mPosition);
+        return results.getJSONArray(position);
     }
 }

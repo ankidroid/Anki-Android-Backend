@@ -42,67 +42,67 @@ import BackendProto.Sqlite;
 
 /** Handles transaction state management */
 public class Session implements SQLHandler {
-    private final SQLHandler mBackend;
-    private final Stack<SessionState> mSessions = new Stack<>();
+    private final SQLHandler backend;
+    private final Stack<SessionState> sessions = new Stack<>();
 
     public Session(SQLHandler backend) {
-        this.mBackend = backend;
+        this.backend = backend;
     }
 
     private boolean mInTransaction() {
-        return !mSessions.empty();
+        return !sessions.empty();
     }
 
     public void beginTransaction() {
         if (!mInTransaction()) {
-            mBackend.beginTransaction();
+            backend.beginTransaction();
         }
-        mSessions.add(SessionState.initial());
+        sessions.add(SessionState.initial());
     }
 
     @Override
     public void commitTransaction() {
-        mBackend.commitTransaction();
+        backend.commitTransaction();
     }
 
     @Override
     public void rollbackTransaction() {
-        mBackend.rollbackTransaction();
+        backend.rollbackTransaction();
     }
 
     @Override
     public String[] getColumnNames(String sql) {
-        return mBackend.getColumnNames(sql);
+        return backend.getColumnNames(sql);
     }
 
     @Override
     public void closeDatabase() {
-        mBackend.closeDatabase();
+        backend.closeDatabase();
     }
 
     @Override
     public String getPath() {
-        return mBackend.getPath();
+        return backend.getPath();
     }
 
     @Override
     public Sqlite.DBResponse getPage(int page) {
-        return mBackend.getPage(page);
+        return backend.getPage(page);
     }
 
     @Override
     public Sqlite.DBResponse fullQueryProto(String query, Object... bindArgs) {
-        return mBackend.fullQueryProto(query, bindArgs);
+        return backend.fullQueryProto(query, bindArgs);
     }
 
     @Override
     public int getCurrentRowCount() {
-        return mBackend.getCurrentRowCount();
+        return backend.getCurrentRowCount();
     }
 
     @Override
     public void cancelCurrentProtoQuery() {
-        mBackend.cancelCurrentProtoQuery();
+        backend.cancelCurrentProtoQuery();
     }
 
 
@@ -110,7 +110,7 @@ public class Session implements SQLHandler {
         if (!inTransaction()) {
             throw new IllegalStateException("must be in a transaction");
         }
-        mSessions.peek().markSuccessful();
+        sessions.peek().markSuccessful();
     }
 
     public void endTransaction() {
@@ -120,9 +120,9 @@ public class Session implements SQLHandler {
 
         SessionState currentState = pop();
 
-        if (mSessions.size() != 0) {
+        if (sessions.size() != 0) {
             if (!currentState.isSuccessful()) {
-                mSessions.peek().markAsFailed();
+                sessions.peek().markAsFailed();
             }
 
             return;
@@ -138,7 +138,7 @@ public class Session implements SQLHandler {
     }
 
     private SessionState pop() {
-        return mSessions.pop();
+        return sessions.pop();
     }
 
     public boolean inTransaction() {
@@ -146,17 +146,17 @@ public class Session implements SQLHandler {
     }
 
     public JSONArray fullQuery(String query, Object[] bindArgs) {
-        return mBackend.fullQuery(query, bindArgs);
+        return backend.fullQuery(query, bindArgs);
     }
 
     @Override
     public int executeGetRowsAffected(String sql, Object[] bindArgs) {
-        return mBackend.executeGetRowsAffected(sql, bindArgs);
+        return backend.executeGetRowsAffected(sql, bindArgs);
     }
 
     @Override
     public long insertForId(String sql, Object[] bindArgs) {
-        return mBackend.insertForId(sql, bindArgs);
+        return backend.insertForId(sql, bindArgs);
     }
 
     public static class SessionState {

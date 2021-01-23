@@ -30,8 +30,8 @@ import org.apache.commons.exec.OS;
  */
 public class RustBackendLoader {
 
-    private static boolean sLoaded;
-    private static final HashMap<String, String> sCache = new HashMap<>();
+    private static boolean alreadyLoaded;
+    private static final HashMap<String, String> FILENAME_TO_PATH_CACHE = new HashMap<>();
 
     /**
      * Allows unit testing rsdroid under Robolectric <br/>
@@ -44,7 +44,7 @@ public class RustBackendLoader {
      * @throws UnsatisfiedLinkError The library could not be loaded
      */
     public static void init() {
-        if (!sLoaded) {
+        if (!alreadyLoaded) {
             if (OS.isFamilyWindows()) {
                 load("rsdroid", ".dll");
             } else if (OS.isFamilyMac()) {
@@ -56,7 +56,7 @@ public class RustBackendLoader {
                 throw new IllegalStateException(String.format("Could not determine OS Type for: '%s'", osName));
             }
 
-            sLoaded = true;
+            alreadyLoaded = true;
         }
     }
 
@@ -101,8 +101,8 @@ public class RustBackendLoader {
         String fullFilename = fileName + extension;
 
         // maintain a cache to the files so we reduce IO activity if a file has already been extracted.
-        if (sCache.containsKey(fullFilename)) {
-            return sCache.get(fullFilename);
+        if (FILENAME_TO_PATH_CACHE.containsKey(fullFilename)) {
+            return FILENAME_TO_PATH_CACHE.get(fullFilename);
         }
 
         String path = File.createTempFile(fileName, extension).getAbsolutePath();
@@ -128,7 +128,7 @@ public class RustBackendLoader {
             }
         }
 
-        sCache.put(fullFilename, path);
+        FILENAME_TO_PATH_CACHE.put(fullFilename, path);
 
         return path;
     }

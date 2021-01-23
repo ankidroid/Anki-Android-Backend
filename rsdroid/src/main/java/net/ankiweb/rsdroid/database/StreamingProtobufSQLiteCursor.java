@@ -33,47 +33,47 @@ public class StreamingProtobufSQLiteCursor extends AnkiDatabaseCursor {
     // MAINTENANCE: This is not obtained from the Rust, so must manually be kept in sync
     public static final int RUST_PAGE_SIZE = 1000;
 
-    private final SQLHandler mBackend;
-    private final String mQuery;
-    private Sqlite.DBResponse mResults;
-    private int mPosition = -1;
-    private int mPage = -1;
-    private String[] mColumnMapping;
-    private boolean mClosed = false;
-    private final int mSequenceNumber;
+    private final SQLHandler backend;
+    private final String query;
+    private Sqlite.DBResponse results;
+    private int position = -1;
+    private int page = -1;
+    private String[] columnMapping;
+    private boolean isClosed = false;
+    private final int sequenceNumber;
 
 
     public StreamingProtobufSQLiteCursor(SQLHandler backend, String query, Object[] bindArgs) {
-        this.mBackend = backend;
-        this.mQuery = query;
+        this.backend = backend;
+        this.query = query;
 
-        mPage++;
+        page++;
         try {
-            mResults = mBackend.fullQueryProto(mQuery, bindArgs);
-            mSequenceNumber = mResults.getSequenceNumber();
+            results = this.backend.fullQueryProto(this.query, bindArgs);
+            sequenceNumber = results.getSequenceNumber();
         } catch (BackendException e) {
-            throw e.toSQLiteException(mQuery);
+            throw e.toSQLiteException(this.query);
         }
     }
 
     private void getNextPage() {
-        mPage++;
-        mPosition = -1;
+        page++;
+        position = -1;
 
         try {
-            mResults = mBackend.getPage(mPage);
-            if (mResults.getSequenceNumber() != mSequenceNumber) {
+            results = backend.getPage(page);
+            if (results.getSequenceNumber() != sequenceNumber) {
                 throw new IllegalStateException("rsdroid does not currently handle nested cursor-based queries. Please change the code to avoid holding a reference to the query, or implement the functionality in rsdroid");
             }
         } catch (BackendException e) {
-            throw e.toSQLiteException(mQuery);
+            throw e.toSQLiteException(query);
         }
     }
 
     @Override
     public int getCount() {
         // BUG: This will fail if we've iterated the whole collection.
-        int currentRowCount = mBackend.getCurrentRowCount();
+        int currentRowCount = backend.getCurrentRowCount();
         if (currentRowCount == -1) {
             throw new IllegalStateException("Unable to obtain row count");
         }
@@ -82,7 +82,7 @@ public class StreamingProtobufSQLiteCursor extends AnkiDatabaseCursor {
 
     @Override
     public int getPosition() {
-        return mPosition;
+        return position;
     }
 
     @Override
@@ -90,17 +90,17 @@ public class StreamingProtobufSQLiteCursor extends AnkiDatabaseCursor {
         if (getCurrentSliceRowCount() == 0) {
             return false;
         }
-        mPosition = 0;
+        position = 0;
         return true;
     }
 
     @Override
     public boolean moveToNext() {
-        if (getCurrentSliceRowCount() > 0 && mPosition + 1 >= RUST_PAGE_SIZE) {
+        if (getCurrentSliceRowCount() > 0 && position + 1 >= RUST_PAGE_SIZE) {
             getNextPage();
         }
-        mPosition++;
-        return getCurrentSliceRowCount() != 0 && mPosition < getCurrentSliceRowCount();
+        position++;
+        return getCurrentSliceRowCount() != 0 && position < getCurrentSliceRowCount();
     }
 
     @Override
@@ -144,14 +144,14 @@ public class StreamingProtobufSQLiteCursor extends AnkiDatabaseCursor {
     }
 
     private String[] getColumnNamesInternal() {
-        if (mColumnMapping == null) {
-            mColumnMapping = mBackend.getColumnNames(mQuery);
-            if (mColumnMapping == null) {
+        if (columnMapping == null) {
+            columnMapping = backend.getColumnNames(query);
+            if (columnMapping == null) {
                 throw new IllegalStateException("unable to obtain column mapping");
             }
         }
 
-        return mColumnMapping;
+        return columnMapping;
     }
 
     @Override
@@ -159,7 +159,7 @@ public class StreamingProtobufSQLiteCursor extends AnkiDatabaseCursor {
         if (getCurrentSliceRowCount() == 0) {
             return 0;
         } else {
-            return mResults.getResult().getRows(0).getFieldsCount();
+            return results.getResult().getRows(0).getFieldsCount();
         }
     }
 
@@ -231,22 +231,22 @@ public class StreamingProtobufSQLiteCursor extends AnkiDatabaseCursor {
 
     @Override
     public void close() {
-        mClosed = true;
-        mBackend.cancelCurrentProtoQuery();
+        isClosed = true;
+        backend.cancelCurrentProtoQuery();
     }
 
     @Override
     public boolean isClosed() {
-        return mClosed;
+        return isClosed;
     }
 
     protected Sqlite.Row getRowAtCurrentPosition() {
-        Sqlite.DBResult result = mResults.getResult();
+        Sqlite.DBResult result = results.getResult();
         int rowCount = getCurrentSliceRowCount();
-        if (mPosition < 0 || mPosition >= rowCount) {
-            throw new CursorIndexOutOfBoundsException(String.format(Locale.ROOT, "Index %d requested, with a size of %d", mPosition, rowCount));
+        if (position < 0 || position >= rowCount) {
+            throw new CursorIndexOutOfBoundsException(String.format(Locale.ROOT, "Index %d requested, with a size of %d", position, rowCount));
         }
-        return result.getRows(mPosition);
+        return result.getRows(position);
     }
 
     private Sqlite.SqlValue getFieldAtIndex(int columnIndex) {
@@ -254,7 +254,7 @@ public class StreamingProtobufSQLiteCursor extends AnkiDatabaseCursor {
     }
 
     private int getCurrentSliceRowCount() {
-        return mResults.getResult().getRowsCount();
+        return results.getResult().getRowsCount();
     }
 }
 

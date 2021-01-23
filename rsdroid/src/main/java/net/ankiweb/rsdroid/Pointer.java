@@ -1,15 +1,15 @@
 package net.ankiweb.rsdroid;
 
 public class Pointer {
-    private final long mPointer;
+    private final long pointer;
 
 
     public Pointer(long backendPointer) {
-        mPointer = backendPointer;
+        pointer = backendPointer;
     }
 
 
     public long toJni() {
-        return mPointer;
+        return pointer;
     }
 }

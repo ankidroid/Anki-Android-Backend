@@ -32,16 +32,16 @@ import BackendProto.Backend;
 public class BackendException extends RuntimeException {
     @SuppressWarnings({"unused", "RedundantSuppression"})
     @Nullable
-    private final Backend.BackendError mError;
+    private final Backend.BackendError error;
 
     public BackendException(Backend.BackendError error)  {
         super(error.getLocalized());
-        this.mError = error;
+        this.error = error;
     }
 
     public BackendException(String message) {
         super(message);
-        mError = null;
+        error = null;
     }
 
     public static BackendException fromError(Backend.BackendError error) {

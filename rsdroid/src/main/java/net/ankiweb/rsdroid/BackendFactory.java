@@ -18,7 +18,7 @@ package net.ankiweb.rsdroid;
 
 public class BackendFactory {
 
-    private BackendV1 mBackend;
+    private BackendV1 backend;
 
     // Force users to go through getInstance - for now we need to handle the backend failure
     private BackendFactory() {
@@ -36,18 +36,18 @@ public class BackendFactory {
     }
 
     public synchronized BackendV1 getBackend() {
-        if (mBackend == null) {
-            mBackend = new BackendMutex(new BackendV1Impl());
+        if (backend == null) {
+            backend = new BackendMutex(new BackendV1Impl());
         }
-        return mBackend;
+        return backend;
     }
 
     public synchronized void closeCollection() {
-        if (mBackend == null) {
+        if (backend == null) {
             return;
         }
 
         // we could swallow the exception here, most of the time it will be "collection is already closed"
-        mBackend.closeCollection(false);
+        backend.closeCollection(false);
     }
 }

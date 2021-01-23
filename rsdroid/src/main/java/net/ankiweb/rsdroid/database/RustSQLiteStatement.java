@@ -25,34 +25,34 @@ import java.util.HashMap;
 import java.util.Set;
 
 public class RustSQLiteStatement implements SupportSQLiteStatement {
-    private final RustSupportSQLiteDatabase mDatabase;
-    private final String mSql;
+    private final RustSupportSQLiteDatabase database;
+    private final String sql;
 
     private final HashMap<Integer, Object> mBindings = new HashMap<>();
 
     public RustSQLiteStatement(RustSupportSQLiteDatabase database, String sql) {
-        mDatabase = database;
-        mSql = sql;
+        this.database = database;
+        this.sql = sql;
     }
 
     @Override
     public void execute() {
-        mDatabase.query(mSql, getBindings());
+        database.query(sql, getBindings());
     }
 
     @Override
     public int executeUpdateDelete() {
-        return mDatabase.executeGetRowsAffected(mSql, getBindings());
+        return database.executeGetRowsAffected(sql, getBindings());
     }
 
     @Override
     public long executeInsert() {
-        return mDatabase.insertForForId(mSql, getBindings());
+        return database.insertForForId(sql, getBindings());
     }
 
     @Override
     public long simpleQueryForLong() {
-        try (Cursor query = mDatabase.query(mSql, getBindings())) {
+        try (Cursor query = database.query(sql, getBindings())) {
             if (!query.moveToFirst()) {
                 throw new SQLiteDoneException();
             }
@@ -62,7 +62,7 @@ public class RustSQLiteStatement implements SupportSQLiteStatement {
 
     @Override
     public String simpleQueryForString() {
-        try (Cursor query = mDatabase.query(mSql, getBindings())) {
+        try (Cursor query = database.query(sql, getBindings())) {
             if (!query.moveToFirst()) {
                 throw new SQLiteDoneException();
             }

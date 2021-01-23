@@ -46,10 +46,10 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
     Implies that ?
      */
 
-    private Pointer mBackEndPointer = null;
+    private Pointer backEndPointer = null;
     @Nullable
-    private String mCollectionPath;
-    private boolean mDisposed;
+    private String collectionPath;
+    private boolean isDisposed;
 
     // intentionally package private - use BackendFactory
     BackendV1Impl() {
@@ -68,11 +68,11 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
     @Override
     @CheckResult
     public Pointer ensureBackend() {
-        if (mDisposed) {
+        if (isDisposed) {
             throw new BackendException("Backend has been closed");
         }
 
-        if (mBackEndPointer == null) {
+        if (backEndPointer == null) {
             boolean isServer = false;
             String langs = "en";
             String localeFolderPath = "";
@@ -86,20 +86,20 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
 
             long backendPointer = NativeMethods.openBackend(builder.build().toByteArray());
 
-            mBackEndPointer = new Pointer(backendPointer);
+            backEndPointer = new Pointer(backendPointer);
         }
-        return mBackEndPointer;
+        return backEndPointer;
     }
 
     @Override
     public boolean isOpen() {
-        return mBackEndPointer != null;
+        return backEndPointer != null;
     }
 
     @Override
     public void close() {
         Timber.i("Closing rust backend");
-        if (mBackEndPointer != null) {
+        if (backEndPointer != null) {
             try {
                 closeDatabase();
             } catch (BackendException ex) {
@@ -107,13 +107,13 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
                 Timber.w(ex, "Error while closing rust database");
             }
             Timber.d("Executing close backend command");
-            NativeMethods.closeBackend(mBackEndPointer.toJni());
+            NativeMethods.closeBackend(backEndPointer.toJni());
         }
-        this.mDisposed = true;
+        this.isDisposed = true;
     }
 
     public void openAnkiDroidCollection(Backend.OpenCollectionIn args) {
-        mCollectionPath = args.getCollectionPath();
+        collectionPath = args.getCollectionPath();
         try {
             Pointer backendPointer = ensureBackend();
             Timber.i("Opening Collection: '%s' '%s' '%s' '%s'", args.getCollectionPath(), args.getLogPath(), args.getMediaDbPath(), args.getMediaFolderPath());
@@ -121,10 +121,10 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
             Backend.Empty message = Backend.Empty.parseFrom(result);
             validateMessage(result, message);
         } catch (BackendException.BackendDbException ex) {
-            mCollectionPath = null;
+            collectionPath = null;
             throw ex.toSQLiteException("openAnkiDroidCollection");
         } catch (InvalidProtocolBufferException ex) {
-            mCollectionPath = null;
+            collectionPath = null;
             throw BackendException.fromException(ex);
         }
     }
@@ -347,7 +347,7 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
 
     @Override
     public String getPath() {
-        return mCollectionPath;
+        return collectionPath;
     }
 
     @SuppressWarnings("CharsetObjectCanBeUsed")

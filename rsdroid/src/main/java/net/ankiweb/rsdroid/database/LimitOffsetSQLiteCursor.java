@@ -41,9 +41,9 @@ public class LimitOffsetSQLiteCursor extends AnkiJsonDatabaseCursor {
      */
     public static int PAGE_SIZE = 100;
 
-    private int mPosition = -1;
-    private int mPageOffset = -1;
-    private final int mPageSize = PAGE_SIZE;
+    private int position = -1;
+    private int pageOffset = -1;
+    private final int pageSize = PAGE_SIZE;
 
     public LimitOffsetSQLiteCursor(Session backend, String query, Object[] bindArgs) {
         super(backend, query, bindArgs);
@@ -52,12 +52,12 @@ public class LimitOffsetSQLiteCursor extends AnkiJsonDatabaseCursor {
 
 
     private void loadPage() {
-        mPageOffset++;
-        mPosition = -1;
+        pageOffset++;
+        position = -1;
 
-        String query = mQuery + " LIMIT " + getPageSize() + " OFFSET " + mPageOffset * getPageSize();
+        String query = this.query + " LIMIT " + getPageSize() + " OFFSET " + pageOffset * getPageSize();
         try {
-            mResults = super.fullQuery(query, mBindArgs);
+            results = super.fullQuery(query, bindArgs);
         } catch (BackendException e) {
             throw e.toSQLiteException(query);
         }
@@ -65,16 +65,16 @@ public class LimitOffsetSQLiteCursor extends AnkiJsonDatabaseCursor {
 
     @Override
     public int getCount() {
-        Timber.w("Extremely slow call: getCount() on '%s'", mQuery);
+        Timber.w("Extremely slow call: getCount() on '%s'", query);
 
         // Consider wrapping the query with a "select count() from (`query`)"
         // will that work in all cases?
-        int currentPageOffset = mPageOffset;
-        int currentPosition = mPosition;
+        int currentPageOffset = pageOffset;
+        int currentPosition = position;
 
-        int knownCount = mPageOffset * (getPageSize() - 1) + mResults.length();
+        int knownCount = pageOffset * (getPageSize() - 1) + results.length();
 
-        if (mResults.length() > 0 && mResults.length() < getPageSize()) {
+        if (results.length() > 0 && results.length() < getPageSize()) {
             return knownCount;
         }
 
@@ -83,49 +83,49 @@ public class LimitOffsetSQLiteCursor extends AnkiJsonDatabaseCursor {
 
         int count = 0;
 
-        while (mResults.length() == PAGE_SIZE) {
+        while (results.length() == PAGE_SIZE) {
             loadPage();
-            count += mResults.length();
+            count += results.length();
         }
 
         // reload the current page
-        mPageOffset = currentPageOffset -1;
+        pageOffset = currentPageOffset -1;
         loadPage();
 
         // reset the variables
-        mPageOffset = currentPageOffset;
-        mPosition = currentPosition;
+        pageOffset = currentPageOffset;
+        position = currentPosition;
 
         return count;
     }
 
     private void reset() {
-        mResults = null;
-        mPageOffset = -1;
-        mPosition = -1;
+        results = null;
+        pageOffset = -1;
+        position = -1;
     }
 
     @Override
     public int getPosition() {
-        return mPageOffset * getPageSize() + mPosition;
+        return pageOffset * getPageSize() + position;
     }
 
     @Override
     public boolean moveToFirst() {
-        if (mResults.length() == 0) {
+        if (results.length() == 0) {
             return false;
         }
-        mPosition = 0;
+        position = 0;
         return true;
     }
 
     @Override
     public boolean moveToNext() {
-        if (mResults.length() > 0 && mPosition + 1 >= getPageSize()) {
+        if (results.length() > 0 && position + 1 >= getPageSize()) {
             loadPage();
         }
-        mPosition++;
-        return mResults.length() != 0 && mPosition < mResults.length();
+        position++;
+        return results.length() != 0 && position < results.length();
     }
 
     @Override
@@ -135,10 +135,10 @@ public class LimitOffsetSQLiteCursor extends AnkiJsonDatabaseCursor {
 
     @Override
     protected JSONArray getRowAtCurrentPosition() throws JSONException {
-        return mResults.getJSONArray(mPosition);
+        return results.getJSONArray(position);
     }
 
     public int getPageSize() {
-        return mPageSize;
+        return pageSize;
     }
 }

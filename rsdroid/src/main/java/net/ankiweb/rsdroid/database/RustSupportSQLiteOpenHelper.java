@@ -29,33 +29,33 @@ import timber.log.Timber;
 
 public class RustSupportSQLiteOpenHelper implements SupportSQLiteOpenHelper {
     @Nullable
-    private final Configuration mConfiguration;
+    private final Configuration configuration;
     @Nullable
-    private final BackendV1 mBackend;
-    private BackendFactory mBackendFactory;
-    private RustSupportSQLiteDatabase mDatabase;
+    private final BackendV1 backend;
+    private BackendFactory backendFactory;
+    private RustSupportSQLiteDatabase database;
 
     public RustSupportSQLiteOpenHelper(@NonNull Configuration configuration, BackendFactory backendFactory) {
-        this.mConfiguration = configuration;
-        this.mBackendFactory = backendFactory;
-        mBackend = null;
+        this.configuration = configuration;
+        this.backendFactory = backendFactory;
+        this.backend = null;
     }
 
     public RustSupportSQLiteOpenHelper(@NonNull BackendV1 backend) {
         if (!backend.isOpen()) {
             throw new IllegalStateException("Backend should be open");
         }
-        this.mBackend = backend;
-        mConfiguration = null;
+        this.backend = backend;
+        configuration = null;
     }
 
     @Nullable
     @Override
     public String getDatabaseName() {
-        if (mBackend != null) {
-            return mBackend.getPath();
-        } else if (mConfiguration != null) {
-            return mConfiguration.name;
+        if (backend != null) {
+            return backend.getPath();
+        } else if (configuration != null) {
+            return configuration.name;
         } else {
             throw new IllegalStateException("Class invalid: no config or backend");
         }
@@ -68,10 +68,10 @@ public class RustSupportSQLiteOpenHelper implements SupportSQLiteOpenHelper {
 
     @Override
     public SupportSQLiteDatabase getWritableDatabase() {
-        if (mDatabase == null) {
-            this.mDatabase = createRustSupportSQLiteDatabase(false);
+        if (database == null) {
+            this.database = createRustSupportSQLiteDatabase(false);
         }
-        return mDatabase;
+        return database;
     }
 
     @Override
@@ -86,12 +86,12 @@ public class RustSupportSQLiteOpenHelper implements SupportSQLiteOpenHelper {
 
     private RustSupportSQLiteDatabase createRustSupportSQLiteDatabase(@SuppressWarnings("SameParameterValue") boolean readOnly) {
         Timber.d("createRustSupportSQLiteDatabase");
-        if (mConfiguration != null) {
-            BackendV1 backend = mBackendFactory.getBackend();
-            BackendUtils.openAnkiDroidCollection(backend, mConfiguration.name);
+        if (configuration != null) {
+            BackendV1 backend = backendFactory.getBackend();
+            BackendUtils.openAnkiDroidCollection(backend, configuration.name);
             return new RustSupportSQLiteDatabase(backend, readOnly);
         } else {
-            return new RustSupportSQLiteDatabase(mBackend, readOnly);
+            return new RustSupportSQLiteDatabase(backend, readOnly);
         }
     }
 }

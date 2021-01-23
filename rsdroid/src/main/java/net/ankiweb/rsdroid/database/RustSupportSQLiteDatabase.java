@@ -62,26 +62,26 @@ public class RustSupportSQLiteDatabase implements SupportSQLiteDatabase {
             {"", " OR ROLLBACK ", " OR ABORT ", " OR FAIL ", " OR IGNORE ", " OR REPLACE "};
 
     private final ThreadLocal<Session> sessionFactory;
-    private final boolean mReadOnly;
-    private boolean mOpen;
+    private final boolean isReadOnly;
+    private boolean isOpen;
 
     public RustSupportSQLiteDatabase(BackendV1 backend, boolean readOnly) {
         if (backend == null) {
             throw new IllegalArgumentException("backend was null");
         }
         this.sessionFactory = new SessionThreadLocal(backend);
-        this.mReadOnly = readOnly;
-        this.mOpen = true;
+        this.isReadOnly = readOnly;
+        this.isOpen = true;
     }
 
     @Override
     public boolean isReadOnly() {
-        return mReadOnly;
+        return isReadOnly;
     }
 
     @Override
     public boolean isOpen() {
-        return mOpen;
+        return isOpen;
     }
 
     @Override
@@ -275,7 +275,7 @@ public class RustSupportSQLiteDatabase implements SupportSQLiteDatabase {
 
     @Override
     public void close() {
-        mOpen = false;
+        isOpen = false;
         getSession().closeDatabase();
     }
 

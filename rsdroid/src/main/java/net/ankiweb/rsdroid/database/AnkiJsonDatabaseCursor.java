@@ -21,17 +21,17 @@ import org.json.JSONException;
 
 public abstract class AnkiJsonDatabaseCursor extends AnkiDatabaseCursor {
 
-    private final Session mBackend;
-    protected final String mQuery;
-    protected final Object[] mBindArgs;
-    protected JSONArray mResults;
-    private String[] mColumnMapping;
+    private final Session backend;
+    protected final String query;
+    protected final Object[] bindArgs;
+    protected JSONArray results;
+    private String[] columnMapping;
 
 
     public AnkiJsonDatabaseCursor(Session backend, String query, Object[] bindArgs) {
-        this.mBackend = backend;
-        this.mQuery = query;
-        this.mBindArgs = bindArgs;
+        this.backend = backend;
+        this.query = query;
+        this.bindArgs = bindArgs;
     }
 
     // There's no need to close this cursor.
@@ -43,11 +43,11 @@ public abstract class AnkiJsonDatabaseCursor extends AnkiDatabaseCursor {
 
     @Override
     public int getColumnCount() {
-        if (mResults.length() == 0) {
+        if (results.length() == 0) {
             return 0;
         } else {
             try {
-                return mResults.getJSONArray(0).length();
+                return results.getJSONArray(0).length();
             } catch (JSONException e) {
                 return 0;
             }
@@ -175,19 +175,19 @@ public abstract class AnkiJsonDatabaseCursor extends AnkiDatabaseCursor {
     }
 
     private String[] getColumnNamesInternal() {
-        if (mColumnMapping == null) {
-            mColumnMapping = mBackend.getColumnNames(mQuery);
-            if (mColumnMapping == null) {
+        if (columnMapping == null) {
+            columnMapping = backend.getColumnNames(query);
+            if (columnMapping == null) {
                 throw new IllegalStateException("unable to obtain column mapping");
             }
         }
 
-        return mColumnMapping;
+        return columnMapping;
     }
 
     protected abstract JSONArray getRowAtCurrentPosition() throws JSONException;
 
     protected JSONArray fullQuery(String query, Object[] bindArgs) {
-        return mBackend.fullQuery(query, bindArgs);
+        return backend.fullQuery(query, bindArgs);
     }
 }
