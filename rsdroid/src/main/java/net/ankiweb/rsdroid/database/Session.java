@@ -96,11 +96,6 @@ public class Session implements SQLHandler {
     }
 
     @Override
-    public int getCurrentRowCount() {
-        return backend.getCurrentRowCount();
-    }
-
-    @Override
     public void cancelCurrentProtoQuery() {
         backend.cancelCurrentProtoQuery();
     }

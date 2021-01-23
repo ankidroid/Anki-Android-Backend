@@ -55,16 +55,6 @@ pub(crate) unsafe fn get_next(ptr : backend_pointer, offset : usize, to_take : u
     Some(trimmed_result)
 }
 
-pub(crate) unsafe fn get_count(ptr: backend_pointer) -> Option<i32> {
-    let map = HASHMAP.lock().unwrap();
-
-    let result_ptr = *map.get(&ptr)?;
-
-    let current_result = &mut *(result_ptr as *mut DbResponse);
-
-    Some(current_result.result.as_ref()?.rows.len() as i32)
-}
-
 static mut SEQUENCE_NUMBER: i32 = 0;
 
 pub(crate) unsafe fn next_sequence_number() -> i32 {

@@ -71,11 +71,7 @@ public class NativeMethods {
      * @return DbResult object */
     @CheckResult
     static native byte[] databaseGetNextResultPage(long backendPointer, int page);
-
-    /** Returns the count of elements in the result set from the current query */
-    static native int databaseGetCount(long toJni);
-
-
+    
     /** Clears the memory from the current protobuf query. */
     static native int cancelCurrentProtoQuery(long toJni);
 

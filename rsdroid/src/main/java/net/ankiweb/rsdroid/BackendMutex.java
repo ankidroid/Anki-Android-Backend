@@ -158,16 +158,6 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public int getCurrentRowCount() {
-        try {
-            lock.lock();
-            return backend.getCurrentRowCount();
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    @Override
     public void cancelCurrentProtoQuery() {
         try {
             lock.lock();

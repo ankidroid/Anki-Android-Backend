@@ -279,14 +279,6 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
         }
     }
 
-
-    @Override
-    public int getCurrentRowCount() {
-        return NativeMethods.databaseGetCount(ensureBackend().toJni());
-    }
-
-
-
     @Override
     public void cancelCurrentProtoQuery() {
         Timber.d("cancelCurrentProtoQuery");

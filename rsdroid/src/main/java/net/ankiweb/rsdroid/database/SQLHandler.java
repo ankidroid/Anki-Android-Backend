@@ -43,7 +43,6 @@ public interface SQLHandler {
     /* Protobuf-related (#6) */
     Sqlite.DBResponse getPage(int page);
     Sqlite.DBResponse fullQueryProto(String query, Object... bindArgs);
-    int getCurrentRowCount();
 
     void cancelCurrentProtoQuery();
 }

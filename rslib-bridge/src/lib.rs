@@ -184,15 +184,6 @@ pub unsafe extern "C" fn Java_net_ankiweb_rsdroid_NativeMethods_databaseGetNextR
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn Java_net_ankiweb_rsdroid_NativeMethods_databaseGetCount(
-    _: JNIEnv,
-    _: JClass,
-    backend_ptr : jlong
-) -> i32 {
-    dbcommand::get_count(backend_ptr).unwrap_or(-1)
-}
-
-#[no_mangle]
 pub unsafe extern "C" fn Java_net_ankiweb_rsdroid_NativeMethods_cancelCurrentProtoQuery(
     _: JNIEnv,
     _: JClass,
