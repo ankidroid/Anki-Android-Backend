@@ -370,14 +370,15 @@ Store the data in the cache if there's more than DB_COMMAND_NUM_ROWS.<br/>
 Returns: The data capped to DB_COMMAND_NUM_ROWS
 */
 fn trim_and_cache_remaining(backend_ptr: i64, values: DbResult, sequence_number: i32) -> DbResponse {
+    let row_count = values.rows.len() as i32;
     if values.rows.len() > DB_COMMAND_NUM_ROWS {
         let result = values.rows.iter().take(DB_COMMAND_NUM_ROWS).cloned().collect();
-        let to_store = DbResponse { result: Some(values), sequence_number };
+        let to_store = DbResponse { result: Some(values), sequence_number, row_count };
         dbcommand::insert_cache(backend_ptr, to_store);
 
-        DbResponse { result: Some(DbResult { rows: result }), sequence_number }
+        DbResponse { result: Some(DbResult { rows: result }), sequence_number, row_count }
     } else {
-        DbResponse { result: Some(values), sequence_number }
+        DbResponse { result: Some(values), sequence_number, row_count }
     }
 }
 

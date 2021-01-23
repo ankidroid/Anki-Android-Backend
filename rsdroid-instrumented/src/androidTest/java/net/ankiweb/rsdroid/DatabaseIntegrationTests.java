@@ -20,7 +20,10 @@ import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
 import android.database.sqlite.SQLiteException;
 
+import androidx.sqlite.db.SupportSQLiteDatabase;
+
 import net.ankiweb.rsdroid.ankiutil.DatabaseUtil;
+import net.ankiweb.rsdroid.database.StreamingProtobufSQLiteCursor;
 import net.ankiweb.rsdroid.database.testutils.DatabaseComparison;
 
 import org.junit.Test;
@@ -219,6 +222,59 @@ public class DatabaseIntegrationTests extends DatabaseComparison {
             testDoubleConversion("byte", 42);
         } catch (SQLiteException e) {
             assertThat(e.getMessage(), is("unknown error (code 0): Unable to convert BLOB to double"));
+        }
+    }
+
+    @Test
+    public void testRowCountEmpty() {
+        SupportSQLiteDatabase db = mDatabase;
+
+        db.execSQL("create table test (id int)");
+
+        try (Cursor c = db.query("select * from test")) {
+            assertThat(c.getCount(), is(0));
+        }
+    }
+
+    @Test
+    public void testRowCountSingle() {
+        SupportSQLiteDatabase db = mDatabase;
+
+        db.execSQL("create table test (id int)");
+        db.execSQL("insert into test VALUES (1)");
+
+        try (Cursor c = db.query("select * from test")) {
+            assertThat(c.getCount(), is(1));
+        }
+    }
+
+    @Test
+    public void testRowCountPage() {
+        SupportSQLiteDatabase db = mDatabase;
+
+        db.execSQL("create table test (id int)");
+
+        for (int i = 0; i < StreamingProtobufSQLiteCursor.RUST_PAGE_SIZE; i++) {
+            db.execSQL("insert into test VALUES (1)");
+        }
+
+        try (Cursor c = db.query("select * from test")) {
+            assertThat(c.getCount(), is(StreamingProtobufSQLiteCursor.RUST_PAGE_SIZE));
+        }
+    }
+
+    @Test
+    public void testRowCountPageAndOne() {
+        SupportSQLiteDatabase db = mDatabase;
+
+        db.execSQL("create table test (id int)");
+
+        for (int i = 0; i < StreamingProtobufSQLiteCursor.RUST_PAGE_SIZE + 1; i++) {
+            db.execSQL("insert into test VALUES (1)");
+        }
+
+        try (Cursor c = db.query("select * from test")) {
+            assertThat(c.getCount(), is(StreamingProtobufSQLiteCursor.RUST_PAGE_SIZE + 1));
         }
     }
 

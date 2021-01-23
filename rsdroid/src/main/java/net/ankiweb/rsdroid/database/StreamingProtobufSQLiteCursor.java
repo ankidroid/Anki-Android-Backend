@@ -41,6 +41,7 @@ public class StreamingProtobufSQLiteCursor extends AnkiDatabaseCursor {
     private String[] columnMapping;
     private boolean isClosed = false;
     private final int sequenceNumber;
+    private final int rowCount;
 
 
     public StreamingProtobufSQLiteCursor(SQLHandler backend, String query, Object[] bindArgs) {
@@ -51,6 +52,7 @@ public class StreamingProtobufSQLiteCursor extends AnkiDatabaseCursor {
         try {
             results = this.backend.fullQueryProto(this.query, bindArgs);
             sequenceNumber = results.getSequenceNumber();
+            rowCount = results.getRowCount();
         } catch (BackendException e) {
             throw e.toSQLiteException(this.query);
         }
@@ -72,12 +74,7 @@ public class StreamingProtobufSQLiteCursor extends AnkiDatabaseCursor {
 
     @Override
     public int getCount() {
-        // BUG: This will fail if we've iterated the whole collection.
-        int currentRowCount = backend.getCurrentRowCount();
-        if (currentRowCount == -1) {
-            throw new IllegalStateException("Unable to obtain row count");
-        }
-        return currentRowCount;
+        return rowCount;
     }
 
     @Override

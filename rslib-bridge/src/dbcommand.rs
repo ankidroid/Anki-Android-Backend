@@ -50,7 +50,7 @@ pub(crate) unsafe fn get_next(ptr : backend_pointer, offset : usize, to_take : u
         flush_cache(&ptr)
     }
 
-    let trimmed_result = DbResponse { result: Some(result), sequence_number: current_result.sequence_number };
+    let trimmed_result = DbResponse { result: Some(result), sequence_number: current_result.sequence_number, row_count: current_result.row_count };
 
     Some(trimmed_result)
 }
