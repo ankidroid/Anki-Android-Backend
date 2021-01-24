@@ -45,4 +45,8 @@ jobs:
         ORG_GRADLE_PROJECT_SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
         SONATYPE_NEXUS_USERNAME: david-allison-1
         SONATYPE_NEXUS_PASSWORD: ${{ secrets.SONATYPE_NEXUS_PASSWORD }}
-      run: ./gradlew rsdroid:uploadArchives -DtestBuildType=release -Dorg.gradle.daemon=false -Dorg.gradle.console=plain
+      run: |
+             ./gradlew rsdroid:uploadArchives -DtestBuildType=release -Dorg.gradle.daemon=false -Dorg.gradle.console=plain
+
+    - name: ℹ️Additional Release Instructions (requires human interaction)
+      run: echo "Sign in to https://oss.sonatype.org/#stagingRepositories , close the repsository, then release it"
