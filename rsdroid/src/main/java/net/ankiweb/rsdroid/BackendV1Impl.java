@@ -333,8 +333,14 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
     }
 
     @Override
+    public void closeCollection(boolean downgradeToSchema11) {
+        cancelCurrentProtoQuery();
+        super.closeCollection(downgradeToSchema11);
+    }
+
+    @Override
     public void closeDatabase() {
-        super.closeCollection(false);
+        closeCollection(false);
     }
 
     @Override
