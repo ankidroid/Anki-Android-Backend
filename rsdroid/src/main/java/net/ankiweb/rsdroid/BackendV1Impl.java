@@ -92,6 +92,11 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
     }
 
     @Override
+    protected byte[] executeCommand(long backendPointer, int command, byte[] args) {
+        return NativeMethods.executeCommand(backendPointer, command, args);
+    }
+
+    @Override
     public boolean isOpen() {
         return backEndPointer != null;
     }

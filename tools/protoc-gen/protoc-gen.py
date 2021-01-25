@@ -10,6 +10,8 @@ from google.protobuf.compiler import plugin_pb2 as plugin
 # Needs map<> and Fluent import rather than Backend
 ignore_methods_accepting = ["TranslateStringIn"]
 
+backend_name = "Backend"
+
 class Method:
     def __init__(self, method):
         self.method = method
@@ -86,7 +88,7 @@ class Method:
     def as_builder(self):
         # we can't set fields to null, so we can't use the builder fluent syntax.
 
-        ret = "Backend.{}.Builder builder = Backend.{}.newBuilder();\n".format(self.method.name, self.method.name)
+        ret = "{namespace}.{methodName}.Builder builder = {namespace}.{methodName}.newBuilder();\n".format(methodName=self.method.name, namespace=backend_name)
         for setter, field in self.getFieldSetters():
             if self.is_primitive(field):
                 ret += "            builder{};\n".format(setter)
@@ -94,7 +96,7 @@ class Method:
                 ret += "            if ({} != null) {{ builder{}; }}\n".format(field.json_name, setter)
 
 
-        ret += "            Backend.{} protobuf = builder.build();\n".format(self.method.name)
+        ret += "            {}.{} protobuf = builder.build();\n".format(backend_name, self.method.name)
         return ret
 
 
@@ -120,13 +122,13 @@ class RPC:
     def parse_input(str):
         if str == ".BackendProto.Empty":
             return "()"
-        return "(" + str.replace(".BackendProto.", "Backend.") + " args)"
+        return "(" + str.replace(".BackendProto.", backend_name + ".") + " args)"
 
     @staticmethod
     def parse_output(str):
         if str == ".BackendProto.Empty":
             return "void"
-        return str.replace(".BackendProto.", "Backend.")
+        return str.replace(".BackendProto.", backend_name + ".")
 
     def get_input(self):
         return self.parse(self.method.input_type, True)
@@ -164,7 +166,7 @@ class RPC:
                        "        try {{\n" \
                        "            {deser}\n" \
                        "            Pointer backendPointer = ensureBackend();\n" \
-                       "            result = NativeMethods.executeCommand(backendPointer.toJni(), {num}, protobuf.toByteArray());\n" \
+                       "            result = executeCommand(backendPointer.toJni(), {num}, protobuf.toByteArray());\n" \
                        "            Backend.Empty message = Backend.Empty.parseFrom(result);\n" \
                        "            validateMessage(result, message);\n" \
                        "        }} catch (InvalidProtocolBufferException ex) {{\n" \
@@ -179,7 +181,7 @@ class RPC:
                        "        byte[] result = null;\n" \
                        "        try {{\n" \
                        "            Pointer backendPointer = ensureBackend();\n" \
-                       "            result = NativeMethods.executeCommand(backendPointer.toJni(), {num}, {args});\n" \
+                       "            result = executeCommand(backendPointer.toJni(), {num}, {args});\n" \
                        "            Backend.Empty message = Backend.Empty.parseFrom(result);\n" \
                        "            validateMessage(result, message);\n" \
                        "        }} catch (InvalidProtocolBufferException ex) {{\n" \
@@ -197,7 +199,7 @@ class RPC:
                        "        try {{\n" \
                        "            {deser}\n" \
                        "            Pointer backendPointer = ensureBackend();\n" \
-                       "            result = NativeMethods.executeCommand(backendPointer.toJni(), {num}, protobuf.toByteArray());\n" \
+                       "            result = executeCommand(backendPointer.toJni(), {num}, protobuf.toByteArray());\n" \
                        "            {out} message = {out}.parseFrom(result);\n" \
                        "            validateMessage(result, message);\n" \
                        "            return message;\n" \
@@ -214,7 +216,7 @@ class RPC:
                        "        byte[] result = null;\n" \
                        "        try {{\n" \
                        "            Pointer backendPointer = ensureBackend();\n" \
-                       "            result = NativeMethods.executeCommand(backendPointer.toJni(), {num}, {args});\n" \
+                       "            result = executeCommand(backendPointer.toJni(), {num}, {args});\n" \
                        "            {out} message = {out}.parseFrom(result);\n" \
                        "            validateMessage(result, message);\n" \
                        "            return message;\n" \
@@ -275,13 +277,19 @@ def gen_backend_methods(file, proto_file, methods, class_name):
     file.content = "\n".join(contents)
 
 def generate_code(request, response):
+    global backend_name
     for proto_file in request.proto_file:
 
         service_methods = traverse(proto_file)
         if not service_methods:
             continue
 
+        backend_name = proto_file.name.replace(".proto", "")
+        if backend_name == "backend":
+            backend_name = "Backend"
+            
         class_name = proto_file.name.capitalize().replace(".proto", "").replace("Backend", "RustBackend")
+        current_import = "" if backend_name == "Backend" else "import BackendProto.{};".format(backend_name)
         file_contents = ["/*\n "
                          "  This class was autogenerated from {} by {}\n"
                          "  Please Rebuild project to regenerate."
@@ -290,7 +298,8 @@ def generate_code(request, response):
                          "import androidx.annotation.Nullable;\n\n"
                          "import com.google.protobuf.InvalidProtocolBufferException;\n"
                          "import com.google.protobuf.GeneratedMessageV3;\n\n"
-                         "import BackendProto.Backend;\n\n"
+                         "import BackendProto.Backend;\n"
+                         "{currentImport}\n\n"
                          "public abstract class {cls}Impl implements net.ankiweb.rsdroid.{cls} {{\n\n"
                          "    public abstract Pointer ensureBackend();\n\n\n"
                          "    protected void validateMessage(byte[] result, GeneratedMessageV3 message) throws InvalidProtocolBufferException {{\n"
@@ -300,6 +309,8 @@ def generate_code(request, response):
                          "        Backend.BackendError ex = Backend.BackendError.parseFrom(result);\n"
                          "        throw BackendException.fromError(ex);\n"
                          "    }}"
+                         "\n"
+                         "    protected abstract byte[] executeCommand(long backendPointer, final int command, byte[] args);\n"
                          "\n"
                          "    protected void validateResult(@Nullable byte[] result) {{\n"
                          "        if (result == null) {{\n"
@@ -311,7 +322,7 @@ def generate_code(request, response):
                          "        }} catch (InvalidProtocolBufferException e) {{\n"
                          "            // ignore - throw the original exception\n"
                          "        }}\n"
-                         "    }}".format(proto_file.name, __file__, cls=class_name)]
+                         "    }}".format(proto_file.name, __file__, cls=class_name, currentImport = current_import)]
 
         for method in service_methods:
             file_contents.append("\n\n" + str(method))
@@ -331,8 +342,8 @@ def generate_code(request, response):
                          " */\n\n"
                          "package net.ankiweb.rsdroid;\n\n"
                          "import androidx.annotation.Nullable;\n\n"
-                         "import BackendProto.Backend;\n\n"
-                         "public interface {} {{".format(proto_file.name, __file__, class_name)]
+                         "import BackendProto.{backend};\n\n"
+                         "public interface {} {{".format(proto_file.name, __file__, class_name, backend=backend_name)]
         for method in service_methods:
             iface_contents.append("\n" + str(method.as_interface()))
         iface_contents.append("\n}")

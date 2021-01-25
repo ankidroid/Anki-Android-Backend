@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package BackendProto;
+
+option java_generic_services = true;
+
+// Generic containers
+///////////////////////////////////////////////////////////
+
+// IDs used in RPC calls
+///////////////////////////////////////////////////////////
+
+// New style RPC definitions
+///////////////////////////////////////////////////////////
+
+service AnkiDroidBackendService {
+    rpc SchedTimingTodayLegacy (SchedTimingTodayIn) returns (SchedTimingTodayOut2);
+    rpc LocalMinutesWestLegacy (LocalMinutesWestIn) returns (LocalMinutesWestOut);
+}
+
+// Protobuf stored in .anki2 files
+// These should be moved to a separate file in the future
+///////////////////////////////////////////////////////////
+
+// Containers for passing around database objects
+///////////////////////////////////////////////////////////
+
+// Backend
+///////////////////////////////////////////////////////////
+
+
+// Errors
+///////////////////////////////////////////////////////////
+
+// Progress
+///////////////////////////////////////////////////////////
+
+// Messages
+///////////////////////////////////////////////////////////
+
+message LocalMinutesWestIn {
+    int64 collection_creation_time = 1;
+}
+
+message LocalMinutesWestOut {
+    sint32 mins_west = 1;
+}
+
+message SchedTimingTodayIn {
+    int64 created_secs = 1;
+    sint32 created_mins_west = 2;
+    int64 now_secs = 3;
+    sint32 now_mins_west = 4;
+    sint32 rollover_hour = 5;
+}
+
+message SchedTimingTodayOut2 {
+    uint32 days_elapsed = 1;
+    int64 next_day_at = 2;
+}
+

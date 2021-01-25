@@ -1,6 +1,7 @@
 import org.gradle.internal.os.OperatingSystem
 
 def protobufFolder = new File(rootDir, "anki/proto").getAbsolutePath()
+def droidProtobufFolder = new File(rootDir, "rslib-bridge/proto").getAbsolutePath()
 
 android {
     if (!new File(protobufFolder).exists()) {
@@ -12,6 +13,7 @@ android {
         main {
             proto {
                 srcDir protobufFolder
+                srcDir droidProtobufFolder
             }
         }
     }
