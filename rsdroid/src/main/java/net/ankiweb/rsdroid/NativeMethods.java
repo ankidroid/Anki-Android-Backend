@@ -34,8 +34,9 @@ public class NativeMethods {
             }
             // In Robolectric, assume setup works (setupException == null) if the library throws.
             // As the library is loaded at a later time (or a failure will be quickly found).
+        } finally {
+            hasSetUp = true;
         }
-        hasSetUp = true;
     }
 
     public static byte[] executeCommand(long backendPointer, final int command, byte[] args) {
