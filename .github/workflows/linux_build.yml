@@ -1,6 +1,8 @@
 name: rsdroid (Linux)
-on: push
-
+on:
+  push:
+  schedule:
+    - cron: "0 0 * * *"
 # Some of the commands here were added to attempt to get a build on a local Ubuntu VirtualBox
 # using https://github.com/nektos/act/
 # I didn't get this working, and these should likely be removed

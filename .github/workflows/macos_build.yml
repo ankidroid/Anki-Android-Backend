@@ -1,6 +1,8 @@
 name: rsdroid (macOS)
-on: push
-
+on:
+  push:
+  schedule:
+    - cron: "0 0 * * *"
 # TODO: consider assembleRelease if possible
 
 jobs:

@@ -1,5 +1,8 @@
 name: Build JAR for Robolectric Testing
-on: push
+on:
+  push:
+  schedule:
+    - cron: "0 0 * * *"
 
 jobs:
   build:
