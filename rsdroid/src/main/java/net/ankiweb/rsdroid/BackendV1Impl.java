@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import BackendProto.AdBackend;
 import BackendProto.Backend;
 import BackendProto.Sqlite;
 import timber.log.Timber;
@@ -50,10 +51,11 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
     @Nullable
     private String collectionPath;
     private boolean isDisposed;
+    private AnkiDroidBackendImpl ankiDroidBackend;
 
     // intentionally package private - use BackendFactory
     BackendV1Impl() {
-
+        ankiDroidBackend = new AnkiDroidBackendImpl(this::ensureBackend);
     }
 
     /**
@@ -356,5 +358,15 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
     @SuppressWarnings("CharsetObjectCanBeUsed")
     private byte[] jsonToBytes(JSONObject o) {
         return o.toString().getBytes(Charset.forName("UTF-8"));
+    }
+
+    @Override
+    public AdBackend.SchedTimingTodayOut2 schedTimingTodayLegacy(long createdSecs, int createdMinsWest, long nowSecs, int nowMinsWest, int rolloverHour) {
+        return ankiDroidBackend.schedTimingTodayLegacy(createdSecs, createdMinsWest, nowSecs, nowMinsWest, rolloverHour);
+    }
+
+    @Override
+    public AdBackend.LocalMinutesWestOut localMinutesWestLegacy(long collectionCreationTime) {
+        return ankiDroidBackend.localMinutesWestLegacy(collectionCreationTime);
     }
 }

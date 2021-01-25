@@ -9,7 +9,7 @@ use anki::backend_proto as pb;
 use pb::OpenCollectionIn;
 use crate::sqlite::{open_collection_ankidroid, insert_for_id, query_for_affected};
 
-use anki::backend::{init_backend, anki_error_to_proto_error};
+use anki::backend::{init_backend, anki_error_to_proto_error, Backend};
 use crate::ankidroid::AnkiDroidBackend;
 
 // allows encode/decode
@@ -20,10 +20,16 @@ use anki::err::AnkiError;
 use anki::i18n::I18n;
 
 use anki::backend_proto::{DbResult, DbResponse};
+use core::result;
+use crate::backend_proto::{DroidBackendService, LocalMinutesWestIn, SchedTimingTodayIn, SchedTimingTodayOut2, LocalMinutesWestOut};
+use anki::sched::cutoff;
+use anki::timestamp::TimestampSecs;
+use anki::sched::cutoff::SchedTimingToday;
 
 mod dbcommand;
 mod sqlite;
 mod ankidroid;
+mod backend_proto;
 
 // TODO: Use a macro to handle panics to reduce code duplication
 
@@ -33,6 +39,35 @@ mod ankidroid;
 
 // MAINTENANCE: This must manually be kept in sync with the Java
 const DB_COMMAND_NUM_ROWS: usize = 1000;
+
+impl From<SchedTimingToday> for SchedTimingTodayOut2 {
+    fn from(data: SchedTimingToday) -> Self {
+        SchedTimingTodayOut2 {
+            days_elapsed: data.days_elapsed,
+            next_day_at: data.next_day_at
+        }
+    }
+}
+
+impl backend_proto::DroidBackendService for Backend {
+    fn sched_timing_today_legacy(&self, input: SchedTimingTodayIn) -> Result<SchedTimingTodayOut2, AnkiError> {
+        let result = cutoff::sched_timing_today(
+            TimestampSecs::from(input.created_secs),
+            TimestampSecs::from(input.now_secs),
+            Some(input.created_mins_west),
+            Some(input.now_mins_west),
+            Some(input.rollover_hour as u8)
+        );
+        Ok(SchedTimingTodayOut2::from(result))
+    }
+
+    fn local_minutes_west_legacy(&self, input : LocalMinutesWestIn) -> Result<LocalMinutesWestOut, AnkiError> {
+        let out = LocalMinutesWestOut {
+            mins_west: cutoff::local_minutes_west_for_stamp(input.collection_creation_time)
+        };
+        Ok(out)
+    }
+}
 
 #[no_mangle]
 pub unsafe extern "C" fn Java_net_ankiweb_rsdroid_NativeMethods_openBackend(
@@ -127,6 +162,43 @@ pub unsafe extern "C" fn Java_net_ankiweb_rsdroid_NativeMethods_command(
         Ok(_s) => _s,
         Err(err) => panic_to_bytes(env,err.as_ref(), &backend.backend.i18n)
     }
+}
+
+
+#[no_mangle]
+pub unsafe extern "C" fn Java_net_ankiweb_rsdroid_NativeMethods_executeAnkiDroidCommand(
+    env: JNIEnv,
+    _: JClass,
+    backend_ptr : jlong,
+    command: jint,
+    args: jbyteArray,
+) -> jbyteArray {
+
+    let backend = to_backend(backend_ptr);
+
+    let result = catch_unwind(AssertUnwindSafe(|| {
+        let command: u32 = command as u32;
+        let in_bytes = env.convert_byte_array(args).unwrap();
+
+        match run_ad_command_bytes(backend, command, &in_bytes) {
+            Ok(_s) => env.byte_array_from_slice(&_s).unwrap(),
+            Err(_err) => env.byte_array_from_slice(&_err).unwrap(),
+        }
+    }));
+
+    match result {
+        Ok(_s) => _s,
+        Err(err) => panic_to_bytes(env,err.as_ref(), &backend.backend.i18n)
+    }
+}
+
+pub(crate) fn run_ad_command_bytes(backend: &mut AnkiDroidBackend, method: u32, input: &[u8]) -> result::Result<Vec<u8>, Vec<u8>> {
+    backend.backend.run_command_bytes2_inner_ad(method, input).map_err(|err| {
+        let backend_err = anki_error_to_proto_error(err, &backend.backend.i18n);
+        let mut bytes = Vec::new();
+        backend_err.encode(&mut bytes).unwrap();
+        bytes
+    })
 }
 
 #[no_mangle]

@@ -6,7 +6,7 @@ import java.io.Closeable;
 
 import BackendProto.Backend;
 
-public interface BackendV1 extends SQLHandler, net.ankiweb.rsdroid.RustBackend, Closeable {
+public interface BackendV1 extends SQLHandler, net.ankiweb.rsdroid.RustBackend, net.ankiweb.rsdroid.Adbackend, Closeable {
     void openAnkiDroidCollection(Backend.OpenCollectionIn args) throws BackendException;
 
     boolean isOpen();

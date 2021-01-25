@@ -91,4 +91,6 @@ public class NativeMethods {
     static native String[] getColumnNames(long backendPointer, String sql);
 
     static native long closeBackend(long backendPointer);
+
+    static native byte[] executeAnkiDroidCommand(long backendPointer, int command, byte[] args);
 }

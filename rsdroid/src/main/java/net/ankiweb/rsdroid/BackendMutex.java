@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
+import BackendProto.AdBackend;
 import BackendProto.Backend;
 import BackendProto.Sqlite;
 
@@ -974,6 +975,26 @@ public class BackendMutex implements BackendV1 {
         try {
             lock.lock();
             backend.close();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    @Override
+    public AdBackend.SchedTimingTodayOut2 schedTimingTodayLegacy(long createdSecs, int createdMinsWest, long nowSecs, int nowMinsWest, int rolloverHour) {
+        try {
+            lock.lock();
+            return backend.schedTimingTodayLegacy(createdSecs, createdMinsWest, nowSecs, nowMinsWest, rolloverHour);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    @Override
+    public AdBackend.LocalMinutesWestOut localMinutesWestLegacy(long collectionCreationTime) {
+        try {
+            lock.lock();
+            return backend.localMinutesWestLegacy(collectionCreationTime);
         } finally {
             lock.unlock();
         }
