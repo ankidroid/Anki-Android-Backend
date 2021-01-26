@@ -61,6 +61,21 @@ public class RustBackendLoader {
     }
 
     /**
+     * Allows unit testing rsdroid under Robolectric <br/>
+     * Loads (via {@link Runtime#load(String)}) a librsdroid.so alternative compiled for the current operating system.<br/><br/>
+     *
+     * @param filePath A full path to the compiled .dll/.dylib/.so
+     */
+    public static void loadRsdroid(String filePath) {
+        if (alreadyLoaded) {
+            return;
+        }
+
+        loadPath(filePath);
+        alreadyLoaded = true;
+    }
+
+    /**
      * loads a named file in the jar via {@link Runtime#load(String)}
      *
      * @param fileName The name of the file in the jar
@@ -77,6 +92,10 @@ public class RustBackendLoader {
             throw new RuntimeException(e);
         }
 
+        loadPath(path);
+    }
+
+    private static void loadPath(String path) {
         try {
             Runtime.getRuntime().load(path);
         } catch (UnsatisfiedLinkError e) {
