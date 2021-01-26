@@ -2,6 +2,13 @@
 
 Adapter allowing AnkiDroid interop with `anki/rslib` allowing AnkiDroid to leverage Anki Desktop's business logic layer, maintaining 100% compatibility with upstream without the need to port code to Java.
 
+## Installation
+
+```gradle
+    implementation "io.github.david-allison-1:anki-android-backend:0.1.0"
+    testImplementation "io.github.david-allison-1:anki-android-backend-testing:0.1.0"
+```
+
 ## Folders
 
 `/anki/` - git submodule containing the Anki Codebase, used both for building into `.so` files, and to obtain the current `.proto` files for use in Java codegen
