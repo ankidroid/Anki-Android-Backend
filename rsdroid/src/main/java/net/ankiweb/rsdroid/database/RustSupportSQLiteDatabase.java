@@ -191,7 +191,7 @@ public class RustSupportSQLiteDatabase implements SupportSQLiteDatabase {
         }
         sql.append(')');
 
-        query(sql.toString(), bindArgs);
+        query(sql.toString(), bindArgs).close();
         return 0;
     }
 
@@ -238,7 +238,7 @@ public class RustSupportSQLiteDatabase implements SupportSQLiteDatabase {
 
     @Override
     public void execSQL(String sql, Object[] bindArgs) throws SQLException {
-        query(sql, bindArgs);
+        query(sql, bindArgs).close();
     }
 
     @Override

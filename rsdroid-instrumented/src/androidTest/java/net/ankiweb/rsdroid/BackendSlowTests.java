@@ -154,7 +154,7 @@ public class BackendSlowTests extends InstrumentedTest {
 
             for (int i = 0; i < numberOfElements; i++) {
                 // add a suffix so the string can't be interned
-                db.query("insert into tmp (id) values (?)", new Object[] { longString.toString() + i });
+                db.execSQL("insert into tmp (id) values (?)", new Object[] { longString.toString() + i });
             }
 
             int count = 0;

@@ -90,11 +90,11 @@ public class DatabaseIntegrationTests extends DatabaseComparison {
 
     @Test
     public void testMultipleParameters() {
-        Cursor returnValue = mDatabase.query("select ?, ?", new Object[] { 1, 2 });
-
-        returnValue.moveToFirst();
-        assertThat(returnValue.getInt(0), is(1));
-        assertThat(returnValue.getInt(1), is(2));
+        try (Cursor returnValue = mDatabase.query("select ?, ?", new Object[] { 1, 2 })) {
+            returnValue.moveToFirst();
+            assertThat(returnValue.getInt(0), is(1));
+            assertThat(returnValue.getInt(1), is(2));
+        }
     }
 
     @Test

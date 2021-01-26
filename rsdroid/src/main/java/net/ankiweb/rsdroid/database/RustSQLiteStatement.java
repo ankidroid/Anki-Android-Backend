@@ -37,7 +37,7 @@ public class RustSQLiteStatement implements SupportSQLiteStatement {
 
     @Override
     public void execute() {
-        database.query(sql, getBindings());
+        database.query(sql, getBindings()).close();
     }
 
     @Override

@@ -116,10 +116,10 @@ public class LimitOffsetSQLiteCursorTest extends InstrumentedTest {
     }
 
     private void addRows(int rowCount) {
-        mDatabase.query("create table tmp (id varchar)");
+        mDatabase.execSQL("create table tmp (id varchar)");
 
         for(int i = 0; i < rowCount; i++) {
-            mDatabase.query("insert into tmp (id) VALUES (?)", new Object[] { Integer.toString(i) });
+            mDatabase.execSQL("insert into tmp (id) VALUES (?)", new Object[] { Integer.toString(i) });
         }
     }
 
