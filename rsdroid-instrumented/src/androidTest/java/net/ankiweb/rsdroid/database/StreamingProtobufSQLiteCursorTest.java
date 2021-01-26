@@ -38,6 +38,43 @@ import static org.junit.Assert.fail;
 public class StreamingProtobufSQLiteCursorTest extends InstrumentedTest {
 
     @Test
+    public void testPaging() throws IOException {
+
+        try (BackendV1 backend = super.getBackend("initial_version_2_12_1.anki2")) {
+            SupportSQLiteDatabase db = new RustSupportSQLiteOpenHelper(backend).getWritableDatabase();
+
+            db.execSQL("create table tmp (id int)");
+
+            for (int i = 0; i < 999; i++) {
+                db.execSQL("insert into tmp VALUES (?)", new Object[] { i });
+            }
+
+            iterateAllRows(db); // 999
+
+            db.execSQL("insert into tmp VALUES (?)", new Object[] { 999 });
+
+            iterateAllRows(db); // 1000
+
+            db.execSQL("insert into tmp VALUES (?)", new Object[] { 1000 });
+
+            iterateAllRows(db); // 1001
+
+        }
+    }
+
+    private void iterateAllRows(SupportSQLiteDatabase db) {
+        long position = 0;
+
+        try (Cursor cur = db.query("SELECT * from tmp")) {
+            while (cur.moveToNext()) {
+                assertThat(cur.getLong(0), is(position));
+                position++;
+            }
+        }
+    }
+
+
+    @Test
     public void testCorruptionIsWarned() {
         try {
             testCorruptionIsHandled();

@@ -93,7 +93,7 @@ public class StreamingProtobufSQLiteCursor extends AnkiDatabaseCursor {
 
     @Override
     public boolean moveToNext() {
-        if (getCurrentSliceRowCount() > 0 && position + 1 >= RUST_PAGE_SIZE) {
+        if (getCurrentSliceRowCount() > 0 && position + 1 >= RUST_PAGE_SIZE && getCount() != RUST_PAGE_SIZE) {
             getNextPage();
         }
         position++;

@@ -121,6 +121,7 @@ public class LimitOffsetSQLiteCursor extends AnkiJsonDatabaseCursor {
 
     @Override
     public boolean moveToNext() {
+        // This will overrun by 1 row if there are PageSize elements. That shouldn't cause a problem here.
         if (results.length() > 0 && position + 1 >= getPageSize()) {
             loadPage();
         }
