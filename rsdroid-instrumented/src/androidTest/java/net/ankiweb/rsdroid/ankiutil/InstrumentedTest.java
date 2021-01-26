@@ -27,13 +27,22 @@ import net.ankiweb.rsdroid.BackendUtils;
 import net.ankiweb.rsdroid.BackendV1;
 import net.ankiweb.rsdroid.RustBackendFailedException;
 
+import org.junit.After;
 import org.junit.Before;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.hamcrest.Matchers.empty;
+import static org.junit.Assert.assertThat;
 
 public class InstrumentedTest {
 
     static {
         Log.e("InstrumentedTest", "Timber has been disabled.");
     }
+
+    private final List<BackendV1> backendList = new ArrayList<>();
 
     @Before
     public void before() {
@@ -42,6 +51,16 @@ public class InstrumentedTest {
         Timber.uprootAll();
         Timber.plant(new Timber.DebugTree());
         */
+    }
+
+    @After
+    public void after() {
+        for (BackendV1 b : backendList) {
+            if (b != null && b.isOpen()) {
+                assertThat("All database cursors should be closed", b.debugActiveDatabaseSequenceNumbers(0).getSequenceNumbersList(), empty());
+            }
+        }
+        backendList.clear();
     }
 
     protected String getAssetFilePath(String fileName) {
@@ -84,6 +103,7 @@ public class InstrumentedTest {
         BackendV1 backendV1 = getClosedBackend();
         String path = getAssetFilePath(fileName);
         BackendUtils.openAnkiDroidCollection(backendV1, path);
+        this.backendList.add(backendV1);
         return backendV1;
     }
 

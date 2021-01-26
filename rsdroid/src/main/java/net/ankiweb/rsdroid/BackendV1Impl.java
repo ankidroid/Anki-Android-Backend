@@ -51,7 +51,7 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
     @Nullable
     private String collectionPath;
     private boolean isDisposed;
-    private AnkiDroidBackendImpl ankiDroidBackend;
+    private final AnkiDroidBackendImpl ankiDroidBackend;
 
     // intentionally package private - use BackendFactory
     BackendV1Impl() {
@@ -117,6 +117,7 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
             NativeMethods.closeBackend(backEndPointer.toJni());
         }
         this.isDisposed = true;
+        backEndPointer = null;
     }
 
     public void openAnkiDroidCollection(Backend.OpenCollectionIn args) {
@@ -269,13 +270,13 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
     }
 
     @Override
-    public Sqlite.DBResponse getPage(int page) {
+    public Sqlite.DBResponse getPage(int page, int sequenceNumber) {
         byte[] result = null;
         try {
             Timber.d("Rust: getPage %d", page);
 
             Pointer backend = ensureBackend();
-            result = NativeMethods.databaseGetNextResultPage(backend.toJni(), page);
+            result = NativeMethods.databaseGetNextResultPage(backend.toJni(), sequenceNumber, page);
 
             Sqlite.DBResponse message = Sqlite.DBResponse.parseFrom(result);
             validateMessage(result, message);
@@ -287,9 +288,16 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
     }
 
     @Override
-    public void cancelCurrentProtoQuery() {
+    public void cancelCurrentProtoQuery(int sequenceNumber) {
         Timber.d("cancelCurrentProtoQuery");
-        NativeMethods.cancelCurrentProtoQuery(ensureBackend().toJni());
+        NativeMethods.cancelCurrentProtoQuery(ensureBackend().toJni(), sequenceNumber);
+    }
+
+    @Override
+    public void cancelAllProtoQueries() {
+        Timber.d("cancelAllProtoQueries");
+        NativeMethods.cancelAllProtoQueries(ensureBackend().toJni());
+
     }
 
     /* End protobuf-based database streaming methods */
@@ -341,7 +349,7 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
 
     @Override
     public void closeCollection(boolean downgradeToSchema11) {
-        cancelCurrentProtoQuery();
+        cancelAllProtoQueries();
         super.closeCollection(downgradeToSchema11);
     }
 
@@ -368,5 +376,11 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
     @Override
     public AdBackend.LocalMinutesWestOut localMinutesWestLegacy(long collectionCreationTime) {
         return ankiDroidBackend.localMinutesWestLegacy(collectionCreationTime);
+    }
+
+    @Override
+    @RustCleanup("Architecture - backendPtr param is not required")
+    public AdBackend.DebugActiveDatabaseSequenceNumbersOut debugActiveDatabaseSequenceNumbers(long backendPtr) {
+        return ankiDroidBackend.debugActiveDatabaseSequenceNumbers(ensureBackend().toJni());
     }
 }

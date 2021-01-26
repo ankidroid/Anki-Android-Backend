@@ -86,8 +86,8 @@ public class Session implements SQLHandler {
     }
 
     @Override
-    public Sqlite.DBResponse getPage(int page) {
-        return backend.getPage(page);
+    public Sqlite.DBResponse getPage(int page, int sequenceNumber) {
+        return backend.getPage(page, sequenceNumber);
     }
 
     @Override
@@ -96,8 +96,13 @@ public class Session implements SQLHandler {
     }
 
     @Override
-    public void cancelCurrentProtoQuery() {
-        backend.cancelCurrentProtoQuery();
+    public void cancelCurrentProtoQuery(int sequenceNumber) {
+        backend.cancelCurrentProtoQuery(sequenceNumber);
+    }
+
+    @Override
+    public void cancelAllProtoQueries() {
+        backend.cancelAllProtoQueries();
     }
 
 

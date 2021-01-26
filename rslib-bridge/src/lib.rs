@@ -21,7 +21,7 @@ use anki::i18n::I18n;
 
 use anki::backend_proto::{DbResult, DbResponse};
 use core::result;
-use crate::backend_proto::{DroidBackendService, LocalMinutesWestIn, SchedTimingTodayIn, SchedTimingTodayOut2, LocalMinutesWestOut};
+use crate::backend_proto::{DroidBackendService, LocalMinutesWestIn, SchedTimingTodayIn, SchedTimingTodayOut2, LocalMinutesWestOut, DebugActiveDatabaseSequenceNumbersIn, DebugActiveDatabaseSequenceNumbersOut};
 use anki::sched::cutoff;
 use anki::timestamp::TimestampSecs;
 use anki::sched::cutoff::SchedTimingToday;
@@ -30,6 +30,8 @@ mod dbcommand;
 mod sqlite;
 mod ankidroid;
 mod backend_proto;
+
+use itertools::Itertools;
 
 // TODO: Use a macro to handle panics to reduce code duplication
 
@@ -66,6 +68,14 @@ impl backend_proto::DroidBackendService for Backend {
             mins_west: cutoff::local_minutes_west_for_stamp(input.collection_creation_time)
         };
         Ok(out)
+    }
+
+    fn debug_active_database_sequence_numbers(&self, input: DebugActiveDatabaseSequenceNumbersIn) -> Result<DebugActiveDatabaseSequenceNumbersOut, AnkiError> {
+        let backend_ptr = input.backend_ptr.clone();
+        let result = DebugActiveDatabaseSequenceNumbersOut {
+            sequence_numbers: dbcommand::active_sequences(backend_ptr)
+        };
+        Ok(result)
     }
 }
 
@@ -234,14 +244,20 @@ pub unsafe extern "C" fn Java_net_ankiweb_rsdroid_NativeMethods_databaseGetNextR
     env: JNIEnv,
     _: JClass,
     backend_ptr : jlong,
-    page: i32
+    sequence_number: jint,
+    page: jint
 ) -> jbyteArray {
 
     let backend = to_backend(backend_ptr);
 
     let result = catch_unwind(AssertUnwindSafe(|| {
 
-        let next_page = dbcommand::get_next(backend_ptr, (page as usize) * DB_COMMAND_NUM_ROWS as usize, DB_COMMAND_NUM_ROWS).unwrap();
+        let next_page = dbcommand::get_next(
+            backend_ptr,
+            sequence_number,
+            (page as usize) * DB_COMMAND_NUM_ROWS as usize,
+            DB_COMMAND_NUM_ROWS
+        ).unwrap();
 
 
         let mut out_bytes = Vec::new();
@@ -259,9 +275,19 @@ pub unsafe extern "C" fn Java_net_ankiweb_rsdroid_NativeMethods_databaseGetNextR
 pub unsafe extern "C" fn Java_net_ankiweb_rsdroid_NativeMethods_cancelCurrentProtoQuery(
     _: JNIEnv,
     _: JClass,
+    backend_ptr : jlong,
+    sequence_number: jint
+) {
+    dbcommand::flush_cache(&backend_ptr, sequence_number);
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn Java_net_ankiweb_rsdroid_NativeMethods_cancelAllProtoQueries(
+    _: JNIEnv,
+    _: JClass,
     backend_ptr : jlong
 ) {
-    dbcommand::flush_cache(&backend_ptr);
+    dbcommand::flush_all(&backend_ptr);
 }
 
 #[no_mangle]
@@ -271,9 +297,6 @@ pub unsafe extern "C" fn Java_net_ankiweb_rsdroid_NativeMethods_databaseCommand(
     backend_ptr : jlong,
     input : jbyteArray
 ) -> jbyteArray {
-
-    dbcommand::flush_cache(&backend_ptr);
-
     let backend = to_backend(backend_ptr);
 
     let result = catch_unwind(AssertUnwindSafe(|| {

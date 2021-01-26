@@ -71,10 +71,13 @@ public class NativeMethods {
     /** Returns the next page of results after a databaseCommand.
      * @return DbResult object */
     @CheckResult
-    static native byte[] databaseGetNextResultPage(long backendPointer, int page);
+    static native byte[] databaseGetNextResultPage(long backendPointer, int sequenceNumber, int page);
     
     /** Clears the memory from the current protobuf query. */
-    static native int cancelCurrentProtoQuery(long toJni);
+    static native int cancelCurrentProtoQuery(long backendPointer, int sequenceNumber);
+
+    /** Clears the memory from the all protobuf queries. */
+    static native void cancelAllProtoQueries(long backendPointer);
 
     /**
      * Performs an insert and returns the last inserted row id.

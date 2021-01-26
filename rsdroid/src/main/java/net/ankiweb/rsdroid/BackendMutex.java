@@ -139,10 +139,10 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Sqlite.DBResponse getPage(int page) {
+    public Sqlite.DBResponse getPage(int page, int sequenceNumber) {
         try {
             lock.lock();
-            return backend.getPage(page);
+            return backend.getPage(page, sequenceNumber);
         } finally {
             lock.unlock();
         }
@@ -159,10 +159,20 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public void cancelCurrentProtoQuery() {
+    public void cancelCurrentProtoQuery(int sequenceNumber) {
         try {
             lock.lock();
-            backend.cancelCurrentProtoQuery();
+            backend.cancelCurrentProtoQuery(sequenceNumber);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    @Override
+    public void cancelAllProtoQueries() {
+        try {
+            lock.lock();
+            backend.cancelAllProtoQueries();
         } finally {
             lock.unlock();
         }
@@ -995,6 +1005,16 @@ public class BackendMutex implements BackendV1 {
         try {
             lock.lock();
             return backend.localMinutesWestLegacy(collectionCreationTime);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    @Override
+    public AdBackend.DebugActiveDatabaseSequenceNumbersOut debugActiveDatabaseSequenceNumbers(long backendPtr) {
+        try {
+            lock.lock();
+            return backend.debugActiveDatabaseSequenceNumbers(backendPtr);
         } finally {
             lock.unlock();
         }

@@ -16,6 +16,7 @@ option java_generic_services = true;
 service AnkiDroidBackendService {
     rpc SchedTimingTodayLegacy (SchedTimingTodayIn) returns (SchedTimingTodayOut2);
     rpc LocalMinutesWestLegacy (LocalMinutesWestIn) returns (LocalMinutesWestOut);
+    rpc DebugActiveDatabaseSequenceNumbers (DebugActiveDatabaseSequenceNumbersIn) returns (DebugActiveDatabaseSequenceNumbersOut);
 }
 
 // Protobuf stored in .anki2 files
@@ -37,6 +38,14 @@ service AnkiDroidBackendService {
 
 // Messages
 ///////////////////////////////////////////////////////////
+
+message DebugActiveDatabaseSequenceNumbersIn {
+    int64 backend_ptr = 1;
+}
+
+message DebugActiveDatabaseSequenceNumbersOut {
+    repeated int32 sequence_numbers = 1;
+}
 
 message LocalMinutesWestIn {
     int64 collection_creation_time = 1;

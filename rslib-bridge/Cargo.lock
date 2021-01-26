@@ -1398,6 +1398,7 @@ name = "rsdroid"
 version = "0.1.0"
 dependencies = [
  "anki",
+ "itertools 0.9.0",
  "jni",
  "lazy_static",
  "num_enum",

@@ -73,19 +73,7 @@ public class StreamingProtobufSQLiteCursorTest extends InstrumentedTest {
         }
     }
 
-
     @Test
-    public void testCorruptionIsWarned() {
-        try {
-            testCorruptionIsHandled();
-            fail("exception should be thrown");
-        } catch (Exception e) {
-            assertThat(e.getMessage(), containsString("rsdroid does not currently handle nested cursor-based queries"));
-        }
-    }
-
-    @Test
-    @Ignore("Not implemented")
     public void testCorruptionIsHandled() throws IOException {
         int elements = StreamingProtobufSQLiteCursor.RUST_PAGE_SIZE;
 

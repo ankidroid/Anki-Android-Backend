@@ -63,7 +63,7 @@ public class StreamingProtobufSQLiteCursor extends AnkiDatabaseCursor {
         position = -1;
 
         try {
-            results = backend.getPage(page);
+            results = backend.getPage(page, sequenceNumber);
             if (results.getSequenceNumber() != sequenceNumber) {
                 throw new IllegalStateException("rsdroid does not currently handle nested cursor-based queries. Please change the code to avoid holding a reference to the query, or implement the functionality in rsdroid");
             }
@@ -229,7 +229,7 @@ public class StreamingProtobufSQLiteCursor extends AnkiDatabaseCursor {
     @Override
     public void close() {
         isClosed = true;
-        backend.cancelCurrentProtoQuery();
+        backend.cancelCurrentProtoQuery(sequenceNumber);
     }
 
     @Override
