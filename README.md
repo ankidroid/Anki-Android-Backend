@@ -42,3 +42,8 @@ This is defined as an application to allow instrumented tests to be run against 
 ## Additional Information
 
 See `/docs` for more in-depth information.
+
+## License
+
+[GPL-3.0 License](https://github.com/ankidroid/Anki-Android/blob/master/COPYING)  
+[AGPL-3.0 Licence](https://github.com/david-allison-1/anki/blob/master/LICENSE) (anki submodule)
