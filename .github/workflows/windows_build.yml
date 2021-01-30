@@ -55,7 +55,11 @@ jobs:
 
     # actions-rs only accepts "target" (although a "targets" param to be added in v2). We need 4 targets.
     - name: Install Rust Targets
-      run: .github/scripts/install_rust_targets.sh
+      run: |
+             rustup target add armv7-linux-androideabi 
+             rustup target add i686-linux-android
+             rustup target add aarch64-linux-android
+             rustup target add x86_64-linux-android
 
     - name: Install & Test Protobuf Compiler
       run: |
