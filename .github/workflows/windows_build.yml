@@ -15,7 +15,9 @@ jobs:
     # TODO: Ignore lines like we do in the Unix scripts, rather than all of them
     - name: Install NDK (silent)
       run: |
-            Write-Host "NDK Install Started 2"
+            Write-Host "NDK Install Started"
+            Write-Host "ANDROID_HOME - $Env:ANDROID_HOME"
+            Write-Host "ANDROID_SDK_ROOT - $Env:ANDROID_SDK_ROOT"
 
             (. "$Env:ANDROID_HOME\tools\bin\sdkmanager.bat" --install "ndk;22.0.7026061" --sdk_root="$Env:ANDROID_SDK_ROOT") | out-null
 
@@ -25,20 +27,16 @@ jobs:
     # Setting this variable is a pain, as it contains a dash
     # It's easier to just move the directory and fix the environment variables to point to the new NDK
     # we change Program Files (x86) to "ProgramFiles"
-    # environment variables were obtained by "shell: cmd, run: env"
     # TODO: Move the setting of environment variables here (permanently)
     - name: Move SDK to directory with no spaces
       run: |
              New-Item -ItemType directory -Path 'C:\ProgramFiles\Android'
 
-             Get-ChildItem 'C:\Program Files (x86)\Android\android-sdk'
+             Get-ChildItem "$Env:ANDROID_SDK_ROOT"
 
-             Move-Item -Path 'C:\Program Files (x86)\Android\android-sdk' -Destination 'C:\ProgramFiles\Android' -ErrorAction Stop -Force
+             Move-Item -Path "$Env:ANDROID_SDK_ROOT" -Destination 'C:\ProgramFiles\Android' -ErrorAction Stop -Force
 
              Get-ChildItem 'C:\ProgramFiles\Android\android-sdk'
-
-             $directoryInfo = Get-ChildItem 'C:\ProgramFiles\Android\android-sdk\ndk-bundle' | Measure-Object
-             if ( $directoryInfo.count -eq 0 ) {  exit 1 }
 
 
     - name: Debug Env
