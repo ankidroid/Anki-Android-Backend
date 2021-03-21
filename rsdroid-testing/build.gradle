@@ -43,6 +43,15 @@ enum Platform {
     LINUX, MACOS, WINDOWS
 }
 
+def Platform getCurrentPlatform() {
+    def currentOS = org.gradle.internal.os.OperatingSystem.current()
+    if (currentOS.isWindows()) return Platform.WINDOWS
+    if (currentOS.isMacOsX()) return Platform.MACOS
+    if (currentOS.isLinux()) return Platform.LINUX
+
+    throw "Unsuported OS"
+}
+
 def getInputDir() {
     def path = "${project.sourceSets.main.java.srcDirs[0]}/../../../../rslib-bridge"
     def canonicalPath = new File(path).getCanonicalPath()
@@ -65,7 +74,13 @@ def toCommandLine(Platform targetPlatform) {
     // the --out-dir flag requires -Z unstable-options
     // -Z unstable-options requires a 'nightly' toolchain
     // TODO: Explain how to select the version
-    def standardArg = "cargo  +nightly build --release -Z unstable-options --features no-android"
+
+    def useCross = true
+    if (getCurrentPlatform() == targetPlatform) {
+        useCross = false
+    }
+
+    def standardArg = "${useCross ? "cross" : "cargo"}  +nightly build --release -Z unstable-options --features no-android"
     def assetsPath = new File("${project.sourceSets.main.java.srcDirs[0]}/../../../assets").getCanonicalPath()
 
     String assetsSubPath = "/rsdroid-testing/assets"
@@ -79,6 +94,12 @@ def toCommandLine(Platform targetPlatform) {
     def outDir = "--out-dir ${path}"
     System.out.println(assetsPath)
     def mainArg = standardArg + " " + outDir
+    if (useCross) {
+        mainArg = "DONT_RUSTFMT=1 " + mainArg //FIXME: try to mount $CARGO_HOME/bin and add it to path using cross
+
+        //instruct cross to mount the output directory
+        mainArg = "OUT_DIR=${path} " + mainArg
+    }
     switch (targetPlatform) {
         case Platform.LINUX: return toWindowsCommandLine("CC=\$ANKIDROID_LINUX_CC ${mainArg} --target x86_64-unknown-linux-gnu")
         case Platform.MACOS:
