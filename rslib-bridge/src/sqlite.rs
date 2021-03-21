@@ -140,7 +140,7 @@ pub(crate) fn open_or_create_no_update(path: &Path, _i18n: &I18n, _server: bool,
 
 
     db.execute("begin exclusive", NO_PARAMS)?;
-    db.execute_batch(include_str!("../../anki/rslib/src/storage/schema11.sql"))?;
+    db.execute_batch(include_str!("../anki/rslib/src/storage/schema11.sql"))?;
     // start at schema 11, then upgrade below
     let crt = v1_creation_date();
     db.execute(
