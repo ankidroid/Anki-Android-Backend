@@ -1,6 +1,6 @@
 import org.gradle.internal.os.OperatingSystem
 
-def protobufFolder = new File(rootDir, "anki/proto").getAbsolutePath()
+def protobufFolder = new File(rootDir, "rslib-bridge/anki/proto").getAbsolutePath()
 def droidProtobufFolder = new File(rootDir, "rslib-bridge/proto").getAbsolutePath()
 
 android {
