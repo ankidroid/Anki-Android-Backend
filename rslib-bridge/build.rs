@@ -92,14 +92,18 @@ fn main() -> std::io::Result<()> {
         .service_generator(service_generator())
         .compile_protos(&["proto/AdBackend.proto"], &["proto"])
         .unwrap();
-		
-    // rustfmt the protobuf code
-    let rustfmt = Command::new("rustfmt")
-        .arg(Path::new("src/backend_proto.rs"))
-        .status()
-        .unwrap();
-		
-    assert!(rustfmt.success(), "rustfmt backend_proto.rs failed");
+
+    if let Err(e) = std::env::var("DONT_RUSTFMT") {
+        assert_eq!(e, std::env::VarError::NotPresent);
+        println!("Using rustfmt to format src/backend_proto.rs");
+        // rustfmt the protobuf code
+        let rustfmt = Command::new("rustfmt")
+            .arg(Path::new("src/backend_proto.rs"))
+            .status()
+            .unwrap();
+
+        assert!(rustfmt.success(), "rustfmt backend_proto.rs failed");
+    }
 
     Ok(())
 }
