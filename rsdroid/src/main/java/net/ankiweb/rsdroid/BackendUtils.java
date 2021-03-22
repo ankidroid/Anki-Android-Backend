@@ -16,6 +16,8 @@
 
 package net.ankiweb.rsdroid;
 
+import androidx.annotation.NonNull;
+
 import BackendProto.Backend;
 
 public class BackendUtils {
@@ -25,5 +27,10 @@ public class BackendUtils {
      */
     public static void openAnkiDroidCollection(BackendV1 backendV1, String path) {
         backendV1.openAnkiDroidCollection(Backend.OpenCollectionIn.newBuilder().setCollectionPath(path).build());
+    }
+
+    @NonNull
+    public static String getAnkiCommitHash() {
+        return BuildConfig.ANKI_COMMIT_HASH;
     }
 }

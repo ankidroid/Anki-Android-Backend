@@ -3,6 +3,17 @@ apply plugin: 'com.google.protobuf'
 apply plugin: 'signing'
 apply plugin: 'com.vanniktech.maven.publish'
 
+def getAnkiCommitHash = { ->
+    def hashStdOut = new ByteArrayOutputStream()
+    exec {
+        commandLine "git", "-C", new File("${project.rootDir}", "rslib-bridge/anki"), "rev-parse", "HEAD"
+        standardOutput = hashStdOut
+    }
+    def commit = hashStdOut.toString().trim()
+    println("Anki commit: ${commit}")
+    return commit
+}
+
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.1"
@@ -20,6 +31,8 @@ android {
         versionName VERSION_NAME
 
         consumerProguardFiles "consumer-rules.pro"
+
+        buildConfigField("String", "ANKI_COMMIT_HASH", "\"${getAnkiCommitHash()}\"")
     }
 
     buildTypes {
