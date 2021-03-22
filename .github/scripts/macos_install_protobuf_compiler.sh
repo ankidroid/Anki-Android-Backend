@@ -21,6 +21,7 @@ pyenv install 3.7.9
 pyenv shell 3.7.9
 pyenv global 3.7.9
 python3 -v
+sudo apt-get install python3-dev
 pip3 install protobuf
 pip3 install protobuf-compiler
 .github/scripts/protoc_gen_deps.py
