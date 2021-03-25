@@ -1,6 +1,19 @@
 # AnkiDroid-Backend
 
-Adapter allowing AnkiDroid interop with `anki/rslib` allowing AnkiDroid to leverage Anki Desktop's business logic layer, maintaining 100% compatibility with upstream without the need to port code to Java.
+Adapter allowing AnkiDroid to leverage Anki Desktop's Rust-based business logic layer via access to `anki/rslib` over JNI.
+
+## Why?
+
+* Removes the need to port Anki Desktop's business logic to Java
+   * 100% compatibility and no bugs
+   * Rust should provide a speed increase
+   * An upgrade for AnkiDroid should only require moving to a later commit in a submodule
+   * Saves massive amount of AnkiDroid developer time & effort
+   * Allows Anki Desktop to iterate faster
+   * We can quickly port changes upstream, which will benefit the ecosystem
+* Insulates Anki-Android users from the complexity of installing multiple toolchains
+   * The Rust/Python/cross-compilation toolchain is much more complex than downloading Android Studio
+   * A separate repository means we keep a low barrier to entry for new contributors
 
 ## Installation
 
