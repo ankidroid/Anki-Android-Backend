@@ -75,8 +75,8 @@ def toCommandLine(Platform targetPlatform) {
     // -Z unstable-options requires a 'nightly' toolchain
     // TODO: Explain how to select the version
 
-    def useCross = true
-    if (getCurrentPlatform() == targetPlatform) {
+    def useCross = System.getenv("NO_CROSS") != "true"
+    if (useCross && getCurrentPlatform() == targetPlatform) {
         useCross = false
     }
 
