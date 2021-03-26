@@ -12,6 +12,7 @@ on:
 
 jobs:
   build:
+    timeout-minutes: 80
     runs-on: ubuntu-latest
     # env:
       # required for "act": https://github.com/nektos/act/issues/265
