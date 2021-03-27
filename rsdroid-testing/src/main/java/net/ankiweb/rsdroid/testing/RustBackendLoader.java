@@ -34,6 +34,8 @@ public class RustBackendLoader {
     private static boolean alreadyLoaded;
     private static final HashMap<String, String> FILENAME_TO_PATH_CACHE = new HashMap<>();
 
+    public static boolean PRINT_DEBUG = false;
+
     /**
      * Allows unit testing rsdroid under Robolectric <br/>
      * Loads (via {@link Runtime#load(String)}) a librsdroid.so alternative compiled for the current operating system.<br/><br/>
@@ -46,6 +48,10 @@ public class RustBackendLoader {
      */
     public static void init() {
         if (!alreadyLoaded) {
+
+            // This should help diagnose some issues,
+            print("loading rsdroid-testing for: " + System.getProperty("os.name"));
+
             if (OS.isFamilyWindows()) {
                 load("rsdroid", ".dll");
             } else if (OS.isFamilyMac()) {
@@ -58,6 +64,12 @@ public class RustBackendLoader {
             }
 
             alreadyLoaded = true;
+        }
+    }
+
+    private static void print(String message) {
+        if (PRINT_DEBUG) {
+            System.out.println(message);
         }
     }
 
