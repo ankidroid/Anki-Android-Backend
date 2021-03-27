@@ -17,6 +17,7 @@
 package net.ankiweb.rsdroid.testing;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -99,6 +100,10 @@ public class RustBackendLoader {
         try {
             Runtime.getRuntime().load(path);
         } catch (UnsatisfiedLinkError e) {
+            if (!new File(path).exists()) {
+                FileNotFoundException exception = new FileNotFoundException("Extracted file was not found. Maybe the temp folder was deleted. Please try again: '" + path + "'");
+                throw new RuntimeException(exception);
+            }
             if (e.getMessage() == null || !e.getMessage().contains("already loaded in another classloader")) {
                 throw e;
             }
