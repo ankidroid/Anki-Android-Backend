@@ -23,6 +23,18 @@ import android.database.sqlite.SQLiteFullException;
 
 import androidx.annotation.Nullable;
 
+import net.ankiweb.rsdroid.exceptions.BackendDeckIsFilteredException;
+import net.ankiweb.rsdroid.exceptions.BackendExistingException;
+import net.ankiweb.rsdroid.exceptions.BackendInterruptedException;
+import net.ankiweb.rsdroid.exceptions.BackendInvalidInputException;
+import net.ankiweb.rsdroid.exceptions.BackendIoException;
+import net.ankiweb.rsdroid.exceptions.BackendJsonException;
+import net.ankiweb.rsdroid.exceptions.BackendNetworkException;
+import net.ankiweb.rsdroid.exceptions.BackendNotFoundException;
+import net.ankiweb.rsdroid.exceptions.BackendProtoException;
+import net.ankiweb.rsdroid.exceptions.BackendSyncException;
+import net.ankiweb.rsdroid.exceptions.BackendTemplateException;
+
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -45,13 +57,37 @@ public class BackendException extends RuntimeException {
     }
 
     public static BackendException fromError(Backend.BackendError error) {
-        if (error.hasDbError()) {
-            return new BackendDbException(error);
+        switch (error.getValueCase()) {
+            case DB_ERROR:
+                return BackendDbException.fromDbError(error);
+            case JSON_ERROR:
+                return new BackendJsonException(error.getJsonError());
+            case SYNC_ERROR:
+                return BackendSyncException.fromSyncError(error);
+            case FATAL_ERROR:
+                // This should have produced a hasFatalError property
+                throw new BackendFatalError(error.getFatalError());
+            case EXISTS:
+                return new BackendExistingException(error);
+            case DECK_IS_FILTERED:
+                return new BackendDeckIsFilteredException(error);
+            case INTERRUPTED:
+                return new BackendInterruptedException(error);
+            case PROTO_ERROR:
+                return new BackendProtoException(error);
+            case NOT_FOUND_ERROR:
+                return new BackendNotFoundException(error);
+            case INVALID_INPUT:
+                return BackendInvalidInputException.fromInvalidInputError(error);
+            case NETWORK_ERROR:
+                return BackendNetworkException.fromNetworkError(error);
+            case TEMPLATE_PARSE:
+                return BackendTemplateException.fromTemplateError(error);
+            case IO_ERROR:
+                return new BackendIoException(error);
+            case VALUE_NOT_SET:
         }
-        // This should have produced a hasFatalError property?
-        if (error.getValueCase() == Backend.BackendError.ValueCase.FATAL_ERROR) {
-            throw new BackendFatalError(error.getFatalError());
-        }
+
 
         return new BackendException(error);
     }
@@ -73,6 +109,34 @@ public class BackendException extends RuntimeException {
             // Later on, we may want to use structured error messages
             // DBError { info: "SqliteFailure(Error { code: Unknown, extended_code: 1 }, Some(\"no such table: aa\"))", kind: Other }
             super(error);
+        }
+
+        public static BackendException fromDbError(Backend.BackendError error) {
+
+            String localised = error.getLocalized();
+
+            if (localised == null) {
+                return new BackendDbException(error);
+            }
+
+            if (localised.contains("kind: FileTooNew")) {
+                return new BackendDbFileTooNewException(error);
+            }
+            if (localised.contains("kind: FileTooOld")) {
+                return new BackendDbFileTooOldException(error);
+            }
+            if (localised.contains("kind: MissingEntity")) {
+                return new BackendDbMissingEntityException(error);
+            }
+            if (localised.contains("kind: Other")) {
+                return new BackendDbException(error);
+            }
+            // Anki already open, or media currently syncing.
+            if (localised.startsWith("Anki already open")) {
+                return new BackendDbLockedException(error);
+            }
+
+            return new BackendDbException(error);
         }
 
         @Override
@@ -103,6 +167,30 @@ public class BackendException extends RuntimeException {
 
             String outMessage = String.format(Locale.ROOT, "error while compiling: \"%s\": %s", query, message);
             throw new SQLiteException(outMessage, this);
+        }
+
+        public static class BackendDbFileTooNewException extends BackendException {
+            public BackendDbFileTooNewException(Backend.BackendError error) {
+                super(error);
+            }
+        }
+
+        public static class BackendDbFileTooOldException extends BackendException {
+            public BackendDbFileTooOldException(Backend.BackendError error) {
+                super(error);
+            }
+        }
+
+        public static class BackendDbLockedException extends BackendException {
+            public BackendDbLockedException(Backend.BackendError error) {
+                super(error);
+            }
+        }
+
+        public static class BackendDbMissingEntityException extends BackendException {
+            public BackendDbMissingEntityException(Backend.BackendError error) {
+                super(error);
+            }
         }
     }
 }

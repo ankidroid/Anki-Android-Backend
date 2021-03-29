@@ -5,6 +5,7 @@ import android.os.Build;
 
 import androidx.annotation.CheckResult;
 import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 
 import timber.log.Timber;
 
@@ -96,4 +97,10 @@ public class NativeMethods {
     static native long closeBackend(long backendPointer);
 
     static native byte[] executeAnkiDroidCommand(long backendPointer, int command, byte[] args);
+
+    /**
+     * Produces all possible Rust-based errors.
+     */
+    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
+    static native byte[] debugProduceError(long backendPointer, String command);
 }
