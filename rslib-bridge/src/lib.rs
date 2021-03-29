@@ -31,8 +31,6 @@ mod sqlite;
 mod ankidroid;
 mod backend_proto;
 
-use itertools::Itertools;
-
 // TODO: Use a macro to handle panics to reduce code duplication
 
 // FUTURE_EXTENSION: Allow DB_COMMAND_NUM_ROWS to be variable to allow tuning of memory usage
@@ -92,6 +90,70 @@ pub unsafe extern "C" fn Java_net_ankiweb_rsdroid_NativeMethods_openBackend(
 
     Box::into_raw(Box::new(backend)) as jlong
 }
+
+/// Produces an error
+#[no_mangle]
+pub unsafe extern "C" fn Java_net_ankiweb_rsdroid_NativeMethods_debugProduceError(
+    _env: JNIEnv,
+    _: JClass,
+    backend_ptr : jlong,
+    error : JString) -> jbyteArray {
+
+    let backend = to_backend(backend_ptr);
+
+    // We need to go from string -> AnkiError  -> BackendError. BackendError is less expressive than
+    // AnkiError, and we want to test all possibilities.
+    let error_type_string: String = _env.get_string(error).expect("Couldn't get java string!").into();
+
+    use anki::err::NetworkErrorKind as Net;
+    use anki::err::SyncErrorKind as Sync;
+    use anki::err::DBErrorKind as DB;
+
+    let error_value = "error_value".to_string();
+    let err = match error_type_string.as_ref() {
+        "InvalidInput" => AnkiError::InvalidInput { info: error_value },
+        "TemplateError" => AnkiError::TemplateError { info: error_value },
+        "TemplateSaveError" => AnkiError::TemplateSaveError { ordinal: 1 },
+        "IOError" => AnkiError::IOError { info: error_value },
+        "DbErrorFileTooNew" => AnkiError::DBError { info: error_value, kind: DB::FileTooNew },
+        "DbErrorFileTooOld" => AnkiError::DBError { info: error_value, kind: DB::FileTooOld },
+        "DbErrorMissingEntity" => AnkiError::DBError { info: error_value, kind: DB::MissingEntity },
+        "DbErrorCorrupt" => AnkiError::DBError { info: error_value, kind: DB::Corrupt },
+        "DbErrorLocked" => AnkiError::DBError { info: error_value, kind: DB::Locked },
+        "DbErrorOther" => AnkiError::DBError { info: error_value, kind: DB::Other },
+        "NetworkErrorOffline" => AnkiError::NetworkError { info: error_value, kind: Net::Offline},
+        "NetworkErrorTimeout" => AnkiError::NetworkError { info: error_value, kind: Net::Timeout},
+        "NetworkErrorProxyAuth" => AnkiError::NetworkError { info: error_value, kind: Net::ProxyAuth},
+        "NetworkErrorOther" => AnkiError::NetworkError { info: error_value, kind: Net::Other},
+        "SyncErrorConflict" => AnkiError::SyncError { info: error_value, kind: Sync::Conflict },
+        "SyncErrorServerError" => AnkiError::SyncError { info: error_value, kind: Sync::ServerError },
+        "SyncErrorClientTooOld" => AnkiError::SyncError { info: error_value, kind: Sync::ClientTooOld },
+        "SyncErrorAuthFailed" => AnkiError::SyncError { info: error_value, kind: Sync::AuthFailed },
+        "SyncErrorServerMessage" => AnkiError::SyncError { info: error_value, kind: Sync::ServerMessage },
+        "SyncErrorClockIncorrect" => AnkiError::SyncError { info: error_value, kind: Sync::ClockIncorrect},
+        "SyncErrorOther" => AnkiError::SyncError { info: error_value, kind: Sync::Other },
+        "SyncErrorResyncRequired" => AnkiError::SyncError { info: error_value, kind: Sync::ResyncRequired },
+        "SyncErrorDatabaseCheckRequired"=> AnkiError::SyncError { info: error_value, kind: Sync::DatabaseCheckRequired },
+        "JSONError" => AnkiError::JSONError { info: error_value},
+        "ProtoError" => AnkiError::ProtoError { info: error_value},
+        "Interrupted" => AnkiError::Interrupted,
+        "CollectionNotOpen" => AnkiError::CollectionNotOpen,
+        "CollectionAlreadyOpen" => AnkiError::CollectionAlreadyOpen,
+        "NotFound" => AnkiError::NotFound,
+        "Existing" => AnkiError::Existing,
+        "DeckIsFiltered" => AnkiError::DeckIsFiltered,
+        "SearchError" => AnkiError::SearchError(Some(error_value)),
+        "FatalError" => AnkiError::FatalError { info: error_value},
+        unknown => AnkiError::FatalError { info: format!("Unknown Error code: {}", unknown) },
+    };
+
+    let error_as_proto = anki_error_to_proto_error(err, &backend.backend.i18n);
+
+    let mut bytes = Vec::new();
+    error_as_proto.encode(&mut bytes).unwrap();
+    _env.byte_array_from_slice(bytes.as_slice()).unwrap()
+}
+
 
 #[no_mangle]
 pub unsafe extern "C" fn Java_net_ankiweb_rsdroid_NativeMethods_closeBackend(
