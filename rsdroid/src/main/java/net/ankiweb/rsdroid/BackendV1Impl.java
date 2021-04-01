@@ -342,11 +342,15 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.NONE)
-    public static void setPageSize(long pageSizeInBytes) {
+    public static void setPageSizeForTesting(long pageSizeInBytes) {
         // TODO: Make this nonstatic
         NativeMethods.setDbPageSize(pageSizeInBytes);
     }
 
+    @Override
+    public void setPageSize(long pageSizeInBytes) {
+        NativeMethods.setDbPageSize(pageSizeInBytes);
+    }
 
     @Override
     public String[] getColumnNames(String sql) {

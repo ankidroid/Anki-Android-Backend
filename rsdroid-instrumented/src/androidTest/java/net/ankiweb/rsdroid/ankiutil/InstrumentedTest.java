@@ -61,7 +61,7 @@ public class InstrumentedTest {
         } catch (RustBackendFailedException e) {
             throw new RuntimeException(e);
         }
-        BackendV1Impl.setPageSize(TEST_PAGE_SIZE);
+        BackendV1Impl.setPageSizeForTesting(TEST_PAGE_SIZE);
     }
 
     @After

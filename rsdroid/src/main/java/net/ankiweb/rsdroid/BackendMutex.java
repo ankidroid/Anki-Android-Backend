@@ -178,6 +178,16 @@ public class BackendMutex implements BackendV1 {
         }
     }
 
+    @Override
+    public void setPageSize(long pageSizeBytes) {
+        try {
+            lock.lock();
+            backend.setPageSize(pageSizeBytes);
+        } finally {
+            lock.unlock();
+        }
+    }
+
     // RustBackend Implementation
 
     @Override

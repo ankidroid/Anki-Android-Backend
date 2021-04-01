@@ -46,4 +46,14 @@ public interface SQLHandler {
 
     void cancelCurrentProtoQuery(int sequenceNumber);
     void cancelAllProtoQueries();
+
+    /**
+     * Sets the page size for all future calls to
+     * {@link SQLHandler#getNextSlice(long, int)}
+     * and
+     * {@link SQLHandler#fullQueryProto(String, Object...)}
+     *
+     * Default: 2MB
+     */
+    void setPageSize(long pageSizeBytes);
 }

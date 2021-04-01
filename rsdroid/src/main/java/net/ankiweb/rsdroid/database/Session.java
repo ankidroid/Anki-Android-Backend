@@ -105,6 +105,11 @@ public class Session implements SQLHandler {
         backend.cancelAllProtoQueries();
     }
 
+    @Override
+    public void setPageSize(long pageSizeBytes) {
+        backend.setPageSize(pageSizeBytes);
+    }
+
 
     public void setTransactionSuccessful() {
         if (!inTransaction()) {
