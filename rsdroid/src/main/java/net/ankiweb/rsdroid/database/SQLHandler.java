@@ -41,7 +41,7 @@ public interface SQLHandler {
     String getPath();
 
     /* Protobuf-related (#6) */
-    Sqlite.DBResponse getPage(int page, int sequenceNumber);
+    Sqlite.DBResponse getNextSlice(long startIndex, int sequenceNumber);
     Sqlite.DBResponse fullQueryProto(String query, Object... bindArgs);
 
     void cancelCurrentProtoQuery(int sequenceNumber);

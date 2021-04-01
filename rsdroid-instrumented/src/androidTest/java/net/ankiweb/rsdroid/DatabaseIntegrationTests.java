@@ -23,7 +23,6 @@ import android.database.sqlite.SQLiteException;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import net.ankiweb.rsdroid.ankiutil.DatabaseUtil;
-import net.ankiweb.rsdroid.database.StreamingProtobufSQLiteCursor;
 import net.ankiweb.rsdroid.database.testutils.DatabaseComparison;
 
 import org.junit.Test;
@@ -38,6 +37,10 @@ import static org.junit.Assert.fail;
 @RunWith(Parameterized.class)
 public class DatabaseIntegrationTests extends DatabaseComparison {
 
+    private static final int INT_SIZE_BYTES = 8;
+    private static final int OPTIONAL_BYTES = 1;
+    /** Number of integers in 1 page of DB results when under test (111) */
+    public static int DB_PAGE_NUM_INT_ELEMENTS = TEST_PAGE_SIZE / (INT_SIZE_BYTES + OPTIONAL_BYTES);
 
     @Test
     public void testScalar() {
@@ -254,12 +257,12 @@ public class DatabaseIntegrationTests extends DatabaseComparison {
 
         db.execSQL("create table test (id int)");
 
-        for (int i = 0; i < StreamingProtobufSQLiteCursor.RUST_PAGE_SIZE; i++) {
+        for (int i = 0; i < DB_PAGE_NUM_INT_ELEMENTS; i++) {
             db.execSQL("insert into test VALUES (1)");
         }
 
         try (Cursor c = db.query("select * from test")) {
-            assertThat(c.getCount(), is(StreamingProtobufSQLiteCursor.RUST_PAGE_SIZE));
+            assertThat(c.getCount(), is(DB_PAGE_NUM_INT_ELEMENTS));
         }
     }
 
@@ -269,12 +272,12 @@ public class DatabaseIntegrationTests extends DatabaseComparison {
 
         db.execSQL("create table test (id int)");
 
-        for (int i = 0; i < StreamingProtobufSQLiteCursor.RUST_PAGE_SIZE + 1; i++) {
+        for (int i = 0; i < DB_PAGE_NUM_INT_ELEMENTS + 1; i++) {
             db.execSQL("insert into test VALUES (1)");
         }
 
         try (Cursor c = db.query("select * from test")) {
-            assertThat(c.getCount(), is(StreamingProtobufSQLiteCursor.RUST_PAGE_SIZE + 1));
+            assertThat(c.getCount(), is(DB_PAGE_NUM_INT_ELEMENTS + 1));
         }
     }
 

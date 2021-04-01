@@ -86,8 +86,8 @@ public class Session implements SQLHandler {
     }
 
     @Override
-    public Sqlite.DBResponse getPage(int page, int sequenceNumber) {
-        return backend.getPage(page, sequenceNumber);
+    public Sqlite.DBResponse getNextSlice(long startIndex, int sequenceNumber) {
+        return backend.getNextSlice(startIndex, sequenceNumber);
     }
 
     @Override

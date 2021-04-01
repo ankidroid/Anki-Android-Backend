@@ -27,28 +27,35 @@ import java.util.Locale;
 import BackendProto.Sqlite;
 
 public class StreamingProtobufSQLiteCursor extends AnkiDatabaseCursor {
-    // Interleaved cursors would corrupt data if there are more than PAGE_SIZE results.
-    // We currently use mSequenceNumber to crash if this is the case
-
-    // MAINTENANCE: This is not obtained from the Rust, so must manually be kept in sync
-    public static final int RUST_PAGE_SIZE = 1000;
+    /**
+     * Rust Implementation:
+     *
+     * When we request a query, rust calculates 2MB (default) of results and sends it to us
+     *
+     * We keep track of where we are with getSliceStartIndex: the index into the rust collection
+     *
+     * The next request should be for index: getSliceStartIndex() + getCurrentSliceRowCount()
+     */
 
     private final SQLHandler backend;
     private final String query;
     private Sqlite.DBResponse results;
     private int position = -1;
-    private int page = -1;
     private String[] columnMapping;
     private boolean isClosed = false;
     private final int sequenceNumber;
+    /** The total number of rows for the query */
     private final int rowCount;
 
+    /**The current index into the collection or rows */
+    private long getSliceStartIndex() {
+        return results.getStartIndex();
+    }
 
     public StreamingProtobufSQLiteCursor(SQLHandler backend, String query, Object[] bindArgs) {
         this.backend = backend;
         this.query = query;
 
-        page++;
         try {
             results = this.backend.fullQueryProto(this.query, bindArgs);
             sequenceNumber = results.getSequenceNumber();
@@ -59,11 +66,10 @@ public class StreamingProtobufSQLiteCursor extends AnkiDatabaseCursor {
     }
 
     private void getNextPage() {
-        page++;
         position = -1;
 
         try {
-            results = backend.getPage(page, sequenceNumber);
+            results = backend.getNextSlice(getSliceStartIndex() + getCurrentSliceRowCount(), sequenceNumber);
             if (results.getSequenceNumber() != sequenceNumber) {
                 throw new IllegalStateException("rsdroid does not currently handle nested cursor-based queries. Please change the code to avoid holding a reference to the query, or implement the functionality in rsdroid");
             }
@@ -79,7 +85,7 @@ public class StreamingProtobufSQLiteCursor extends AnkiDatabaseCursor {
 
     @Override
     public int getPosition() {
-        return position;
+        return (int) getSliceStartIndex() + position;
     }
 
     @Override
@@ -93,7 +99,7 @@ public class StreamingProtobufSQLiteCursor extends AnkiDatabaseCursor {
 
     @Override
     public boolean moveToNext() {
-        if (getCurrentSliceRowCount() > 0 && position + 1 >= RUST_PAGE_SIZE && getCount() != RUST_PAGE_SIZE) {
+        if (getCurrentSliceRowCount() > 0 && position + 1 >= getCurrentSliceRowCount() && getCount() != getCurrentSliceRowCount()) {
             getNextPage();
         }
         position++;
@@ -250,7 +256,7 @@ public class StreamingProtobufSQLiteCursor extends AnkiDatabaseCursor {
         return getRowAtCurrentPosition().getFields(columnIndex);
     }
 
-    private int getCurrentSliceRowCount() {
+    protected int getCurrentSliceRowCount() {
         return results.getResult().getRowsCount();
     }
 }
