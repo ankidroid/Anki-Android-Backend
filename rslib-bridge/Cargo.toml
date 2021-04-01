@@ -18,7 +18,7 @@ serde_json = "1.0.56"
 serde_derive = "1.0.114"
 lazy_static = "1.4.0"
 num_enum = "0.5.0"
-itertools = "0.9.0"
+itertools = "0.10.0"
 
 # picked bundled - TODO: Is this correct?
 rusqlite = { version = "0.23.1", features = ["trace", "functions", "collation", "bundled"] }
