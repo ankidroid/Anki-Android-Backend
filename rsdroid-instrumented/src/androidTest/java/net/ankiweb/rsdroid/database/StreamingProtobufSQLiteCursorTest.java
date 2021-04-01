@@ -21,19 +21,19 @@ import android.database.Cursor;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import net.ankiweb.rsdroid.BackendV1;
+import net.ankiweb.rsdroid.DatabaseIntegrationTests;
 import net.ankiweb.rsdroid.ankiutil.InstrumentedTest;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import timber.log.Timber;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.fail;
 
 public class StreamingProtobufSQLiteCursorTest extends InstrumentedTest {
 
@@ -75,7 +75,7 @@ public class StreamingProtobufSQLiteCursorTest extends InstrumentedTest {
 
     @Test
     public void testCorruptionIsHandled() throws IOException {
-        int elements = StreamingProtobufSQLiteCursor.RUST_PAGE_SIZE;
+       int elements = DatabaseIntegrationTests.DB_PAGE_NUM_INT_ELEMENTS;
 
         try (BackendV1 backend = super.getBackend("initial_version_2_12_1.anki2")) {
             SupportSQLiteDatabase db = new RustSupportSQLiteOpenHelper(backend).getWritableDatabase();
@@ -108,5 +108,71 @@ public class StreamingProtobufSQLiteCursorTest extends InstrumentedTest {
             }
         }
 
+    }
+
+    @Test
+    public void smallQueryHasOneCount() throws IOException {
+        int elements = 30; // 465
+
+
+        try (BackendV1 backend = super.getBackend("initial_version_2_12_1.anki2")) {
+            SupportSQLiteDatabase db = new RustSupportSQLiteOpenHelper(backend).getWritableDatabase();
+
+            db.execSQL("create table tmp (id varchar)");
+            for (int i = 0; i < elements + 1; i++) {
+                String inputOfLength = new String(new char[elements]).replace("\0", "a");
+                db.execSQL("insert into tmp (id) values (?)", new Object[] {inputOfLength});
+            }
+
+            try (TestCursor c1 = new TestCursor(backend, "select * from tmp", new Object[] { })) {
+
+                Set<Integer> sizes = new HashSet<>();
+
+                while (c1.moveToNext()) {
+                    if (sizes.add(c1.getSliceSize()) && sizes.size() > 1) {
+                        throw new IllegalStateException("Expected single size of results");
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    public void variableLengthStringsReturnDifferentRowCounts() throws IOException {
+        int elements = 50; // 1275 > 1000
+
+        try (BackendV1 backend = super.getBackend("initial_version_2_12_1.anki2")) {
+            SupportSQLiteDatabase db = new RustSupportSQLiteOpenHelper(backend).getWritableDatabase();
+
+            db.execSQL("create table tmp (id varchar)");
+            for (int i = 0; i < elements + 1; i++) {
+                String inputOfLength = new String(new char[elements]).replace("\0", "a");
+                db.execSQL("insert into tmp (id) values (?)", new Object[] {inputOfLength});
+            }
+
+            try (TestCursor c1 = new TestCursor(backend, "select * from tmp", new Object[] { })) {
+
+                Set<Integer> sizes = new HashSet<>();
+
+                while (c1.moveToNext()) {
+                    if (sizes.add(c1.getSliceSize()) && sizes.size() > 1) {
+                        return;
+                    }
+                }
+
+                throw new IllegalStateException("Expected multiple sizes of results");
+            }
+        }
+    }
+
+    private static class TestCursor extends StreamingProtobufSQLiteCursor {
+
+        public TestCursor(SQLHandler backend, String query, Object[] bindArgs) {
+            super(backend, query, bindArgs);
+        }
+
+        public int getSliceSize() {
+            return getCurrentSliceRowCount();
+        }
     }
 }

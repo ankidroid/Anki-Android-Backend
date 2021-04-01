@@ -18,6 +18,7 @@ package net.ankiweb.rsdroid;
 
 import androidx.annotation.CheckResult;
 import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
@@ -270,13 +271,13 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
     }
 
     @Override
-    public Sqlite.DBResponse getPage(int page, int sequenceNumber) {
+    public Sqlite.DBResponse getNextSlice(long startIndex, int sequenceNumber) {
         byte[] result = null;
         try {
-            Timber.d("Rust: getPage %d", page);
+            Timber.d("Rust: getNextSlice %d", startIndex);
 
             Pointer backend = ensureBackend();
-            result = NativeMethods.databaseGetNextResultPage(backend.toJni(), sequenceNumber, page);
+            result = NativeMethods.databaseGetNextResultPage(backend.toJni(), sequenceNumber, startIndex);
 
             Sqlite.DBResponse message = Sqlite.DBResponse.parseFrom(result);
             validateMessage(result, message);
@@ -338,6 +339,12 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
+    public static void setPageSize(long pageSizeInBytes) {
+        // TODO: Make this nonstatic
+        NativeMethods.setDbPageSize(pageSizeInBytes);
     }
 
 

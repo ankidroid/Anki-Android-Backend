@@ -72,7 +72,7 @@ public class NativeMethods {
     /** Returns the next page of results after a databaseCommand.
      * @return DbResult object */
     @CheckResult
-    static native byte[] databaseGetNextResultPage(long backendPointer, int sequenceNumber, int page);
+    static native byte[] databaseGetNextResultPage(long backendPointer, int sequenceNumber, long startIndex);
     
     /** Clears the memory from the current protobuf query. */
     static native int cancelCurrentProtoQuery(long backendPointer, int sequenceNumber);
@@ -97,6 +97,12 @@ public class NativeMethods {
     static native long closeBackend(long backendPointer);
 
     static native byte[] executeAnkiDroidCommand(long backendPointer, int command, byte[] args);
+
+    /**
+     * Sets the maximum number of bytes that a page of database results should return
+     * {@link net.ankiweb.rsdroid.database.StreamingProtobufSQLiteCursor}
+     */
+    static native void setDbPageSize(long numberOfBytes);
 
     /**
      * Produces all possible Rust-based errors.

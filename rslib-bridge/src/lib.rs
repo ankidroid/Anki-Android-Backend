@@ -33,13 +33,6 @@ mod backend_proto;
 
 // TODO: Use a macro to handle panics to reduce code duplication
 
-// FUTURE_EXTENSION: Allow DB_COMMAND_NUM_ROWS to be variable to allow tuning of memory usage
-// Maybe also change this to a per-MB value if it's easy to stream-serialise to protobuf until a
-// memory limit is hit.
-
-// MAINTENANCE: This must manually be kept in sync with the Java
-const DB_COMMAND_NUM_ROWS: usize = 1000;
-
 impl From<SchedTimingToday> for SchedTimingTodayOut2 {
     fn from(data: SchedTimingToday) -> Self {
         SchedTimingTodayOut2 {
@@ -307,7 +300,7 @@ pub unsafe extern "C" fn Java_net_ankiweb_rsdroid_NativeMethods_databaseGetNextR
     _: JClass,
     backend_ptr : jlong,
     sequence_number: jint,
-    page: jint
+    requested_index: jlong
 ) -> jbyteArray {
 
     let backend = to_backend(backend_ptr);
@@ -317,8 +310,7 @@ pub unsafe extern "C" fn Java_net_ankiweb_rsdroid_NativeMethods_databaseGetNextR
         let next_page = dbcommand::get_next(
             backend_ptr,
             sequence_number,
-            (page as usize) * DB_COMMAND_NUM_ROWS as usize,
-            DB_COMMAND_NUM_ROWS
+            requested_index
         ).unwrap();
 
 
@@ -369,7 +361,7 @@ pub unsafe extern "C" fn Java_net_ankiweb_rsdroid_NativeMethods_databaseCommand(
 
         match out_res {
             Ok(db_result) => {
-                let trimmed = trim_and_cache_remaining(backend_ptr, db_result, dbcommand::next_sequence_number());
+                let trimmed = dbcommand::trim_and_cache_remaining(backend_ptr, db_result, dbcommand::next_sequence_number());
 
                 let mut out_bytes = Vec::new();
                 trimmed.encode(&mut out_bytes).unwrap();
@@ -499,6 +491,14 @@ pub unsafe extern "C" fn Java_net_ankiweb_rsdroid_NativeMethods_getColumnNames(
     }
 }
 
+#[no_mangle]
+pub unsafe extern "C" fn Java_net_ankiweb_rsdroid_NativeMethods_setDbPageSize(
+    _: JNIEnv,
+    _: JClass,
+    page_size: jlong) {
+    dbcommand::set_max_page_size(page_size as usize);
+}
+
 unsafe fn to_backend(ptr: jlong) -> &'static mut AnkiDroidBackend {
     // TODO: This is not unwindable, but we can't hard-crash as Android won't send it to ACRA
     // As long as the FatalError is sent below, we're OK
@@ -513,23 +513,6 @@ fn panic_to_bytes(env: JNIEnv , s: &(dyn Any + Send), i18n: &I18n) -> jbyteArray
     env.byte_array_from_slice(bytes.as_slice()).unwrap()
 }
 
-/**
-Store the data in the cache if there's more than DB_COMMAND_NUM_ROWS.<br/>
-Returns: The data capped to DB_COMMAND_NUM_ROWS
-*/
-fn trim_and_cache_remaining(backend_ptr: i64, values: DbResult, sequence_number: i32) -> DbResponse {
-    let row_count = values.rows.len() as i32;
-    if values.rows.len() > DB_COMMAND_NUM_ROWS {
-        let result = values.rows.iter().take(DB_COMMAND_NUM_ROWS).cloned().collect();
-        let to_store = DbResponse { result: Some(values), sequence_number, row_count };
-        dbcommand::insert_cache(backend_ptr, to_store);
-
-        DbResponse { result: Some(DbResult { rows: result }), sequence_number, row_count }
-    } else {
-        DbResponse { result: Some(values), sequence_number, row_count }
-    }
-}
-
 fn panic_to_anki_error(s: &(dyn Any + Send)) -> AnkiError {
     if let Some(msg) = s.downcast_ref::<String>(){
         AnkiError::FatalError {
@@ -541,4 +524,3 @@ fn panic_to_anki_error(s: &(dyn Any + Send)) -> AnkiError {
         }
     }
 }
-

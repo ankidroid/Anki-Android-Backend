@@ -139,10 +139,10 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
-    public Sqlite.DBResponse getPage(int page, int sequenceNumber) {
+    public Sqlite.DBResponse getNextSlice(long startIndex, int sequenceNumber) {
         try {
             lock.lock();
-            return backend.getPage(page, sequenceNumber);
+            return backend.getNextSlice(startIndex, sequenceNumber);
         } finally {
             lock.unlock();
         }

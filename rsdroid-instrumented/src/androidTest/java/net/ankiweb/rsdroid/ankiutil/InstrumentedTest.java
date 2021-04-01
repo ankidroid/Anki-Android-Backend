@@ -25,6 +25,8 @@ import androidx.test.platform.app.InstrumentationRegistry;
 import net.ankiweb.rsdroid.BackendFactory;
 import net.ankiweb.rsdroid.BackendUtils;
 import net.ankiweb.rsdroid.BackendV1;
+import net.ankiweb.rsdroid.BackendV1Impl;
+import net.ankiweb.rsdroid.NativeMethods;
 import net.ankiweb.rsdroid.RustBackendFailedException;
 
 import org.junit.After;
@@ -44,6 +46,8 @@ public class InstrumentedTest {
 
     private final List<BackendV1> backendList = new ArrayList<>();
 
+    protected final static int TEST_PAGE_SIZE = 1000;
+
     @Before
     public void before() {
         /*
@@ -51,6 +55,13 @@ public class InstrumentedTest {
         Timber.uprootAll();
         Timber.plant(new Timber.DebugTree());
         */
+
+        try {
+            NativeMethods.ensureSetup();
+        } catch (RustBackendFailedException e) {
+            throw new RuntimeException(e);
+        }
+        BackendV1Impl.setPageSize(TEST_PAGE_SIZE);
     }
 
     @After
