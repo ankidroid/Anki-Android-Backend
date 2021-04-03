@@ -31,10 +31,7 @@ jobs:
       run: .github/scripts/install_rust_targets.sh
 
     - name: Install google protobuf compiler
-      run: |
-              sudo apt-get install python3-setuptools 
-              pip3 install protobuf-compiler
-              .github/scripts/protoc_gen_deps.py
+      run: .github/scripts/linux_install_protobuf.sh
 
     - name: Build
       run: ./gradlew clean assembleRelease -DtestBuildType=release -Dorg.gradle.daemon=false -Dorg.gradle.console=plain
