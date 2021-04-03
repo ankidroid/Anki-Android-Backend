@@ -3,6 +3,7 @@ on:
   push:
   schedule:
     - cron: "0 0 * * *"
+  pull_request:
 # Some of the commands here were added to attempt to get a build on a local Ubuntu VirtualBox
 # using https://github.com/nektos/act/
 # I didn't get this working, and these should likely be removed
@@ -11,6 +12,9 @@ on:
 
 jobs:
   build:
+    env:
+      RUST_FAST_BUILD: "true"
+    timeout-minutes: 80
     runs-on: ubuntu-latest
     # env:
       # required for "act": https://github.com/nektos/act/issues/265
@@ -24,6 +28,10 @@ jobs:
     # i18n did not seem to be handled
     - name: Init i18n submodule
       run: git submodule update --init --recursive
+
+
+    - name: env
+      run: printenv
 
     # COULD_BE_BETTER: Consider turning this into a GitHub action - help the wider community
     # NDK install (unzipping) is really noisy - silence the log spam with grep, while keeping errors
@@ -53,3 +61,6 @@ jobs:
 
     - name: Build
       run: ./gradlew clean assembleRelease -DtestBuildType=release -Dorg.gradle.daemon=false -Dorg.gradle.console=plain # assembleAndroidTest
+
+    - name: Test Javadoc
+      run: ./gradlew :rsdroid:androidJavadocs -DtestBuildType=release -Dorg.gradle.daemon=false -Dorg.gradle.console=plain

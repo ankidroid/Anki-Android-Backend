@@ -36,8 +36,8 @@ apply plugin: "org.mozilla.rust-android-gradle.rust-android"
 cargo {
     module = "../rslib-bridge"
     libname = "rsdroid"
-    targets = ["x86", "arm", "x86_64", "arm64"]
-    profile = 'release'
+    targets = "$System.env.RUST_FAST_BUILD" == "true" ? ["x86_64"] : ["x86", "arm", "x86_64", "arm64"]
+    profile = "$System.env.RUST_FAST_BUILD" == "true" ? 'debug' : 'release'
     apiLevel = 21
     verbose = true
 }

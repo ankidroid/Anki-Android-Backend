@@ -1,6 +1,6 @@
 name: rsdroid (Windows)
 on:
-  push:
+  #push:
   schedule:
     - cron: "0 0 * * *"
 jobs:

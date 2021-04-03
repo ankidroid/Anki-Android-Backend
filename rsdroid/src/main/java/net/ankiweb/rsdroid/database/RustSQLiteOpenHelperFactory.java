@@ -18,13 +18,14 @@ package net.ankiweb.rsdroid.database;
 
 import androidx.annotation.NonNull;
 import androidx.sqlite.db.SupportSQLiteOpenHelper;
+import androidx.sqlite.db.SupportSQLiteOpenHelper.Factory;
 
 import net.ankiweb.rsdroid.BackendFactory;
 
 /**
- * Implementation of {@link SupportSQLiteOpenHelper.Factory} using the Anki Desktop backend
+ * Implementation of {@link Factory} using the Anki Desktop backend
  */
-public class RustSQLiteOpenHelperFactory implements SupportSQLiteOpenHelper.Factory {
+public class RustSQLiteOpenHelperFactory implements Factory {
     private final BackendFactory backendFactory;
 
     public RustSQLiteOpenHelperFactory(BackendFactory backendFactory) {
