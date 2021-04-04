@@ -55,3 +55,7 @@ jobs:
 
     - name: Build
       run: ./gradlew clean assembleRelease -DtestBuildType=release -Dorg.gradle.daemon=false -Dorg.gradle.console=plain # assembleAndroidTest
+
+    # Our publish workflow (publish_library.yaml) in on Ubuntu and needs javadocs (#57)
+    - name: Test Javadoc
+      run: ./gradlew :rsdroid:androidJavadocs -DtestBuildType=release -Dorg.gradle.daemon=false -Dorg.gradle.console=plain
