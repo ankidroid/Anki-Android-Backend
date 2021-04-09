@@ -26,6 +26,7 @@ import net.ankiweb.rsdroid.exceptions.BackendInvalidInputException;
 import net.ankiweb.rsdroid.exceptions.BackendIoException;
 import net.ankiweb.rsdroid.exceptions.BackendJsonException;
 import net.ankiweb.rsdroid.exceptions.BackendNetworkException;
+import net.ankiweb.rsdroid.exceptions.BackendNotFoundException;
 import net.ankiweb.rsdroid.exceptions.BackendProtoException;
 import net.ankiweb.rsdroid.exceptions.BackendSyncException;
 import net.ankiweb.rsdroid.exceptions.BackendTemplateException;
@@ -102,6 +103,8 @@ public class ExceptionTest {
             { BackendForTesting.ErrorType.ProtoError, BackendProtoException.class },
             { BackendForTesting.ErrorType.TemplateError, BackendTemplateException.class},
             { BackendForTesting.ErrorType.TemplateSaveError, BackendTemplateException.BackendTemplateSaveException.class},
+
+            { BackendForTesting.ErrorType.NotFound, BackendNotFoundException.class},
         });
     }
 
