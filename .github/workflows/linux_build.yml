@@ -4,20 +4,11 @@ on:
   schedule:
     - cron: "0 0 * * *"
   pull_request:
-# Some of the commands here were added to attempt to get a build on a local Ubuntu VirtualBox
-# using https://github.com/nektos/act/
-# I didn't get this working, and these should likely be removed
-# This may also mean we're performing too many install steps
-# https://github.com/david-allison-1/Anki-Android-Backend/issues/7
 
 jobs:
   build:
     timeout-minutes: 80
     runs-on: ubuntu-latest
-    # env:
-      # required for "act": https://github.com/nektos/act/issues/265
-      # ANDROID_SDK_ROOT: /usr/lib/android/sdk
-      # ANDROID_HOME: /usr/lib/android/sdk
     steps:
     - uses: actions/checkout@v2
       with:
@@ -45,10 +36,6 @@ jobs:
     # actions-rs only accepts "target" (although a "targets" param to be added in v2). We need 7 targets.
     - name: Install Rust Targets
       run: .github/scripts/install_rust_targets.sh
-
-   # Attempt to get "act" working on a local VM
-   # - name: Install Android SDK
-   #   run: sudo apt update && sudo apt install android-sdk
 
     - name: Install google protobuf compiler
       run: .github/scripts/linux_install_protobuf.sh
