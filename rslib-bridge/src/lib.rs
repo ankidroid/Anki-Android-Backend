@@ -556,8 +556,10 @@ fn panic_to_anki_error(s: &(dyn Any + Send)) -> AnkiError {
             info: msg.to_string()
         }
     } else {
+        // The TypeId (the only thing you can reasonably get from Any) doesn't carry the type name
+        // Confirm an as_ref() rather than a borrow was passed in here.
         AnkiError::FatalError {
-            info: "panic with no info".to_string()
+            info: "panic with unknown info".to_string()
         }
     }
 }
