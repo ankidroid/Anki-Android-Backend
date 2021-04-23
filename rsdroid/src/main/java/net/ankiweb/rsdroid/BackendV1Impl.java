@@ -27,6 +27,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Closeable;
+import java.io.File;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -393,5 +394,14 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
     @RustCleanup("Architecture - backendPtr param is not required")
     public AdBackend.DebugActiveDatabaseSequenceNumbersOut debugActiveDatabaseSequenceNumbers(long backendPtr) {
         return ankiDroidBackend.debugActiveDatabaseSequenceNumbers(ensureBackend().toJni());
+    }
+
+    @Override
+    public void downgradeBackend(String collectionPath) {
+        if (!new File(collectionPath).exists()) {
+            throw new BackendException(collectionPath + " not found");
+        }
+
+        ankiDroidBackend.downgradeBackend(collectionPath);
     }
 }

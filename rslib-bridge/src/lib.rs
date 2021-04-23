@@ -3,11 +3,11 @@ extern crate lazy_static;
 
 use jni::JNIEnv;
 use jni::objects::{JClass, JString, JObject};
-use jni::sys::{jbyteArray, jint, jlong, jobjectArray, jarray};
+use jni::sys::{jbyteArray, jint, jlong, jobjectArray, jarray, jstring};
 
-use anki::backend_proto as pb;
+use anki::{backend_proto as pb, log};
 use pb::OpenCollectionIn;
-use crate::sqlite::{open_collection_ankidroid, insert_for_id, query_for_affected};
+use crate::sqlite::{open_collection_ankidroid, insert_for_id, query_for_affected, get_open_collection_for_downgrade};
 
 use anki::backend::{init_backend, anki_error_to_proto_error, Backend};
 use crate::ankidroid::AnkiDroidBackend;
@@ -229,6 +229,43 @@ pub unsafe extern "C" fn Java_net_ankiweb_rsdroid_NativeMethods_command(
     }
 }
 
+/// Opens a database of V16 or earlier and transforms it into a database of V11
+/// This exists to allow
+/// We do not require or keep a backend open for this operation:
+/// We wouldn't be able to open a backend - openAnkiDroidCollection fails due to the schema mismatch
+#[no_mangle]
+pub unsafe extern "C" fn Java_net_ankiweb_rsdroid_NativeMethods_downgradeDatabase(
+    env: JNIEnv,
+    _: JClass,
+    path: JString) -> jstring {
+
+    let i18n = I18n::new(&[""], "", log::default_logger(None).expect("logger failed"));
+    let result = catch_unwind(|| {
+        let collection_path: String = env.get_string(path).expect("Couldn't get java string!").into();
+
+        // Obtains a collection only if it's version 16. Otherwise throws.
+        // Cause: The .close() method does not check for schema versions, so can't downgrade
+        // if tables are missing
+        let collection = match get_open_collection_for_downgrade(collection_path) {
+            Ok(r) => r,
+            Err(err) => panic!(err.localized_description(&i18n))
+        };
+
+        const DOWNGRADE_TO_11: bool = true;
+        if let Err(msg) = collection.close(DOWNGRADE_TO_11) {
+            panic!(msg.localized_description(&i18n))
+        }
+    });
+
+    let result_string = match result {
+        Ok(_) => "".to_owned(),
+        Err(s) => panic_to_anki_error(s.as_ref()).localized_description(&i18n),
+    };
+
+    env.new_string(result_string)
+        .expect("Failed to produce string")
+        .into_inner()
+}
 
 #[no_mangle]
 pub unsafe extern "C" fn Java_net_ankiweb_rsdroid_NativeMethods_executeAnkiDroidCommand(

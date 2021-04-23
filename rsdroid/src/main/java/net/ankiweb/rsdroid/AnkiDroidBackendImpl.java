@@ -34,6 +34,16 @@ public class AnkiDroidBackendImpl extends net.ankiweb.rsdroid.AdbackendImpl {
         return NativeMethods.executeAnkiDroidCommand(backendPointer, command, args);
     }
 
+    public void downgradeBackend(String collectionPath) {
+        String ret = NativeMethods.downgradeDatabase(collectionPath);
+
+        if (ret != null && ret.length() != 0) {
+            throw new BackendException(ret);
+        }
+
+        // otherwise, return
+    }
+
     public interface PointerGen {
         Pointer generatePointer();
     }

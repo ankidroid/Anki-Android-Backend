@@ -109,4 +109,11 @@ public class NativeMethods {
      */
     @VisibleForTesting(otherwise = VisibleForTesting.NONE)
     static native byte[] debugProduceError(long backendPointer, String command);
+
+    /**
+     *
+     * @param path The path of the collection to downgrade
+     * @return Error message, or empty string for success
+     */
+    static native String downgradeDatabase(String path);
 }

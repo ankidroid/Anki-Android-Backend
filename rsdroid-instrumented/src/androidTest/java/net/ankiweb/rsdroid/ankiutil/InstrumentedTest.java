@@ -29,6 +29,7 @@ import net.ankiweb.rsdroid.BackendV1Impl;
 import net.ankiweb.rsdroid.NativeMethods;
 import net.ankiweb.rsdroid.RustBackendFailedException;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.After;
 import org.junit.Before;
 
@@ -110,9 +111,15 @@ public class InstrumentedTest {
         return InstrumentationRegistry.getInstrumentation().getTargetContext();
     }
 
+    @NotNull
     protected BackendV1 getBackend(String fileName) {
-        BackendV1 backendV1 = getClosedBackend();
         String path = getAssetFilePath(fileName);
+        return getBackendFromPath(path);
+    }
+
+    @NotNull
+    protected BackendV1 getBackendFromPath(String path) {
+        BackendV1 backendV1 = getClosedBackend();
         BackendUtils.openAnkiDroidCollection(backendV1, path);
         this.backendList.add(backendV1);
         return backendV1;
