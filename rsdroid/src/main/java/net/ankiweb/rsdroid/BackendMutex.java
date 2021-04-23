@@ -991,6 +991,16 @@ public class BackendMutex implements BackendV1 {
     }
 
     @Override
+    public void downgradeBackend(String collectionPath) throws BackendException {
+        try {
+            lock.lock();
+            backend.downgradeBackend(collectionPath);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    @Override
     public void close() throws IOException {
         try {
             lock.lock();

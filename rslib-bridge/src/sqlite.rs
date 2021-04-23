@@ -42,9 +42,11 @@ pub fn open_collection_no_update<P: Into<PathBuf>>(
     server: bool,
     i18n: I18n,
     log: Logger,
+    min_schama: u8,
+    max_schema: u8
 ) -> AnkiResult<Collection> {
     let col_path = path.into();
-    let storage = open_or_create_no_update(&col_path, &i18n, server)?;
+    let storage = open_or_create_no_update(&col_path, &i18n, server, min_schama, max_schema)?;
 
     let col = Collection {
         storage,
@@ -75,6 +77,8 @@ pub fn open_collection_ankidroid(backend : &Backend, input: pb::OpenCollectionIn
     };
     let logger = log::default_logger(log_path)?;
 
+    const SCHEMA_ANKIDROID_VERSION: u8 = 11;
+
     let new_col = open_collection_no_update(
         input.collection_path,
         input.media_folder_path,
@@ -82,6 +86,8 @@ pub fn open_collection_ankidroid(backend : &Backend, input: pb::OpenCollectionIn
         false,
         backend.i18n.clone(),
         logger,
+        SCHEMA_ANKIDROID_VERSION,
+        SCHEMA_ANKIDROID_VERSION
     )?;
 
     *col = Some(new_col);
@@ -89,8 +95,25 @@ pub fn open_collection_ankidroid(backend : &Backend, input: pb::OpenCollectionIn
     Ok(().into())
 }
 
+pub fn get_open_collection_for_downgrade(collection_path: String) -> AnkiResult<Collection> {
+    let logger = log::default_logger(None)?;
 
-pub(crate) fn open_or_create_no_update(path: &Path, _i18n: &I18n, _server: bool) -> AnkiResult<SqliteStorage> {
+    const SCHEMA_ANKIDROID_MAX_VERSION: u8 = 16;
+
+    open_collection_no_update(
+        collection_path,
+        "".to_owned(),
+        "".to_owned(),
+        false,
+        I18n::new(&[""], "", logger.clone()),
+        logger,
+        SCHEMA_ANKIDROID_MAX_VERSION,
+        SCHEMA_ANKIDROID_MAX_VERSION
+    )
+}
+
+
+pub(crate) fn open_or_create_no_update(path: &Path, _i18n: &I18n, _server: bool, current_schema: u8, max_schema : u8) -> AnkiResult<SqliteStorage> {
     let db = anki::storage::sqlite::open_or_create_collection_db(path)?;
 
     let (create, ver) = anki::storage::sqlite::schema_version(&db)?;
@@ -99,10 +122,9 @@ pub(crate) fn open_or_create_no_update(path: &Path, _i18n: &I18n, _server: bool)
     // analysis. We may be able to enable WAL at a later time.
     db.pragma_update(None, "journal_mode", &"TRUNCATE")?;
 
-    const SCHEMA_ANKIDROID_VERSION: u8 = 11;
     let err = match ver {
-        v if v < SCHEMA_ANKIDROID_VERSION => Some(DBErrorKind::FileTooOld),
-        v if v > SCHEMA_ANKIDROID_VERSION => Some(DBErrorKind::FileTooNew),
+        v if v < current_schema => Some(DBErrorKind::FileTooOld),
+        v if v > max_schema => Some(DBErrorKind::FileTooNew),
         _ => None,
     };
     if let Some(kind) = err {
@@ -126,7 +148,7 @@ pub(crate) fn open_or_create_no_update(path: &Path, _i18n: &I18n, _server: bool)
         params![
                 crt,
                 crt * 1000,
-                SCHEMA_ANKIDROID_VERSION,
+                current_schema,
                 &config::schema11_config_as_string()
             ],
     )?;
