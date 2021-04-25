@@ -18,8 +18,8 @@ Adapter allowing AnkiDroid to leverage Anki Desktop's Rust-based business logic 
 ## Installation
 
 ```gradle
-    implementation "io.github.david-allison-1:anki-android-backend:0.1.0"
-    testImplementation "io.github.david-allison-1:anki-android-backend-testing:0.1.0"
+    implementation "io.github.david-allison-1:anki-android-backend:0.1.5"
+    testImplementation "io.github.david-allison-1:anki-android-backend-testing:0.1.5"
 ```
 
 ## Folders
