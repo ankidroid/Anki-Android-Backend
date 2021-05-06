@@ -83,7 +83,7 @@ jobs:
       with:
         name: anki-proto
         if-no-files-found: error
-        path: anki/proto/
+        path: rslib-bridge/anki/proto/
 
   test:
     needs: build
@@ -109,12 +109,12 @@ jobs:
       name: Download fluent.proto
       with:
         name: anki-proto
-        path: anki/proto/
+        path: rslib-bridge/anki/proto/
 
     - name: Ensure fluent.proto exists
       if: matrix.os != 'windows-latest'
       run: |
-              if [ ! -f anki/proto/fluent.proto ]; then
+              if [ ! -f rslib-bridge/anki/proto/fluent.proto ]; then
                   echo "fluent.proto not generated"
                   exit 1
               fi
