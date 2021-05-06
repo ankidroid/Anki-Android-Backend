@@ -61,8 +61,16 @@ def getInputDir() {
     return canonicalPath
 }
 
+def getAssetsDir() {
+    return "${project.sourceSets.main.java.srcDirs[0]}/../../../assets";
+}
+
+def getTargetDir() {
+    return getInputDir() + "/target"
+}
+
 def toWindowsCommandLine(String command) {
-    def path = "${project.sourceSets.main.java.srcDirs[0]}/../../../assets"
+    def path = getAssetsDir()
     def canonicalAssetsPath = new File(path).getCanonicalPath()
     if (!new File(canonicalAssetsPath).exists()) {
         throw new FileNotFoundException("could not find output path: ${canonicalAssetsPath}")
@@ -80,7 +88,7 @@ def toCommandLine(Platform targetPlatform) {
         useCross = false
     }
 
-    def standardArg = "${useCross ? "cross" : "cargo"}  +nightly build --release -Z unstable-options --features no-android"
+    def standardArg = "${useCross ? "cross" : "cargo"} build --release --features no-android --verbose"
     def assetsPath = new File("${project.sourceSets.main.java.srcDirs[0]}/../../../assets").getCanonicalPath()
 
     String assetsSubPath = "/rsdroid-testing/assets"
@@ -91,14 +99,11 @@ def toCommandLine(Platform targetPlatform) {
             "/mnt/" + f.absolutePath[0].toLowerCase() + f.absolutePath.substring(1).replace(":\\", "\\").replace("\\", "/")
 
     println "Outputting to: ${path}"
-    def outDir = "--out-dir ${path}"
+    def outDir = ""
     System.out.println(assetsPath)
     def mainArg = standardArg + " " + outDir
     if (useCross) {
         mainArg = "DONT_RUSTFMT=1 " + mainArg //FIXME: try to mount $CARGO_HOME/bin and add it to path using cross
-
-        //instruct cross to mount the output directory
-        mainArg = "OUT_DIR=${path} " + mainArg
     }
     switch (targetPlatform) {
         case Platform.LINUX: return toWindowsCommandLine("CC=\$ANKIDROID_LINUX_CC ${mainArg} --target x86_64-unknown-linux-gnu")
@@ -147,10 +152,37 @@ task preBuildLinux(type: Exec) {
     commandLine(toCommandLine(Platform.LINUX))
 }
 
+task copyLinuxOutput(type: Copy) {
+    dependsOn preBuildLinux
+    File linuxDir = new File(targetDir, "x86_64-unknown-linux-gnu/release/")
+    from linuxDir
+    include "*.so"
+    into assetsDir
+}
+
+task copyMacOutput(type: Copy) {
+    dependsOn preBuildMac
+    File macosDir = new File(targetDir, "x86_64-apple-darwin/release/")
+    from macosDir
+    include "*.dylib"
+    into assetsDir
+}
+
+task copyWindowsOutput(type: Copy) {
+    dependsOn preBuildWindows
+    File windowsDir = new File(targetDir, "x86_64-pc-windows-gnu/release/")
+    from windowsDir
+    include "*.dll"
+    include "*.dll.a"
+    into assetsDir
+}
+
+
 // TODO: check for cargo
 // check for targets: x86_64-apple-darwin, x86_64-pc-windows-gnu, TODO: Linux
 
 processResources.dependsOn preBuildWindows
+processResources.dependsOn copyWindowsOutput
 // To fix: "toolchain 'nightly-x86_64-unknown-linux-gnu' is not installed"
 // execute in bash: rustup toolchain install nightly-x86_64-unknown-linux-gnu
 // "linker `x86_64-unknown-linux-gnu-gcc` not found"
@@ -159,12 +191,14 @@ processResources.dependsOn preBuildWindows
 // rustup target add x86_64-pc-windows-gnu --toolchain nightly
 // brew install mingw-w64 && x86_64-w64-mingw32-gcc -v
 processResources.dependsOn preBuildLinux
+processResources.dependsOn copyLinuxOutput
 
 if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
     // due to restrictions on downloading the MacOS SDK, we can only build for MacOS on MacOS
     // > Install a reasonable number of copies of the Apple Software on Apple-branded computers
     // https://www.apple.com/legal/sla/docs/xcode.pdf
     processResources.dependsOn preBuildMac
+    processResources.dependsOn copyMacOutput
 }
 
 signing {

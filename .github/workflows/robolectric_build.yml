@@ -42,9 +42,8 @@ jobs:
     - name: Install Rust
       uses: actions-rs/toolchain@v1.0.6
       with:
-        toolchain: nightly # nightly is currently required for Robolectric Testing
+        toolchain: stable
         override: true
-        components: rustfmt, clippy
 
     # actions-rs only accepts "target" (although a "targets" param to be added in v2). We need 7 targets.
     - name: Install Rust Targets
