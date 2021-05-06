@@ -21,12 +21,9 @@ jobs:
 #      run: |
 #          echo "/usr/local/opt/gnu-tar/libexec/gnubin" >> $GITHUB_PATH
     - uses: actions/checkout@v2
-      with:
-          submodules: 'true' # anki is a submodule
 
-    # i18n did not seem to be handled
-    - name: Init i18n submodule
-      run: git submodule update --init --recursive
+    - name: Fetch submodules
+      run:  git submodule update --init --recursive --remote --force
 
     - name: Install NDK (r22 - 22.0.7026061)
       run: .github/scripts/install_ndk_macos.sh r22 22.0.7026061
@@ -98,8 +95,9 @@ jobs:
       fail-fast: false
     steps:
     - uses: actions/checkout@v2
-      with:
-          submodules: 'true' # we need the .proto files, but not the i18n files in the recursive submodule (yet).
+
+    - name: Fetch submodules
+      run: git submodule update --init --recursive --remote --force
 
     - uses: actions/download-artifact@v2
       name: Download Artifact
@@ -158,12 +156,12 @@ jobs:
 
     - name: Install & Test Protobuf Compiler
       if: matrix.os != 'windows-latest'
-      shell: bash -l {0} 
+      shell: bash -l {0}
       run: |
               pip3 install protobuf
               pip3 install protobuf-compiler
               python3 .github/scripts/protoc_gen_deps.py
-              
+
     - name: Install & Test Protobuf Compiler (win)
       if: matrix.os == 'windows-latest'
       run: |
@@ -171,12 +169,12 @@ jobs:
               pip3 install protobuf
               pip3 install protobuf-compiler
               python3 .github/scripts/protoc_gen_deps.py
-              
+
     - name: Run Tests
       if: matrix.os != 'windows-latest'
-      shell: bash -l {0} 
+      shell: bash -l {0}
       run: ./gradlew rsdroid:test -x jar -x cargoBuildArm -x cargoBuildX86 -x cargoBuildArm64 -x cargoBuildX86_64
-      
+
     - name: Run Tests (win)
       if: matrix.os == 'windows-latest'
       run: ./gradlew rsdroid:test -x jar -x cargoBuildArm -x cargoBuildX86 -x cargoBuildArm64 -x cargoBuildX86_64
