@@ -12,12 +12,9 @@ jobs:
     timeout-minutes: 80
     steps:
     - uses: actions/checkout@v2
-      with:
-          submodules: 'true' # anki is a submodule
 
-    # i18n did not seem to be handled
-    - name: Init i18n submodule
-      run: git submodule update --init --recursive
+    - name: Fetch submodules
+      run:  git submodule update --init --recursive --remote --force
 
     - name: Install NDK
       run: .github/scripts/install_ndk_macos.sh r22 22.0.7026061
@@ -84,12 +81,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
       name: Checkout
-      with:
-          submodules: 'true' # anki is a submodule - and this is currently required by all gradle builds.
 
     # COULD_BE_BETTER: This may not be needed - tiny speed penalty
-    - name: Init i18n submodule
-      run: git submodule update --init --recursive
+    - name: Fetch submodules
+      run:  git submodule update --init --recursive --remote --force
 
     - name: Download APKs
       uses: actions/download-artifact@v2

@@ -12,8 +12,6 @@ jobs:
     steps:
 
     - uses: actions/checkout@v2
-      with:
-          submodules: 'true' # anki is a submodule
 
     # TODO: Ignore lines like we do in the Unix scripts, rather than all of them
     - name: Install NDK (silent)
@@ -46,9 +44,8 @@ jobs:
       run: |
             $Env:ANDROID_HOME
     
-    # i18n did not seem to be handled
-    - name: Init i18n submodule
-      run: git submodule update --init --recursive
+    - name: Fetch submodules
+      run:  git submodule update --init --recursive --remote --force
 
     - name: Install Rust
       uses: actions-rs/toolchain@v1.0.6

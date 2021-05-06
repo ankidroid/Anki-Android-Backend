@@ -11,12 +11,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-      with:
-          submodules: 'true' # anki is a submodule
 
-    # i18n did not seem to be handled
-    - name: Init i18n submodule
-      run: git submodule update --init --recursive
+    - name: Fetch submodules
+      run:  git submodule update --init --recursive --remote --force
 
     # COULD_BE_BETTER: Consider turning this into a GitHub action - help the wider community
     # NDK install (unzipping) is really noisy - silence the log spam with grep, while keeping errors
