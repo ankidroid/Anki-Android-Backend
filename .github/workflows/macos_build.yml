@@ -43,6 +43,15 @@ jobs:
               pip3 install protobuf
               python3 .github/scripts/protoc_gen_deps.py
 
+    - name: Rust Cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          rslib-bridge/target
+        key: ${{ runner.os }}-cargo-${{ hashFiles('rslib-bridge/**/Cargo.lock') }}
+
     - name: Build
       shell: bash -l {0}
       run: ./gradlew clean assembleDebug -DtestBuildType=debug -Dorg.gradle.daemon=false -Dorg.gradle.console=plain

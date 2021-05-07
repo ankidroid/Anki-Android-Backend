@@ -72,6 +72,15 @@ jobs:
         pip3 install protobuf
         python3 .github/scripts/protoc_gen_deps.py
 
+    - name: Rust Cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          rslib-bridge/target
+        key: ${{ runner.os }}-cargo-${{ hashFiles('rslib-bridge/**/Cargo.lock') }}
+
     # -Dorg.gradle.daemon=false has been removed
     # -Dorg.gradle.console=plain has been removed
     #      env:
