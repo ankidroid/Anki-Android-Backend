@@ -139,30 +139,20 @@ jobs:
 
             Write-Host "NDK Install Completed"
 
-    - name: Install Pyenv
-      if: matrix.os == 'macos-latest'
-      run: .github/scripts/macos_install_pyenv.sh
-
-    # pyenv requires bash_profile, so we need the -l (login) arg for bash from now on on macOS
-    # TODO: find a better way to disambiguate the "shell" variable - we need it for bash being laucnhed with --noprofile while using pyenv
-    - name: Setup Pyenv
-      if: matrix.os == 'macos-latest'
-      shell: bash -l {0}
-      run: |
-             pyenv install 3.7.9
-             pyenv shell 3.7.9
-             pyenv global 3.7.9
-
     - name: Install Python Setuptools
       if: matrix.os == 'ubuntu-latest'
       run: sudo apt-get install python3-setuptools
+
+    - name: Install Protoc
+      uses: arduino/setup-protoc@v1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Install & Test Protobuf Compiler
       if: matrix.os != 'windows-latest'
       shell: bash -l {0}
       run: |
               pip3 install protobuf
-              pip3 install protobuf-compiler
               python3 .github/scripts/protoc_gen_deps.py
 
     - name: Install & Test Protobuf Compiler (win)
@@ -170,7 +160,6 @@ jobs:
       run: |
               Set-Alias -Name "python3" -Value "python"
               pip3 install protobuf
-              pip3 install protobuf-compiler
               python3 .github/scripts/protoc_gen_deps.py
 
     - name: Run Tests

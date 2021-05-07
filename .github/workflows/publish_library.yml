@@ -27,8 +27,10 @@ jobs:
     - name: Install Rust Targets
       run: .github/scripts/install_rust_targets.sh
 
-    - name: Install google protobuf compiler
-      run: .github/scripts/linux_install_protobuf.sh
+    - name: Install Protoc
+      uses: arduino/setup-protoc@v1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Build
       run: ./gradlew clean assembleRelease -DtestBuildType=release -Dorg.gradle.daemon=false -Dorg.gradle.console=plain
