@@ -78,8 +78,14 @@ cargo install cross --git https://github.com/rust-embedded/cross/
 
 cecho $lgray "Installing protobuf python libraries"
 
-if [[ $(pip3 install protobuf) && $(pip3 install protobuf-compiler) ]]; then
-  ok_echo "Protobuf python libraries are installed"
+if [[ $(protoc --version) ]]; then
+  ok_echo "Protobuf compiler is installed"
+else
+  error_echo "Protobuf compiler (protoc) is not found"
+fi
+
+if [[ $(pip3 install protobuf) ]]; then
+  ok_echo "Protobuf python library is installed"
 else
     echo -e "Try installing with python 3.7"
     error_echo "Failed installing Protobuf python libraries"

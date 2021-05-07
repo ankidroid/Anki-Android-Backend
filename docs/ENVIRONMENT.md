@@ -40,19 +40,16 @@ $ rustup target add x86_64-linux-android      # x86_64
 ```bash
 $ cargo install cross --git https://github.com/rust-embedded/cross/
 ```
-- [ ] Install Python
-    - [ ] Install protobuf pakages
+- [ ] Install protobuf compiler (protoc) 3.x
+    - macOS: `brew install protobuf`
+    - ubuntu: `sudo apt-get install protobuf-compiler`
+    - others:
+        - [build from source](https://github.com/protocolbuffers/protobuf/blob/master/src/README.md)
+        - [pre built binary](https://github.com/protocolbuffers/protobuf/releases)
+            - name: `protoc-$VERSION-$PLATFORM.zip`
+            - add bin directory to your PATH
+- [ ] Install Python3
+    - [ ] Install protobuf package
 ```bash
 $ pip3 install protobuf
-$ pip3 install protobuf-compiler
-```
-
-## Note for macOS users
-You may face issues while trying to install protobuf packages. you can solve these issues by installing pythton 3.7.
-### Using pyenv
-https://github.com/pyenv/pyenv#installation
-### Using homebrew
-```bash
-$ brew install python@3.7
-$ brew link python@3.7 # if you do already a have a version installed unlink it first
 ```
