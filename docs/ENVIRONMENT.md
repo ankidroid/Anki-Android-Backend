@@ -14,7 +14,7 @@ $ ./tools/build-docker-images.sh
 ```
 - [ ] Android SDK
 - [ ] Android NDK
-    - You can find the exact needed version from `[rsdriod/build.gradle](./rsdriod/build.gradle)`
+    - You can find the exact needed version from [`rsdriod/build.gradle`](./rsdriod/build.gradle)
 ```groovy
 android {
     compileSdkVersion 30
