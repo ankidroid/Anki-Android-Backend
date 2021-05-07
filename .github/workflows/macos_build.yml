@@ -32,25 +32,15 @@ jobs:
     - name: Install Rust Targets
       run: .github/scripts/install_rust_targets.sh
 
-    - name: Install Pyenv
-      run: .github/scripts/macos_install_pyenv.sh
-
-    # pyenv requires bash_profile, so we need the -l (login) arg for bash from now on on macOS
-    # should only require 3.5 mins to setup, but can be at least 9.5 on occasion.
-    - name: Setup Pyenv
-      timeout-minutes: 20
-      shell: bash -l {0}
-      run: |
-             pyenv install 3.7.9
-             pyenv shell 3.7.9
-             pyenv global 3.7.9
-
+    - name: Install Protoc
+      uses: arduino/setup-protoc@v1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Install & Test Protobuf Compiler
       shell: bash -l {0} 
       run: |
               pip3 install protobuf
-              pip3 install protobuf-compiler
               python3 .github/scripts/protoc_gen_deps.py
 
     - name: Build

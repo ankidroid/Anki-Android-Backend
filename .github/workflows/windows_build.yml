@@ -61,12 +61,16 @@ jobs:
              rustup target add aarch64-linux-android
              rustup target add x86_64-linux-android
 
-    - name: Install & Test Protobuf Compiler
+    - name: Install Protoc
+      uses: arduino/setup-protoc@v1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Install & Test Protobuf
       run: |
-              Set-Alias -Name "python3" -Value "python"
-              pip3 install protobuf
-              pip3 install protobuf-compiler
-              python3 .github/scripts/protoc_gen_deps.py
+        Set-Alias -Name "python3" -Value "python"
+        pip3 install protobuf
+        python3 .github/scripts/protoc_gen_deps.py
 
     # -Dorg.gradle.daemon=false has been removed
     # -Dorg.gradle.console=plain has been removed
