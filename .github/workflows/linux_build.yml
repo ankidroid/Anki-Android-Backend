@@ -39,6 +39,15 @@ jobs:
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
 
+    - name: Rust Cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          rslib-bridge/target
+        key: ${{ runner.os }}-cargo-${{ hashFiles('rslib-bridge/**/Cargo.lock') }}
+
     - name: Build
       run: ./gradlew clean assembleRelease -DtestBuildType=release -Dorg.gradle.daemon=false -Dorg.gradle.console=plain # assembleAndroidTest
 
