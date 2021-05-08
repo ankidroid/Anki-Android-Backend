@@ -41,7 +41,7 @@ jobs:
           ~/.cargo/registry
           ~/.cargo/git
           rslib-bridge/target
-        key: ${{ runner.os }}-cargo-${{ hashFiles('rslib-bridge/**/Cargo.lock') }}
+        key: ${{ runner.os }}-assembleRelease-rust-${{ hashFiles('rslib-bridge/**/Cargo.lock') }}
 
     - name: Build
       run: ./gradlew clean assembleRelease -DtestBuildType=release
