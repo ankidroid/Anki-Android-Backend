@@ -50,7 +50,7 @@ jobs:
           ~/.cargo/registry
           ~/.cargo/git
           rslib-bridge/target
-        key: ${{ runner.os }}-cargo-${{ hashFiles('rslib-bridge/**/Cargo.lock') }}
+        key: ${{ runner.os }}-assembleDebug-rust--${{ hashFiles('rslib-bridge/**/Cargo.lock') }}
 
     - name: Build
       shell: bash -l {0}
