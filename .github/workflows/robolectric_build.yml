@@ -65,7 +65,10 @@ jobs:
           ~/.cargo/registry
           ~/.cargo/git
           rslib-bridge/target
-        key: ${{ runner.os }}-rsdroid-testing:build-rust-${{ hashFiles('rslib-bridge/**/Cargo.lock') }}
+        key: ${{ runner.os }}-rust-v1-rsdroid-testing:build-${{ hashFiles('rslib-bridge/**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-rust-v1-rsdroid-testing:build
+          ${{ runner.os }}-rust-v1
 
     - name: Build JAR
       run: |
