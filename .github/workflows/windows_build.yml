@@ -79,7 +79,10 @@ jobs:
           ~/.cargo/registry
           ~/.cargo/git
           rslib-bridge/target
-        key: ${{ runner.os }}-assembleRelease-rust-${{ hashFiles('rslib-bridge/**/Cargo.lock') }}
+        key: ${{ runner.os }}-rust-v1-assembleRelease-${{ hashFiles('rslib-bridge/**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-rust-v1-assembleRelease
+          ${{ runner.os }}-rust-v1
 
     # -Dorg.gradle.daemon=false has been removed
     # -Dorg.gradle.console=plain has been removed

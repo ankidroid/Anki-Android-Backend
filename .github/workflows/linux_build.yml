@@ -46,7 +46,10 @@ jobs:
           ~/.cargo/registry
           ~/.cargo/git
           rslib-bridge/target
-        key: ${{ runner.os }}-assembleRelease-rust-${{ hashFiles('rslib-bridge/**/Cargo.lock') }}
+        key: ${{ runner.os }}-rust-v1-assembleRelease-${{ hashFiles('rslib-bridge/**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-rust-v1-assembleRelease
+          ${{ runner.os }}-rust-v1
 
     - name: Build
       run: ./gradlew clean assembleRelease -DtestBuildType=release -Dorg.gradle.daemon=false -Dorg.gradle.console=plain # assembleAndroidTest
