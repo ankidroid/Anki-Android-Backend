@@ -51,12 +51,6 @@ public abstract class AnkiDatabaseCursor implements Cursor {
     public abstract int getPosition();
 
     @Override
-    public abstract boolean moveToFirst();
-
-    @Override
-    public abstract boolean moveToNext();
-
-    @Override
     public abstract int getColumnIndex(String columnName);
 
     @Override
@@ -154,9 +148,7 @@ public abstract class AnkiDatabaseCursor implements Cursor {
     }
 
     @Override
-    public boolean moveToPosition(int position) {
-        return move(position - getPosition());
-    }
+    public abstract boolean moveToPosition(int position);
 
     @Override
     public void registerContentObserver(ContentObserver observer) {
@@ -178,19 +170,10 @@ public abstract class AnkiDatabaseCursor implements Cursor {
         Timber.w("Not implemented: unregisterDataSetObserver - shouldn't matter unless requery() is called");
     }
 
-    @Override
-    public boolean moveToLast() {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public boolean moveToPrevious() {
-        throw new NotImplementedException();
-    }
 
     @Override
     public boolean isLast() {
-        return getPosition() == getCount() - 1;
+        return getPosition() == getLastPosition();
     }
 
     @Override
@@ -200,17 +183,33 @@ public abstract class AnkiDatabaseCursor implements Cursor {
 
     @Override
     public boolean move(int offset) {
-        if (offset < 0) {
-            Timber.w("Negative moves are not supported");
-            return false;
-        }
-        while (offset > 0) {
-            if (!moveToNext()) {
-                return false;
-            }
-            offset--;
-        }
+        return moveToPosition(getPosition() + offset);
+    }
 
-        return true;
+    @Override
+    public boolean moveToLast() {
+        int toMoveTo = getLastPosition();
+        return moveToPosition(toMoveTo);
+    }
+
+    @Override
+    public boolean moveToFirst() {
+        return moveToPosition(0);
+    }
+
+    @Override
+    public boolean moveToNext() {
+        int toMoveTo = getPosition() + 1;
+        return moveToPosition(toMoveTo);
+    }
+
+    @Override
+    public boolean moveToPrevious() {
+        int toMoveTo = getPosition() - 1;
+        return moveToPosition(toMoveTo);
+    }
+
+    protected int getLastPosition() {
+        return getCount() - 1;
     }
 }
