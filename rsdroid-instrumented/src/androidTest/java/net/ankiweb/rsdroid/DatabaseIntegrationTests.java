@@ -31,6 +31,7 @@ import org.junit.runners.Parameterized;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isOneOf;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
@@ -173,7 +174,8 @@ public class DatabaseIntegrationTests extends DatabaseComparison {
         try {
             testStringConversion("byte", "?");
         } catch (SQLiteException e) {
-           assertThat(e.getMessage(), is("unknown error (code 0): Unable to convert BLOB to string"));
+           assertThat(e.getMessage(), isOneOf("unknown error (code 0): Unable to convert BLOB to string",
+                   "unknown error (code 0 SQLITE_OK): Unable to convert BLOB to string"));
         }
     }
 
@@ -190,7 +192,8 @@ public class DatabaseIntegrationTests extends DatabaseComparison {
         try {
             testIntConversion("byte", 42);
         } catch (SQLiteException e) {
-            assertThat(e.getMessage(), is("unknown error (code 0): Unable to convert BLOB to long"));
+            assertThat(e.getMessage(), isOneOf("unknown error (code 0): Unable to convert BLOB to long",
+                    "unknown error (code 0 SQLITE_OK): Unable to convert BLOB to long"));
         }
     }
 
@@ -207,7 +210,8 @@ public class DatabaseIntegrationTests extends DatabaseComparison {
         try {
             testFloatConversion("byte", 42);
         } catch (SQLiteException e) {
-            assertThat(e.getMessage(), is("unknown error (code 0): Unable to convert BLOB to double"));
+            assertThat(e.getMessage(), isOneOf("unknown error (code 0): Unable to convert BLOB to double",
+                    "unknown error (code 0 SQLITE_OK): Unable to convert BLOB to double"));
         }
     }
 
@@ -224,7 +228,8 @@ public class DatabaseIntegrationTests extends DatabaseComparison {
         try {
             testDoubleConversion("byte", 42);
         } catch (SQLiteException e) {
-            assertThat(e.getMessage(), is("unknown error (code 0): Unable to convert BLOB to double"));
+            assertThat(e.getMessage(), isOneOf("unknown error (code 0): Unable to convert BLOB to double",
+                    "unknown error (code 0 SQLITE_OK): Unable to convert BLOB to double"));
         }
     }
 
