@@ -190,4 +190,9 @@ public abstract class AnkiJsonDatabaseCursor extends AnkiDatabaseCursor {
     protected JSONArray fullQuery(String query, Object[] bindArgs) {
         return backend.fullQuery(query, bindArgs);
     }
+
+    @Override
+    public int getType(int columnIndex) {
+        throw new NotImplementedException();
+    }
 }
