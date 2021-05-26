@@ -99,9 +99,7 @@ public abstract class AnkiDatabaseCursor implements Cursor {
     public abstract boolean isClosed();
 
     @Override
-    public int getType(int columnIndex) {
-        throw new NotImplementedException();
-    }
+    public abstract int getType(int columnIndex);
 
     @Override
     public byte[] getBlob(int columnIndex) {
@@ -115,6 +113,7 @@ public abstract class AnkiDatabaseCursor implements Cursor {
 
     @Override
     public void deactivate() {
+        Timber.w("deactivate - not implemented - throwing");
         throw new NotImplementedException();
     }
 
@@ -125,6 +124,7 @@ public abstract class AnkiDatabaseCursor implements Cursor {
 
     @Override
     public boolean requery() {
+        Timber.w("requery - not implemented - throwing");
         throw new NotImplementedException();
     }
 
@@ -155,7 +155,7 @@ public abstract class AnkiDatabaseCursor implements Cursor {
 
     @Override
     public boolean moveToPosition(int position) {
-        return false;
+        return move(position - getPosition());
     }
 
     @Override
@@ -190,17 +190,27 @@ public abstract class AnkiDatabaseCursor implements Cursor {
 
     @Override
     public boolean isLast() {
-        throw new NotImplementedException();
+        return getPosition() == getCount() - 1;
     }
-
 
     @Override
     public boolean isAfterLast() {
-        throw new NotImplementedException();
+        return getPosition() >= getCount();
     }
 
     @Override
     public boolean move(int offset) {
-        throw new NotImplementedException();
+        if (offset < 0) {
+            Timber.w("Negative moves are not supported");
+            return false;
+        }
+        while (offset > 0) {
+            if (!moveToNext()) {
+                return false;
+            }
+            offset--;
+        }
+
+        return true;
     }
 }

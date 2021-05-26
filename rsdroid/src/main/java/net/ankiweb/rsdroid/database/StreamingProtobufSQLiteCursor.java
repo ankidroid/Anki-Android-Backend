@@ -243,6 +243,19 @@ public class StreamingProtobufSQLiteCursor extends AnkiDatabaseCursor {
         return isClosed;
     }
 
+    @Override
+    public int getType(int columnIndex) {
+        Sqlite.SqlValue field = getFieldAtIndex(columnIndex);
+        switch (field.getDataCase()) {
+            case BLOBVALUE: return FIELD_TYPE_BLOB;
+            case LONGVALUE: return FIELD_TYPE_INTEGER;
+            case DOUBLEVALUE: return FIELD_TYPE_FLOAT;
+            case STRINGVALUE: return FIELD_TYPE_STRING;
+            case DATA_NOT_SET: return FIELD_TYPE_NULL;
+            default: throw new IllegalStateException("Unknown data case: " + field.getDataCase());
+        }
+    }
+
     protected Sqlite.Row getRowAtCurrentPosition() {
         Sqlite.DBResult result = results.getResult();
         int rowCount = getCurrentSliceRowCount();
