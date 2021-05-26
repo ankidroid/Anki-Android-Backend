@@ -41,7 +41,7 @@ public class StreamingProtobufSQLiteCursor extends AnkiDatabaseCursor {
     private final String query;
     private Sqlite.DBResponse results;
     /** The local position in the current slice */
-    private int position = -1;
+    private int positionInSlice = -1;
     private String[] columnMapping;
     private boolean isClosed = false;
     private final int sequenceNumber;
@@ -70,7 +70,7 @@ public class StreamingProtobufSQLiteCursor extends AnkiDatabaseCursor {
         try {
             long requestedIndex = startingAtIndex == -1 ? 0 : startingAtIndex;
             results = backend.getNextSlice(requestedIndex, sequenceNumber);
-            position = startingAtIndex == -1 ? -1 : 0;
+            positionInSlice = startingAtIndex == -1 ? -1 : 0;
             if (results.getSequenceNumber() != sequenceNumber) {
                 throw new IllegalStateException("rsdroid does not currently handle nested cursor-based queries. Please change the code to avoid holding a reference to the query, or implement the functionality in rsdroid");
             }
@@ -86,7 +86,7 @@ public class StreamingProtobufSQLiteCursor extends AnkiDatabaseCursor {
 
     @Override
     public int getPosition() {
-        return getSliceStartIndex() + position;
+        return getSliceStartIndex() + positionInSlice;
     }
 
     @Override
@@ -97,10 +97,10 @@ public class StreamingProtobufSQLiteCursor extends AnkiDatabaseCursor {
             // loadPage this resets the position to 0
             loadPage(nextPositionGlobal);
         } else {
-            position = nextPositionLocal;
+            positionInSlice = nextPositionLocal;
         }
         // moving to -1 should return false and mutate the position
-        return position >= 0 && getCurrentSliceRowCount() > 0 && position < getCurrentSliceRowCount();
+        return positionInSlice >= 0 && getCurrentSliceRowCount() > 0 && positionInSlice < getCurrentSliceRowCount();
     }
 
     @Override
@@ -256,10 +256,10 @@ public class StreamingProtobufSQLiteCursor extends AnkiDatabaseCursor {
     protected Sqlite.Row getRowAtCurrentPosition() {
         Sqlite.DBResult result = results.getResult();
         int rowCount = getCurrentSliceRowCount();
-        if (position < 0 || position >= rowCount) {
-            throw new CursorIndexOutOfBoundsException(String.format(Locale.ROOT, "Index %d requested, with a size of %d", position, rowCount));
+        if (positionInSlice < 0 || positionInSlice >= rowCount) {
+            throw new CursorIndexOutOfBoundsException(String.format(Locale.ROOT, "Index %d requested, with a size of %d", positionInSlice, rowCount));
         }
-        return result.getRows(position);
+        return result.getRows(positionInSlice);
     }
 
     private Sqlite.SqlValue getFieldAtIndex(int columnIndex) {
