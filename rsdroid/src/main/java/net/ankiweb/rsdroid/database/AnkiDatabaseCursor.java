@@ -24,6 +24,8 @@ import android.database.DataSetObserver;
 import android.net.Uri;
 import android.os.Bundle;
 
+import timber.log.Timber;
+
 /**
  * Base class for all database cursors, abstracting database methods to a common interface
  * Throwing on non-database-related cursor-methods
@@ -158,22 +160,22 @@ public abstract class AnkiDatabaseCursor implements Cursor {
 
     @Override
     public void registerContentObserver(ContentObserver observer) {
-        throw new NotImplementedException();
+        Timber.w("Not implemented: registerContentObserver - shouldn't matter unless requery() is called");
     }
 
     @Override
     public void unregisterContentObserver(ContentObserver observer) {
-        throw new NotImplementedException();
+        Timber.w("Not implemented: unregisterContentObserver - shouldn't matter unless requery() is called");
     }
 
     @Override
     public void registerDataSetObserver(DataSetObserver observer) {
-        throw new NotImplementedException();
+        Timber.w("Not implemented: registerDataSetObserver - shouldn't matter unless requery() is called");
     }
 
     @Override
     public void unregisterDataSetObserver(DataSetObserver observer) {
-        throw new NotImplementedException();
+        Timber.w("Not implemented: unregisterDataSetObserver - shouldn't matter unless requery() is called");
     }
 
     @Override
