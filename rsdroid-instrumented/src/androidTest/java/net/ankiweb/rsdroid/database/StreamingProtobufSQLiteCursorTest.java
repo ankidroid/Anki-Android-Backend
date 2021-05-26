@@ -49,26 +49,100 @@ public class StreamingProtobufSQLiteCursorTest extends InstrumentedTest {
                 db.execSQL("insert into tmp VALUES (?)", new Object[] { i });
             }
 
-            iterateAllRows(db); // 999
+            checkValueAtRowEqualsRowNumForwards(db); // 999
 
             db.execSQL("insert into tmp VALUES (?)", new Object[] { 999 });
 
-            iterateAllRows(db); // 1000
+            checkValueAtRowEqualsRowNumForwards(db); // 1000
 
             db.execSQL("insert into tmp VALUES (?)", new Object[] { 1000 });
 
-            iterateAllRows(db); // 1001
+            checkValueAtRowEqualsRowNumForwards(db); // 1001
+        }
+    }
+
+    @Test
+    public void testBackwards() throws IOException {
+        Timber.w("This is much slower than forwards");
+        try (BackendV1 backend = super.getBackend("initial_version_2_12_1.anki2")) {
+            SupportSQLiteDatabase db = new RustSupportSQLiteOpenHelper(backend).getWritableDatabase();
+
+            db.execSQL("create table tmp (id int)");
+
+            for (int i = 0; i < 999; i++) {
+                db.execSQL("insert into tmp VALUES (?)", new Object[] { i });
+            }
+
+            checkValueAtRowEqualsRowNumBackwards(db); // 999
+
+            db.execSQL("insert into tmp VALUES (?)", new Object[] { 999 });
+
+            checkValueAtRowEqualsRowNumBackwards(db); // 1000
+
+            db.execSQL("insert into tmp VALUES (?)", new Object[] { 1000 });
+
+            checkValueAtRowEqualsRowNumBackwards(db); // 1001
+
+
+            try (Cursor c = db.query("select * from tmp")) {
+                c.moveToLast();
+                assertThat(c.getLong(0), is(1000L));
+            }
+
 
         }
     }
 
-    private void iterateAllRows(SupportSQLiteDatabase db) {
+    @Test
+    public void moveToPositionStart() throws IOException {
+        try (BackendV1 backend = super.getBackend("initial_version_2_12_1.anki2")) {
+            SupportSQLiteDatabase db = new RustSupportSQLiteOpenHelper(backend).getWritableDatabase();
+
+            db.execSQL("create table tmp (id int)");
+
+            for (int i = 0; i < 999; i++) {
+                db.execSQL("insert into tmp VALUES (?)", new Object[] { i });
+            }
+
+            Cursor c = db.query("select * from tmp");
+
+            assertThat(c.getPosition(), is(-1));
+            c.moveToNext();
+            assertThat(c.getPosition(), is(0));
+            long firstValue = c.getLong(0);
+
+            // move away
+            c.moveToLast();
+
+            // reset: what we're testing
+            c.moveToPosition(-1);
+
+            assertThat(c.getPosition(), is(-1));
+            c.moveToNext();
+            assertThat(c.getPosition(), is(0));
+            assertThat("values haven't changed", c.getLong(0), is(firstValue));
+        }
+    }
+
+    private void checkValueAtRowEqualsRowNumForwards(SupportSQLiteDatabase db) {
         long position = 0;
 
         try (Cursor cur = db.query("SELECT * from tmp")) {
             while (cur.moveToNext()) {
                 assertThat(cur.getLong(0), is(position));
                 position++;
+            }
+        }
+    }
+
+    private void checkValueAtRowEqualsRowNumBackwards(SupportSQLiteDatabase db) {
+        try (Cursor cur = db.query("SELECT * from tmp")) {
+            long position = cur.getCount() - 1;
+            cur.moveToLast();
+            assertThat((long) cur.getPosition(), is(position));
+            while (cur.moveToPrevious()) {
+                position--;
+                assertThat(cur.getLong(0), is(position));
             }
         }
     }

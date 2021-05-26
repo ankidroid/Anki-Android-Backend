@@ -33,6 +33,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isOneOf;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 @RunWith(Parameterized.class)
@@ -283,6 +284,46 @@ public class DatabaseIntegrationTests extends DatabaseComparison {
 
         try (Cursor c = db.query("select * from test")) {
             assertThat(c.getCount(), is(DB_PAGE_NUM_INT_ELEMENTS + 1));
+        }
+    }
+
+    @Test
+    public void testBackwards() {
+        SupportSQLiteDatabase db = mDatabase;
+
+        db.execSQL("create table test (id int)");
+
+        for (int i = 0; i < DB_PAGE_NUM_INT_ELEMENTS + 1; i++) {
+            db.execSQL("insert into test VALUES (1)");
+        }
+
+        // tests to see if moveToPrevious() returns true or false if position == 0
+        try (Cursor c = db.query("select * from test")) {
+            c.moveToLast();
+            while (c.moveToPrevious()) {
+                c.getLong(0);
+            }
+            assertThat(c.getPosition(), is(-1));
+        }
+    }
+
+    @Test
+    public void moveToBeforeFirst() {
+        SupportSQLiteDatabase db = mDatabase;
+
+        db.execSQL("create table test (id int)");
+
+        for (int i = 0; i < DB_PAGE_NUM_INT_ELEMENTS + 1; i++) {
+            db.execSQL("insert into test VALUES (1)");
+        }
+
+        try (Cursor c = db.query("select * from test")) {
+            assertThat(c.getPosition(), is(-1));
+            assertTrue(c.moveToFirst());
+            assertThat(c.getPosition(), is(0));
+            // despite returning false, it works
+            assertFalse("moveToPosition(-1) should return false, but should work", c.moveToPosition(-1));
+            assertThat(c.getPosition(), is(-1));
         }
     }
 

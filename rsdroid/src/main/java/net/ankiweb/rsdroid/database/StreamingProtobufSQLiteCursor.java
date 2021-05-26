@@ -40,6 +40,7 @@ public class StreamingProtobufSQLiteCursor extends AnkiDatabaseCursor {
     private final SQLHandler backend;
     private final String query;
     private Sqlite.DBResponse results;
+    /** The local position in the current slice */
     private int position = -1;
     private String[] columnMapping;
     private boolean isClosed = false;
@@ -48,8 +49,8 @@ public class StreamingProtobufSQLiteCursor extends AnkiDatabaseCursor {
     private final int rowCount;
 
     /**The current index into the collection or rows */
-    private long getSliceStartIndex() {
-        return results.getStartIndex();
+    private int getSliceStartIndex() {
+        return (int) results.getStartIndex();
     }
 
     public StreamingProtobufSQLiteCursor(SQLHandler backend, String query, Object[] bindArgs) {
@@ -65,11 +66,11 @@ public class StreamingProtobufSQLiteCursor extends AnkiDatabaseCursor {
         }
     }
 
-    private void getNextPage() {
-        position = -1;
-
+    private void loadPage(long startingAtIndex) {
         try {
-            results = backend.getNextSlice(getSliceStartIndex() + getCurrentSliceRowCount(), sequenceNumber);
+            long requestedIndex = startingAtIndex == -1 ? 0 : startingAtIndex;
+            results = backend.getNextSlice(requestedIndex, sequenceNumber);
+            position = startingAtIndex == -1 ? -1 : 0;
             if (results.getSequenceNumber() != sequenceNumber) {
                 throw new IllegalStateException("rsdroid does not currently handle nested cursor-based queries. Please change the code to avoid holding a reference to the query, or implement the functionality in rsdroid");
             }
@@ -85,25 +86,21 @@ public class StreamingProtobufSQLiteCursor extends AnkiDatabaseCursor {
 
     @Override
     public int getPosition() {
-        return (int) getSliceStartIndex() + position;
+        return getSliceStartIndex() + position;
     }
 
     @Override
-    public boolean moveToFirst() {
-        if (getCurrentSliceRowCount() == 0) {
-            return false;
+    public boolean moveToPosition(int nextPositionGlobal) {
+        int nextPositionLocal = nextPositionGlobal - getSliceStartIndex();
+        boolean isInCurrentSlice = nextPositionLocal >= 0 && nextPositionLocal < getCurrentSliceRowCount();
+        if (!isInCurrentSlice && getCurrentSliceRowCount() > 0 && getCount() != getCurrentSliceRowCount()) {
+            // loadPage this resets the position to 0
+            loadPage(nextPositionGlobal);
+        } else {
+            position = nextPositionLocal;
         }
-        position = 0;
-        return true;
-    }
-
-    @Override
-    public boolean moveToNext() {
-        if (getCurrentSliceRowCount() > 0 && position + 1 >= getCurrentSliceRowCount() && getCount() != getCurrentSliceRowCount()) {
-            getNextPage();
-        }
-        position++;
-        return getCurrentSliceRowCount() != 0 && position < getCurrentSliceRowCount();
+        // moving to -1 should return false and mutate the position
+        return position >= 0 && getCurrentSliceRowCount() > 0 && position < getCurrentSliceRowCount();
     }
 
     @Override
