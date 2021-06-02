@@ -29,6 +29,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import java.util.ArrayList;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isOneOf;
@@ -186,6 +188,8 @@ public class DatabaseIntegrationTests extends DatabaseComparison {
         testIntConversion("double", 1); // this is a .floor
         testIntConversion("string", 0);
         testIntConversion("null", 0);
+        testIntFromStringConversion("2", 2);
+        testIntFromStringConversion("2.52", 2);
     }
 
     @Test
@@ -204,6 +208,8 @@ public class DatabaseIntegrationTests extends DatabaseComparison {
         testFloatConversion("double", 1.6f);
         testFloatConversion("string", 0.0f); // yes - really?
         testFloatConversion("null", 0.0f);
+        testFloatFromStringConversion("2", 2);
+        testFloatFromStringConversion("2.52", 2.52f);
     }
 
     @Test
@@ -222,6 +228,8 @@ public class DatabaseIntegrationTests extends DatabaseComparison {
         testDoubleConversion("double", 1.6d);
         testDoubleConversion("string", 0.0d); // yes - really?
         testDoubleConversion("null", 0);
+        testDoubleFromStringConversion("2", 2);
+        testDoubleFromStringConversion("2.52", 2.52);
     }
 
     @Test
@@ -327,28 +335,87 @@ public class DatabaseIntegrationTests extends DatabaseComparison {
         }
     }
 
+    @Test
+    public void testRealConversionIssue() {
+
+        SupportSQLiteDatabase db = mDatabase;
+
+        db.execSQL("create table if not exists revlog (" + "   id              integer primary key,"
+                + "   cid             integer not null," + "   usn             integer not null,"
+                + "   ease            integer not null," + "   ivl             integer not null,"
+                + "   lastIvl         integer not null," + "   factor          integer not null,"
+                + "   time            integer not null," + "   type            integer not null)");
+
+
+        // one in ms: 1622631861000 (Wednesday, 2 June 2021 11:04:21)
+        // two in ms: 1622691861001 ( Thursday, 3 June 2021 03:44:21.001)
+
+        db.execSQL("insert into revlog (id, cid, usn, ease, ivl, lastIvl, factor, time, type) VALUES (1, 1, 0, 1, 10, 5, 250, 1622631861000, 1)");
+        db.execSQL("insert into revlog (id, cid, usn, ease, ivl, lastIvl, factor, time, type) VALUES (2, 1, 0, 1, 10, 5, 250, 1622691861001, 1)");
+
+        ArrayList<double[]> list = new ArrayList<>(7); // one by day of the week
+        String query = "SELECT strftime('%w',datetime( cast(id/ 1000  -" + 3600 +
+                " as int), 'unixepoch')) as wd, " +
+                "sum(case when ease = 1 then 0 else 1 end) / " +
+                "cast(count() as float) * 100, " +
+                "count() " +
+                "from revlog " +
+                "group by wd " +
+                "order by wd";
+
+        try (Cursor cur = db.query(query)) {
+            while (cur.moveToNext()) {
+                list.add(new double[] { cur.getDouble(0), cur.getDouble(1), cur.getDouble(2) });
+            }
+        }
+
+        ArrayList<double[]> expected = new ArrayList<>();
+        expected.add(new double[] { 3.0, 0.0, 2.0});
+        assertThat(list.get(0), is(expected.get(0)));
+    }
+
     public void testStringConversion(String type, String expected) {
-        testConversion(c -> c.getString(0), type, expected);
+        testConversion(c -> c.getString(0), type, expected, f -> f);
     }
 
     public void testIntConversion(String type, int expected) {
-        testConversion(c -> c.getInt(0), type, expected);
+        testConversion(c -> c.getInt(0), type, expected, f -> f);
     }
 
     public void testDoubleConversion(String type, double expected) {
-        testConversion(c -> c.getDouble(0), type, expected);
+        testConversion(c -> c.getDouble(0), type, expected, f -> f);
     }
 
     public void testFloatConversion(String type, float expected) {
-        testConversion(c -> c.getFloat(0), type, expected);
+        testConversion(c -> c.getFloat(0), type, expected, f -> f);
+    }
+
+    private void testDoubleFromStringConversion(String input, double expected) {
+        testConversion(c -> c.getDouble(0), "x" + input, expected, f -> "cast(" + f + " as TEXT)");
+    }
+
+    private void testFloatFromStringConversion(String input, float expected) {
+        testConversion(c -> c.getFloat(0), "x" + input, expected, f -> "cast(" + f + " as TEXT)");
+    }
+
+
+    private void testIntFromStringConversion(String input, int expected) {
+        testConversion(c -> c.getInt(0), "x" + input, expected, f -> "cast(" + f + " as TEXT)");
     }
 
     // Note: We don't test null or blob - blob is unused, didn't feel worth testing null
 
-    public void testConversion(Function<Cursor, Object> f, String type, Object expected) {
+    public void testConversion(Function<Cursor, Object> f, String type, Object expected, Function<String, String> argTransform) {
         mDatabase.execSQL("DROP TABLE IF EXISTS tmp");
+        double digit = 0.0;
+        if (type.startsWith("x") && Character.isDigit(type.charAt(1))) {
+            digit = Double.parseDouble(type.substring(1));
+            type = "x";
+        }
 
-        String sqlType = type.equals("null") ? "string" : type;
+        String sqlType = type;
+        sqlType = sqlType.equals("null") ? "string" : type;
+        sqlType = sqlType.equals("x") ? "string" : type;
         mDatabase.execSQL(String.format("create table tmp (val %s)", sqlType));
 
         Object result;
@@ -358,12 +425,13 @@ public class DatabaseIntegrationTests extends DatabaseComparison {
             case "string" : result = "hi"; break;
             case "byte" : result = new byte[] { 1, 3, 3, 7 }; break;
             case "null": result = null; break;
+            case "x": result = digit; break;
             default: throw new IllegalStateException("test fail: unknown type: " + type);
         }
 
         mDatabase.execSQL("insert into tmp (val) VALUES (?)", new Object[] { result } );
 
-        try (Cursor c = mDatabase.query("select * from tmp")) {
+        try (Cursor c = mDatabase.query("select " + argTransform.apply("val") + " from tmp")) {
             c.moveToFirst();
             assertThat(f.apply(c), is(expected));
         }

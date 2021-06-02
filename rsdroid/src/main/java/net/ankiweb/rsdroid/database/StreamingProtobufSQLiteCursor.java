@@ -21,6 +21,8 @@ import android.database.CursorIndexOutOfBoundsException;
 import android.database.sqlite.SQLiteException;
 
 import net.ankiweb.rsdroid.BackendException;
+import net.ankiweb.rsdroid.utils.StringToDouble;
+import net.ankiweb.rsdroid.utils.StringToLong;
 
 import java.util.Locale;
 
@@ -176,7 +178,6 @@ public class StreamingProtobufSQLiteCursor extends AnkiDatabaseCursor {
         }
     }
 
-    @SuppressWarnings("DuplicateBranchesInSwitch")
     @Override
     public long getLong(int columnIndex) {
         Sqlite.SqlValue field = getFieldAtIndex(columnIndex);
@@ -184,13 +185,12 @@ public class StreamingProtobufSQLiteCursor extends AnkiDatabaseCursor {
             case BLOBVALUE: throw new SQLiteException("unknown error (code 0): Unable to convert BLOB to long");
             case LONGVALUE: return field.getLongValue();
             case DOUBLEVALUE: return (long) field.getDoubleValue();
-            case STRINGVALUE: return 0;
+            case STRINGVALUE: return strtoll(field.getStringValue());
             case DATA_NOT_SET: return 0;
             default: throw new IllegalStateException("Unknown data case: " + field.getDataCase());
         }
     }
 
-    @SuppressWarnings("DuplicateBranchesInSwitch")
     @Override
     public double getDouble(int columnIndex) {
         Sqlite.SqlValue field = getFieldAtIndex(columnIndex);
@@ -198,7 +198,7 @@ public class StreamingProtobufSQLiteCursor extends AnkiDatabaseCursor {
             case BLOBVALUE: throw new SQLiteException("unknown error (code 0): Unable to convert BLOB to double");
             case LONGVALUE: return field.getLongValue();
             case DOUBLEVALUE: return field.getDoubleValue();
-            case STRINGVALUE: return 0d;
+            case STRINGVALUE: return strtod(field.getStringValue());
             case DATA_NOT_SET: return 0d;
             default: throw new IllegalStateException("Unknown data case: " + field.getDataCase());
         }
@@ -268,6 +268,22 @@ public class StreamingProtobufSQLiteCursor extends AnkiDatabaseCursor {
 
     protected int getCurrentSliceRowCount() {
         return results.getResult().getRowsCount();
+    }
+
+    private long strtoll(String stringValue) {
+        try {
+            return StringToLong.strtol(stringValue);
+        } catch (NumberFormatException exception) {
+            return 0;
+        }
+    }
+
+    private double strtod(String stringValue) {
+        try {
+            return StringToDouble.strtod(stringValue);
+        } catch (NumberFormatException exception) {
+            return 0.0;
+        }
     }
 }
 
