@@ -20,6 +20,7 @@ import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
 import android.database.sqlite.SQLiteException;
 
+import androidx.annotation.NonNull;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import net.ankiweb.rsdroid.ankiutil.DatabaseUtil;
@@ -166,16 +167,16 @@ public class DatabaseIntegrationTests extends DatabaseComparison {
 
     @Test
     public void testStringConversions() {
-        testStringConversion("int", "1");
-        testStringConversion("double", "1.6");
-        testStringConversion("string", "hi");
-        testStringConversion("null", null);
+        testStringConversion(SQLOutput.asInt("1"), "1");
+        testStringConversion(SQLOutput.asFloat("1.6"), "1.6");
+        testStringConversion(SQLOutput.asText("hi"), "hi");
+        testStringConversion(SQLOutput.asNull(), null);
     }
 
     @Test
     public void testFailingStringConversions() {
         try {
-            testStringConversion("byte", "?");
+            testStringConversion(SQLOutput.asBlob(), "unused");
         } catch (SQLiteException e) {
            assertThat(e.getMessage(), isOneOf("unknown error (code 0): Unable to convert BLOB to string",
                    "unknown error (code 0 SQLITE_OK): Unable to convert BLOB to string"));
@@ -184,18 +185,18 @@ public class DatabaseIntegrationTests extends DatabaseComparison {
 
     @Test
     public void testIntConversions() {
-        testIntConversion("int", 1);
-        testIntConversion("double", 1); // this is a .floor
-        testIntConversion("string", 0);
-        testIntConversion("null", 0);
-        testIntFromStringConversion("2", 2);
-        testIntFromStringConversion("2.52", 2);
+        testIntConversion(SQLOutput.asInt("1"), 1);
+        testIntConversion(SQLOutput.asFloat("1.6"), 1);
+        testIntConversion(SQLOutput.asNull(), 0);
+        testIntConversion(SQLOutput.asText("hi"), 0);
+        testIntConversion(SQLOutput.asText("2"), 2);
+        testIntConversion(SQLOutput.asText("2.52"), 2);
     }
 
     @Test
     public void testFailingIntConversions() {
         try {
-            testIntConversion("byte", 42);
+            testIntConversion(SQLOutput.asBlob(), 42);
         } catch (SQLiteException e) {
             assertThat(e.getMessage(), isOneOf("unknown error (code 0): Unable to convert BLOB to long",
                     "unknown error (code 0 SQLITE_OK): Unable to convert BLOB to long"));
@@ -204,18 +205,18 @@ public class DatabaseIntegrationTests extends DatabaseComparison {
 
     @Test
     public void testFloatConversions() {
-        testFloatConversion("int", 1.0f);
-        testFloatConversion("double", 1.6f);
-        testFloatConversion("string", 0.0f); // yes - really?
-        testFloatConversion("null", 0.0f);
-        testFloatFromStringConversion("2", 2);
-        testFloatFromStringConversion("2.52", 2.52f);
+        testFloatConversion(SQLOutput.asInt("1"), 1.0f);
+        testFloatConversion(SQLOutput.asFloat("1.6"), 1.6f);
+        testFloatConversion(SQLOutput.asNull(), 0.0f);
+        testFloatConversion(SQLOutput.asText("hi"), 0.0f);
+        testFloatConversion(SQLOutput.asText("2"), 2f);
+        testFloatConversion(SQLOutput.asText("2.52"), 2.52f);
     }
 
     @Test
     public void testFailingFloatConversions() {
         try {
-            testFloatConversion("byte", 42);
+            testFloatConversion(SQLOutput.asBlob(), 42);
         } catch (SQLiteException e) {
             assertThat(e.getMessage(), isOneOf("unknown error (code 0): Unable to convert BLOB to double",
                     "unknown error (code 0 SQLITE_OK): Unable to convert BLOB to double"));
@@ -224,18 +225,18 @@ public class DatabaseIntegrationTests extends DatabaseComparison {
 
     @Test
     public void testDoubleConversions() {
-        testDoubleConversion("int", 1.0d);
-        testDoubleConversion("double", 1.6d);
-        testDoubleConversion("string", 0.0d); // yes - really?
-        testDoubleConversion("null", 0);
-        testDoubleFromStringConversion("2", 2);
-        testDoubleFromStringConversion("2.52", 2.52);
+        testDoubleConversion(SQLOutput.asInt("1"), 1.0d);
+        testDoubleConversion(SQLOutput.asFloat("1.6"), 1.6d);
+        testDoubleConversion(SQLOutput.asNull(), 0.0d);
+        testDoubleConversion(SQLOutput.asText("hi"), 0.0d);
+        testDoubleConversion(SQLOutput.asText("2"), 2d);
+        testDoubleConversion(SQLOutput.asText("2.52"), 2.52d);
     }
 
     @Test
     public void testFailingDoubleConversions() {
         try {
-            testDoubleConversion("byte", 42);
+            testDoubleConversion(SQLOutput.asBlob(), 42);
         } catch (SQLiteException e) {
             assertThat(e.getMessage(), isOneOf("unknown error (code 0): Unable to convert BLOB to double",
                     "unknown error (code 0 SQLITE_OK): Unable to convert BLOB to double"));
@@ -374,70 +375,87 @@ public class DatabaseIntegrationTests extends DatabaseComparison {
         assertThat(list.get(0), is(expected.get(0)));
     }
 
-    public void testStringConversion(String type, String expected) {
-        testConversion(c -> c.getString(0), type, expected, f -> f);
+
+    public void testStringConversion(SQLOutput output, String expected) {
+        testConversion(output, c -> c.getString(0), expected);
     }
 
-    public void testIntConversion(String type, int expected) {
-        testConversion(c -> c.getInt(0), type, expected, f -> f);
+    public void testIntConversion(SQLOutput output, int expected) {
+        testConversion(output, c -> c.getInt(0), expected);
     }
 
-    public void testDoubleConversion(String type, double expected) {
-        testConversion(c -> c.getDouble(0), type, expected, f -> f);
+    public void testFloatConversion(SQLOutput output, float expected) {
+        testConversion(output, c -> c.getFloat(0), expected);
     }
 
-    public void testFloatConversion(String type, float expected) {
-        testConversion(c -> c.getFloat(0), type, expected, f -> f);
+    public void testDoubleConversion(SQLOutput output, double expected) {
+        testConversion(output, c -> c.getDouble(0), expected);
     }
 
-    private void testDoubleFromStringConversion(String input, double expected) {
-        testConversion(c -> c.getDouble(0), "x" + input, expected, f -> "cast(" + f + " as TEXT)");
-    }
-
-    private void testFloatFromStringConversion(String input, float expected) {
-        testConversion(c -> c.getFloat(0), "x" + input, expected, f -> "cast(" + f + " as TEXT)");
-    }
-
-
-    private void testIntFromStringConversion(String input, int expected) {
-        testConversion(c -> c.getInt(0), "x" + input, expected, f -> "cast(" + f + " as TEXT)");
-    }
-
-    // Note: We don't test null or blob - blob is unused, didn't feel worth testing null
-
-    public void testConversion(Function<Cursor, Object> f, String type, Object expected, Function<String, String> argTransform) {
-        mDatabase.execSQL("DROP TABLE IF EXISTS tmp");
-        double digit = 0.0;
-        if (type.startsWith("x") && Character.isDigit(type.charAt(1))) {
-            digit = Double.parseDouble(type.substring(1));
-            type = "x";
-        }
-
-        String sqlType = type;
-        sqlType = sqlType.equals("null") ? "string" : type;
-        sqlType = sqlType.equals("x") ? "string" : type;
-        mDatabase.execSQL(String.format("create table tmp (val %s)", sqlType));
-
-        Object result;
-        switch (type) {
-            case "int" : result = 1; break;
-            case "double" : result = 1.6d; break; // we select 1.6 as the op is a .floor
-            case "string" : result = "hi"; break;
-            case "byte" : result = new byte[] { 1, 3, 3, 7 }; break;
-            case "null": result = null; break;
-            case "x": result = digit; break;
-            default: throw new IllegalStateException("test fail: unknown type: " + type);
-        }
-
-        mDatabase.execSQL("insert into tmp (val) VALUES (?)", new Object[] { result } );
-
-        try (Cursor c = mDatabase.query("select " + argTransform.apply("val") + " from tmp")) {
+    public void testConversion(SQLOutput output, Function<Cursor, Object> f, Object expected) {
+        try (Cursor c = mDatabase.query("select cast(" + output.value + " as " + output.getSqlType() + " )")) {
             c.moveToFirst();
             assertThat(f.apply(c), is(expected));
         }
     }
 
+    private enum SQLiteType {
+        NULL,
+        INTEGER,
+        FLOAT,
+        STRING,
+        BLOB,
+        ;
 
+        public String getSqlType() {
+            switch (this) {
+                case INTEGER: return "INTEGER";
+                case FLOAT: return "REAL";
+                case NULL:
+                case STRING:
+                    return "TEXT";
+                case BLOB: return "BLOB";
+                default: throw new IllegalStateException("Unexpected type");
+            }
+        }
+    }
+
+    public static class SQLOutput {
+        public SQLiteType type;
+        public String value;
+
+        public static SQLOutput asText(@NonNull String value) {
+            return new SQLOutput(SQLiteType.STRING, "\"" + value + "\"");
+        }
+
+        public static SQLOutput asFloat(@NonNull String value) {
+            return new SQLOutput(SQLiteType.FLOAT,  value );
+        }
+
+        public static SQLOutput asInt(@NonNull String value) {
+            return new SQLOutput(SQLiteType.INTEGER, value);
+        }
+
+        public static SQLOutput asNull() {
+            return new SQLOutput(SQLiteType.NULL, null);
+        }
+
+        public static SQLOutput asBlob() {
+            return new SQLOutput(SQLiteType.BLOB, "\"aa\""); // Unsure about this
+        }
+
+        public SQLOutput(SQLiteType type, String value) {
+            this.type = type;
+            this.value = value;
+        }
+
+
+        public String getSqlType() {
+            return type.getSqlType();
+        }
+    }
+
+    /** Required until we implement desugaring */
     private interface Function<T, R> {
         R apply(T t);
     }
