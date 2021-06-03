@@ -204,6 +204,27 @@ public class DatabaseIntegrationTests extends DatabaseComparison {
     }
 
     @Test
+    public void testLongConversions() {
+        testLongConversion(SQLOutput.asInt("1"), 1L);
+        testLongConversion(SQLOutput.asFloat("1.6"), 1L);
+        testLongConversion(SQLOutput.asNull(), 0L);
+        testLongConversion(SQLOutput.asText("hi"), 0L);
+        testLongConversion(SQLOutput.asText("2"), 2L);
+        testLongConversion(SQLOutput.asText("2.52"), 2L);
+        testLongConversion(SQLOutput.asInt("9223372036854775808"), Long.MAX_VALUE);
+    }
+
+    @Test
+    public void testFailingLongConversions() {
+        try {
+            testLongConversion(SQLOutput.asBlob(), 42L);
+        } catch (SQLiteException e) {
+            assertThat(e.getMessage(), isOneOf("unknown error (code 0): Unable to convert BLOB to long",
+                    "unknown error (code 0 SQLITE_OK): Unable to convert BLOB to long"));
+        }
+    }
+
+    @Test
     public void testFloatConversions() {
         testFloatConversion(SQLOutput.asInt("1"), 1.0f);
         testFloatConversion(SQLOutput.asFloat("1.6"), 1.6f);
@@ -375,6 +396,9 @@ public class DatabaseIntegrationTests extends DatabaseComparison {
         assertThat(list.get(0), is(expected.get(0)));
     }
 
+    public void testLongConversion(SQLOutput output, long expected) {
+        testConversion(output, c -> c.getLong(0), expected);
+    }
 
     public void testStringConversion(SQLOutput output, String expected) {
         testConversion(output, c -> c.getString(0), expected);
