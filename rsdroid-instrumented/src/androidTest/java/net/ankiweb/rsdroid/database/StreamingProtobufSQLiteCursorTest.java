@@ -41,7 +41,7 @@ public class StreamingProtobufSQLiteCursorTest extends InstrumentedTest {
     public void testPaging() throws IOException {
 
         try (BackendV1 backend = super.getBackend("initial_version_2_12_1.anki2")) {
-            SupportSQLiteDatabase db = new RustSupportSQLiteOpenHelper(backend).getWritableDatabase();
+            SupportSQLiteDatabase db = getWritableDatabase(backend);
 
             db.execSQL("create table tmp (id int)");
 
@@ -61,11 +61,15 @@ public class StreamingProtobufSQLiteCursorTest extends InstrumentedTest {
         }
     }
 
+    private SupportSQLiteDatabase getWritableDatabase(BackendV1 backend) {
+        return new RustV11SupportSQLiteOpenHelper(backend).getWritableDatabase();
+    }
+
     @Test
     public void testBackwards() throws IOException {
         Timber.w("This is much slower than forwards");
         try (BackendV1 backend = super.getBackend("initial_version_2_12_1.anki2")) {
-            SupportSQLiteDatabase db = new RustSupportSQLiteOpenHelper(backend).getWritableDatabase();
+            SupportSQLiteDatabase db = getWritableDatabase(backend);
 
             db.execSQL("create table tmp (id int)");
 
@@ -96,7 +100,7 @@ public class StreamingProtobufSQLiteCursorTest extends InstrumentedTest {
     @Test
     public void moveToPositionStart() throws IOException {
         try (BackendV1 backend = super.getBackend("initial_version_2_12_1.anki2")) {
-            SupportSQLiteDatabase db = new RustSupportSQLiteOpenHelper(backend).getWritableDatabase();
+            SupportSQLiteDatabase db = getWritableDatabase(backend);
 
             db.execSQL("create table tmp (id int)");
 
@@ -152,7 +156,7 @@ public class StreamingProtobufSQLiteCursorTest extends InstrumentedTest {
        int elements = DatabaseIntegrationTests.DB_PAGE_NUM_INT_ELEMENTS;
 
         try (BackendV1 backend = super.getBackend("initial_version_2_12_1.anki2")) {
-            SupportSQLiteDatabase db = new RustSupportSQLiteOpenHelper(backend).getWritableDatabase();
+            SupportSQLiteDatabase db = getWritableDatabase(backend);
 
             db.execSQL("create table tmp (id int)");
             for (int i = 0; i < elements + 1; i++) {
@@ -190,7 +194,7 @@ public class StreamingProtobufSQLiteCursorTest extends InstrumentedTest {
 
 
         try (BackendV1 backend = super.getBackend("initial_version_2_12_1.anki2")) {
-            SupportSQLiteDatabase db = new RustSupportSQLiteOpenHelper(backend).getWritableDatabase();
+            SupportSQLiteDatabase db = getWritableDatabase(backend);
 
             db.execSQL("create table tmp (id varchar)");
             for (int i = 0; i < elements + 1; i++) {
@@ -216,7 +220,7 @@ public class StreamingProtobufSQLiteCursorTest extends InstrumentedTest {
         int elements = 50; // 1275 > 1000
 
         try (BackendV1 backend = super.getBackend("initial_version_2_12_1.anki2")) {
-            SupportSQLiteDatabase db = new RustSupportSQLiteOpenHelper(backend).getWritableDatabase();
+            SupportSQLiteDatabase db = getWritableDatabase(backend);
 
             db.execSQL("create table tmp (id varchar)");
             for (int i = 0; i < elements + 1; i++) {
