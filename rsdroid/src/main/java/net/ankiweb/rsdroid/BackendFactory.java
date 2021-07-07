@@ -16,6 +16,10 @@
 
 package net.ankiweb.rsdroid;
 
+import androidx.sqlite.db.SupportSQLiteOpenHelper;
+
+import net.ankiweb.rsdroid.database.RustSQLiteOpenHelperFactory;
+
 public class BackendFactory {
 
     private BackendV1 backend;
@@ -49,5 +53,9 @@ public class BackendFactory {
 
         // we could swallow the exception here, most of the time it will be "collection is already closed"
         backend.closeCollection(false);
+    }
+    
+    public SupportSQLiteOpenHelper.Factory getSQLiteOpener() {
+        return new RustSQLiteOpenHelperFactory(this);
     }
 }
