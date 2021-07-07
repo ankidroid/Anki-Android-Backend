@@ -34,6 +34,6 @@ public class RustSQLiteOpenHelperFactory implements SupportSQLiteOpenHelper.Fact
     @NonNull
     @Override
     public SupportSQLiteOpenHelper create(@NonNull SupportSQLiteOpenHelper.Configuration configuration) {
-        return new RustSupportSQLiteOpenHelper(configuration, backendFactory);
+        return new RustV11SupportSQLiteOpenHelper(configuration, backendFactory);
     }
 }
