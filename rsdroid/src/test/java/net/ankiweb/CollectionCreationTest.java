@@ -11,7 +11,7 @@ import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import net.ankiweb.rsdroid.BackendFactory;
-import net.ankiweb.rsdroid.database.RustSupportSQLiteOpenHelper;
+import net.ankiweb.rsdroid.database.RustV11SupportSQLiteOpenHelper;
 import net.ankiweb.rsdroid.testing.RustBackendLoader;
 
 import org.junit.Before;
@@ -44,7 +44,7 @@ public class CollectionCreationTest {
 
         Configuration config = getConfiguration(path);
 
-        SupportSQLiteDatabase database = new RustSupportSQLiteOpenHelper(config, backendV1).getWritableDatabase();
+        SupportSQLiteDatabase database = new RustV11SupportSQLiteOpenHelper(config, backendV1).getWritableDatabase();
 
         database.beginTransaction();
         try {
