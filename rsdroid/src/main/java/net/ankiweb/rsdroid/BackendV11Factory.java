@@ -18,8 +18,7 @@ package net.ankiweb.rsdroid;
 
 import androidx.sqlite.db.SupportSQLiteOpenHelper;
 
-import net.ankiweb.rsdroid.database.RustSQLiteOpenHelperFactory;
-import net.ankiweb.rsdroid.database.RustV16SQLiteOpenHelperFactory;
+import net.ankiweb.rsdroid.database.RustV11SQLiteOpenHelperFactory;
 
 public class BackendV11Factory extends BackendFactory {
 
@@ -34,6 +33,6 @@ public class BackendV11Factory extends BackendFactory {
     }
 
     public SupportSQLiteOpenHelper.Factory getSQLiteOpener() {
-        return new RustSQLiteOpenHelperFactory(this);
+        return new RustV11SQLiteOpenHelperFactory(this);
     }
 }
