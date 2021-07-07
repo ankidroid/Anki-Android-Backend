@@ -18,9 +18,7 @@ package net.ankiweb.rsdroid;
 
 import androidx.sqlite.db.SupportSQLiteOpenHelper;
 
-import net.ankiweb.rsdroid.database.RustSQLiteOpenHelperFactory;
-
-public class BackendFactory {
+public abstract class BackendFactory {
 
     private BackendV1 backend;
 
@@ -29,14 +27,9 @@ public class BackendFactory {
 
     }
 
-    /**
-     * Obtains an instance of BackendFactory which will connect to rsdroid.
-     * Each call will generate a separate instance which can handle a new Anki collection
-     */
-    @RustV1Cleanup("RustBackendFailedException may be moved to a more appropriate location")
+    @RustCleanup("Use BackendV[11/Next]Factory")
     public static BackendFactory createInstance() throws RustBackendFailedException {
-        NativeMethods.ensureSetup();
-        return new BackendFactory();
+        return BackendV11Factory.createInstance();
     }
 
     public synchronized BackendV1 getBackend() {
@@ -55,7 +48,5 @@ public class BackendFactory {
         backend.closeCollection(false);
     }
     
-    public SupportSQLiteOpenHelper.Factory getSQLiteOpener() {
-        return new RustSQLiteOpenHelperFactory(this);
-    }
+    public abstract SupportSQLiteOpenHelper.Factory getSQLiteOpener();
 }
