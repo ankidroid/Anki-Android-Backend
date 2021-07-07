@@ -18,44 +18,22 @@ package net.ankiweb.rsdroid;
 
 import androidx.sqlite.db.SupportSQLiteOpenHelper;
 
-import net.ankiweb.rsdroid.database.RustSQLiteOpenHelperFactory;
+import net.ankiweb.rsdroid.database.RustVNextSQLiteOpenHelperFactory;
 
-public class BackendFactory {
-
-    private BackendV1 backend;
-
-    // Force users to go through getInstance - for now we need to handle the backend failure
-    protected BackendFactory() {
-
-    }
+/** A factory for the latest version of the backend (v16 currently) */
+public class BackendVNextFactory extends BackendFactory {
 
     /**
      * Obtains an instance of BackendFactory which will connect to rsdroid.
      * Each call will generate a separate instance which can handle a new Anki collection
      */
     @RustV1Cleanup("RustBackendFailedException may be moved to a more appropriate location")
-    public static BackendFactory createInstance() throws RustBackendFailedException {
+    public static BackendVNextFactory createInstance() throws RustBackendFailedException {
         NativeMethods.ensureSetup();
-        return new BackendFactory();
+        return new BackendVNextFactory();
     }
 
-    public synchronized BackendV1 getBackend() {
-        if (backend == null) {
-            backend = new BackendMutex(new BackendV1Impl());
-        }
-        return backend;
-    }
-
-    public synchronized void closeCollection() {
-        if (backend == null) {
-            return;
-        }
-
-        // we could swallow the exception here, most of the time it will be "collection is already closed"
-        backend.closeCollection(false);
-    }
-    
     public SupportSQLiteOpenHelper.Factory getSQLiteOpener() {
-        return new RustSQLiteOpenHelperFactory(this);
+        return new RustVNextSQLiteOpenHelperFactory(this);
     }
 }
