@@ -33,7 +33,7 @@ public class RustSupportSQLiteOpenHelper implements SupportSQLiteOpenHelper {
     @Nullable
     private final BackendV1 backend;
     private BackendFactory backendFactory;
-    private RustSupportSQLiteDatabase database;
+    private SupportSQLiteDatabase database;
 
     public RustSupportSQLiteOpenHelper(@NonNull Configuration configuration, BackendFactory backendFactory) {
         this.configuration = configuration;
@@ -84,7 +84,7 @@ public class RustSupportSQLiteOpenHelper implements SupportSQLiteOpenHelper {
 
     }
 
-    private RustSupportSQLiteDatabase createRustSupportSQLiteDatabase(@SuppressWarnings("SameParameterValue") boolean readOnly) {
+    private SupportSQLiteDatabase createRustSupportSQLiteDatabase(@SuppressWarnings("SameParameterValue") boolean readOnly) {
         Timber.d("createRustSupportSQLiteDatabase");
         if (configuration != null) {
             BackendV1 backend = backendFactory.getBackend();
