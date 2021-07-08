@@ -139,18 +139,6 @@ public class BackendV1Impl extends net.ankiweb.rsdroid.RustBackendImpl implement
         }
     }
 
-    // the main openCollection does an upgrade to V15, which is not ideal
-    @Override
-    public void openCollection(@Nullable String collectionPath, @Nullable String mediaFolderPath, @Nullable String mediaDbPath, @Nullable String logPath) {
-        Backend.OpenCollectionIn in = Backend.OpenCollectionIn.newBuilder()
-                .setCollectionPath(collectionPath)
-                .setMediaFolderPath(mediaFolderPath)
-                .setMediaDbPath(mediaDbPath)
-                .setLogPath(logPath)
-                .build();
-        openAnkiDroidCollection(in);
-    }
-
     @CheckResult
     public JSONArray fullQuery(String sql, @Nullable Object... args) {
         try {
