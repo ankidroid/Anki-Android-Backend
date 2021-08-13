@@ -52,5 +52,5 @@ dependencies {
 
     androidTestImplementation 'androidx.sqlite:sqlite-framework:2.1.0'
 
-    androidTestImplementation 'com.jakewharton.timber:timber:4.7.1'
+    androidTestImplementation 'com.jakewharton.timber:timber:5.0.1'
 }
