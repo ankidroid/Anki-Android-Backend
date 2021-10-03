@@ -16,8 +16,9 @@ jobs:
     - name: Install Rust
       uses: actions-rs/toolchain@v1.0.6
       with:
-        toolchain: stable
+        toolchain: 1.54.0
         override: true
+        components: rustfmt
 
     # actions-rs only accepts "target" (although a "targets" param to be added in v2). We need 4 targets.
     - name: Install Rust Targets
