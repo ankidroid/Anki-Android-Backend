@@ -46,7 +46,7 @@ dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "androidx.appcompat:appcompat:${rootProject.ext.appcompatVersion}"
 
-    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+    androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.androidxTestJunitVersion}"
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
     androidTestImplementation project(path: ':rsdroid')
 
