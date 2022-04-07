@@ -31,7 +31,7 @@ protobuf {
         anki { path = f.absolutePath }
     }
     protoc {
-        artifact = 'com.google.protobuf:protoc:3.8.0'
+        artifact = "com.google.protobuf:protoc:${rootProject.ext.protobufVersion}"
     }
     generateProtoTasks {
         all().each { task ->
