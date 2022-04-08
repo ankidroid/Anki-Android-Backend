@@ -16,7 +16,6 @@ def getAnkiCommitHash = { ->
 
 android {
     compileSdkVersion 30
-    buildToolsVersion "30.0.1"
     ndkVersion "22.0.7026061" // Used by GitHub actions - avoids an install step on some machines
 
     compileOptions {
