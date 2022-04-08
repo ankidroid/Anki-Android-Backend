@@ -62,8 +62,9 @@ else
 fi
 
 
-cecho $lgray "Installing rust nightly"
-rustup install nightly
+cecho $lgray "Installing rust 1.54.0" # nightly" - temporarily using 1.54.0 - see #168
+rustup install 1.54.0 #nightly
+rustup default 1.54.0
 
 
 cecho $lgray "Adding rust android targets"
@@ -73,7 +74,7 @@ rustup target add aarch64-linux-android     # arm64
 rustup target add x86_64-linux-android      # x86_64
 
 cecho $lgray "Installing cross"
-cargo install cross --git https://github.com/rust-embedded/cross/
+cargo install cross --git https://github.com/rust-embedded/cross/ --tag v0.2.1 # current requires rust-current
 
 
 cecho $lgray "Installing protobuf python libraries"
