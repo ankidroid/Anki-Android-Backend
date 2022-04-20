@@ -15,7 +15,7 @@ def getAnkiCommitHash = { ->
 }
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion rootProject.ext.compileSdkVersion
     ndkVersion "22.0.7026061" // Used by GitHub actions - avoids an install step on some machines
 
     compileOptions {
@@ -24,8 +24,8 @@ android {
     }
 
     defaultConfig {
-        minSdkVersion 21
-        targetSdkVersion 30
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName VERSION_NAME
 
