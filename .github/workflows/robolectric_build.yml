@@ -192,8 +192,8 @@ jobs:
 
     - name: Run Tests
       if: matrix.os != 'windows-latest'
-      run: ./gradlew rsdroid:test -x preBuildMac -x preBuildWindows -x preBuildLinux -x cargoBuildArm -x cargoBuildX86 -x cargoBuildArm64 -x cargoBuildX86_64
+      run: ./gradlew rsdroid:test -x preBuildMac -x preBuildWindows -x preBuildLinux -x cargoBuildArm -x cargoBuildX86 -x cargoBuildArm64 -x cargoBuildX86_64 --stacktrace
 
     - name: Run Tests (win)
       if: matrix.os == 'windows-latest'
-      run: ./gradlew rsdroid:test -x preBuildMac -x preBuildWindows -x preBuildLinux -x cargoBuildArm -x cargoBuildX86 -x cargoBuildArm64 -x cargoBuildX86_64
+      run: ./gradlew rsdroid:test -x preBuildMac -x preBuildWindows -x preBuildLinux -x cargoBuildArm -x cargoBuildX86 -x cargoBuildArm64 -x cargoBuildX86_64 --stacktrace
