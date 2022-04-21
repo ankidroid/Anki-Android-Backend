@@ -19,10 +19,16 @@ jobs:
     - name: Fetch submodules
       run:  git submodule update --init --recursive --remote --force
 
+    - name: Configure JDK 1.11
+      uses: actions/setup-java@v3
+      with:
+        distribution: "adopt"
+        java-version: "11" # minimum for Android API31
+
     - name: Install Android Command Line Tools
       uses: mikehardy/setup-android@main
 
-      # COULD_BE_BETTER: Consider turning this into a GitHub action - help the wider community
+    # COULD_BE_BETTER: Consider turning this into a GitHub action - help the wider community
     # NDK install (unzipping) is really noisy - silence the log spam with grep, while keeping errors
     - name: Install NDK (silent)
       run: .github/scripts/install_ndk.sh 22.0.7026061
