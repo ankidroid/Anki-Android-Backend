@@ -14,6 +14,9 @@ jobs:
     - name: Fetch submodules
       run:  git submodule update --init --recursive --remote --force
 
+    - name: Install Android Command Line Tools
+      uses: mikehardy/setup-android@main
+
     - name: Install NDK
       run: .github/scripts/install_ndk.sh 22.0.7026061
          
