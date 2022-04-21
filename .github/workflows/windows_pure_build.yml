@@ -17,6 +17,16 @@ jobs:
     - name: Fetch submodules
       run:  git submodule update --init --recursive --remote --force
 
+    - name: Install Android Command Line Tools
+      uses: mikehardy/setup-android@main
+
+    - name: Install NDK (Windows - silent)
+      if: matrix.os == 'windows-latest'
+      run: |
+        Write-Host "NDK Install Started"
+        (. sdkmanager.bat --install "ndk;22.0.7026061" --sdk_root="$Env:ANDROID_SDK_ROOT") | out-null
+        Write-Host "NDK Install Completed"
+
     - name: Install Rust
       uses: actions-rs/toolchain@v1.0.6
       with:

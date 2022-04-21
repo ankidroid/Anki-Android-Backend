@@ -17,15 +17,16 @@ jobs:
 
     - uses: actions/checkout@v2
 
-    # TODO: Ignore lines like we do in the Unix scripts, rather than all of them
+    - name: Install Android Command Line Tools
+      uses: mikehardy/setup-android@main
+
+      # TODO: Ignore lines like we do in the Unix scripts, rather than all of them
     - name: Install NDK (silent)
       run: |
             Write-Host "NDK Install Started"
             Write-Host "ANDROID_HOME - $Env:ANDROID_HOME"
             Write-Host "ANDROID_SDK_ROOT - $Env:ANDROID_SDK_ROOT"
-
-            (. "$Env:ANDROID_HOME\tools\bin\sdkmanager.bat" --install "ndk;22.0.7026061" --sdk_root="$Env:ANDROID_SDK_ROOT") | out-null
-
+            (. sdkmanager.bat --install "ndk;22.0.7026061" --sdk_root="$Env:ANDROID_SDK_ROOT") | out-null
             Write-Host "NDK Install Completed"
 
     # bzip2-sys does not build when the value of CC_armv7-linux-androideabi contains a space
@@ -36,13 +37,9 @@ jobs:
     - name: Move SDK to directory with no spaces
       run: |
              New-Item -ItemType directory -Path 'C:\ProgramFiles\Android'
-
              Get-ChildItem "$Env:ANDROID_SDK_ROOT"
-
              Move-Item -Path "$Env:ANDROID_SDK_ROOT" -Destination 'C:\ProgramFiles\Android' -ErrorAction Stop -Force
-
              Get-ChildItem 'C:\ProgramFiles\Android\android-sdk'
-
 
     - name: Debug Env
       run: |

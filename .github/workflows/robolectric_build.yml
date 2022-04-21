@@ -29,8 +29,11 @@ jobs:
     - name: Fetch submodules
       run:  git submodule update --init --recursive --remote --force
 
+    - name: Install Android Command Line Tools
+      uses: mikehardy/setup-android@main
+
     - name: Install NDK (r22 - 22.0.7026061)
-      run: .github/scripts/install_ndk_macos.sh r22 22.0.7026061
+      run: .github/scripts/install_ndk.sh 22.0.7026061
 
 # TODO: Needs investigation. This seemed to work before adding gnubin/v1, just with serde broken.
 # Now it doesn't seem to be picked up by rust.
@@ -139,21 +142,18 @@ jobs:
                   exit 1
               fi
 
-    - name: Install NDK (silent)
-      if: matrix.os == 'ubuntu-latest'
-      run: .github/scripts/install_ndk.sh 22.0.7026061
+    - name: Install Android Command Line Tools
+      uses: mikehardy/setup-android@main
 
-    - name: Install NDK (macOS) (r22 - 22.0.7026061)
-      if: matrix.os == 'macos-latest'
-      run: .github/scripts/install_ndk_macos.sh r22 22.0.7026061
+    - name: Install NDK (silent)
+      if: matrix.os != 'windows-latest'
+      run: .github/scripts/install_ndk.sh 22.0.7026061
 
     - name: Install NDK (Windows - silent)
       if: matrix.os == 'windows-latest'
       run: |
             Write-Host "NDK Install Started"
-
-            (. "$Env:ANDROID_HOME\tools\bin\sdkmanager.bat" --install "ndk;22.0.7026061" --sdk_root="$Env:ANDROID_SDK_ROOT") | out-null
-
+            (. sdkmanager.bat --install "ndk;22.0.7026061" --sdk_root="$Env:ANDROID_SDK_ROOT") | out-null
             Write-Host "NDK Install Completed"
 
     - name: Install Python Setuptools
