@@ -3,6 +3,10 @@
 name: rsdroid (Windows - Path with spaces)
 on: workflow_dispatch
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: windows-latest

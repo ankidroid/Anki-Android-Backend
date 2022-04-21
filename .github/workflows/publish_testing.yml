@@ -2,6 +2,10 @@
 name: Publish JAR for Robolectric Testing
 on: workflow_dispatch
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   publish:
     runs-on: macos-latest
