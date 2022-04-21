@@ -17,6 +17,12 @@ jobs:
 
     - uses: actions/checkout@v2
 
+    - name: Configure JDK 1.11
+      uses: actions/setup-java@v3
+      with:
+        distribution: "adopt"
+        java-version: "11" # minimum for Android API31
+
     - name: Install Android Command Line Tools
       uses: mikehardy/setup-android@main
 

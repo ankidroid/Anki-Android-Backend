@@ -20,6 +20,12 @@ jobs:
     - name: Fetch submodules
       run:  git submodule update --init --recursive --remote --force
 
+    - name: Configure JDK 1.11
+      uses: actions/setup-java@v3
+      with:
+        distribution: "adopt"
+        java-version: "11" # minimum for Android API31
+
     - name: Install Android Command Line Tools
       uses: mikehardy/setup-android@main
 
@@ -46,7 +52,6 @@ jobs:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Install & Test Protobuf Compiler
-      shell: bash -l {0} 
       run: |
               pip3 install protobuf
               python3 .github/scripts/protoc_gen_deps.py
@@ -64,11 +69,9 @@ jobs:
           ${{ runner.os }}-rust-v1
 
     - name: Build
-      shell: bash -l {0}
       run: ./gradlew clean assembleDebug -DtestBuildType=debug -Dorg.gradle.daemon=false -Dorg.gradle.console=plain
 
     - name: Build Instrumented Test APKs
-      shell: bash -l {0}
       run: ./gradlew rsdroid-instrumented:assembleDebug rsdroid-instrumented:assembleAndroidTest -DtestBuildType=debug -Dorg.gradle.daemon=false -Dorg.gradle.console=plain
 
     - name: Upload APKs as Artifact
@@ -101,6 +104,12 @@ jobs:
       with:
         name: rsdroid-instrumented
         path: rsdroid-instrumented/build/outputs/apk
+
+    - name: Configure JDK 1.11
+      uses: actions/setup-java@v3
+      with:
+        distribution: "adopt"
+        java-version: "11" # minimum for Android API31
 
     - name: Install Android Command Line Tools
       uses: mikehardy/setup-android@main
