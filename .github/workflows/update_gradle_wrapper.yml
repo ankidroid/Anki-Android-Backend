@@ -30,7 +30,7 @@ jobs:
       # COULD_BE_BETTER: Consider turning this into a GitHub action - help the wider community
       # NDK install (unzipping) is really noisy - silence the log spam with grep, while keeping errors
       - name: Install NDK (silent)
-        run: .github/scripts/install_ndk.sh 22.0.7026061
+        run: .github/scripts/install_ndk.sh 24.0.8215888
 
       - name: Update Gradle Wrapper
         uses: gradle-update/update-gradle-wrapper-action@v1

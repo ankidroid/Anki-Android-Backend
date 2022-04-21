@@ -30,7 +30,7 @@ jobs:
       if: matrix.os == 'windows-latest'
       run: |
         Write-Host "NDK Install Started"
-        (. sdkmanager.bat --install "ndk;22.0.7026061" --sdk_root="$Env:ANDROID_SDK_ROOT") | out-null
+        (. sdkmanager.bat --install "ndk;24.0.8215888" --sdk_root="$Env:ANDROID_SDK_ROOT") | out-null
         Write-Host "NDK Install Completed"
 
     - name: Install Rust

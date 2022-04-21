@@ -32,7 +32,7 @@ jobs:
             Write-Host "NDK Install Started"
             Write-Host "ANDROID_HOME - $Env:ANDROID_HOME"
             Write-Host "ANDROID_SDK_ROOT - $Env:ANDROID_SDK_ROOT"
-            (. sdkmanager.bat --install "ndk;22.0.7026061" --sdk_root="$Env:ANDROID_SDK_ROOT") | out-null
+            (. sdkmanager.bat --install "ndk;24.0.8215888" --sdk_root="$Env:ANDROID_SDK_ROOT") | out-null
             Write-Host "NDK Install Completed"
 
     # bzip2-sys does not build when the value of CC_armv7-linux-androideabi contains a space

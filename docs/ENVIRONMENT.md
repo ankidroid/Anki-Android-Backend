@@ -35,7 +35,7 @@ For example:
 ```groovy
     compileSdkVersion 30
     buildToolsVersion "30.0.1"
-    ndkVersion "22.0.7026061" // Used by GitHub actions - avoids an install step on some machines
+    ndkVersion "24.0.8215888" // Used by GitHub actions - avoids an install step on some machines
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -50,7 +50,7 @@ For example:
 That indicates you need:
 
 - SDK 30 installed (compileSdkVersion and targetSdkVersion)
-- NDK 22.0.7026062 (ndkVersion)
+- NDK 24.0.8215888 (ndkVersion)
 - Build Tools 30.0.1 (buildToolsVersion)
 
 You should open Android Studio and use the Tools --> SDK Manager to download them

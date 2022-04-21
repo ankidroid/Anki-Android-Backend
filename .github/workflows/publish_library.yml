@@ -24,7 +24,7 @@ jobs:
       uses: mikehardy/setup-android@main
 
     - name: Install NDK
-      run: .github/scripts/install_ndk.sh 22.0.7026061
+      run: .github/scripts/install_ndk.sh 24.0.8215888
 
     - name: Install linker
       run: .github/scripts/linux_install_x86_64-unknown-linux-gnu-gcc.sh

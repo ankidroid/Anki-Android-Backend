@@ -30,7 +30,7 @@ jobs:
       uses: mikehardy/setup-android@main
 
     - name: Install NDK
-      run: .github/scripts/install_ndk.sh 22.0.7026061
+      run: .github/scripts/install_ndk.sh 24.0.8215888
 
     - name: Test NDK
       run: echo "NDK set to $ANDROID_NDK_HOME"
@@ -115,7 +115,7 @@ jobs:
       uses: mikehardy/setup-android@main
 
     - name: Install NDK
-      run: .github/scripts/install_ndk.sh 22.0.7026061
+      run: .github/scripts/install_ndk.sh 24.0.8215888
 
     - name: run tests
       uses: reactivecircus/android-emulator-runner@v2
