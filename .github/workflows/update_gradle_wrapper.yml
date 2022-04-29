@@ -12,28 +12,27 @@ concurrency:
 jobs:
   update-gradle-wrapper:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: 'recursive'
+    - uses: actions/checkout@v3
+      with:
+        submodules: 'recursive'
 
-      - name: Configure JDK 1.11
-        uses: actions/setup-java@v3
-        with:
-          distribution: "adopt"
-          java-version: "11" # minimum for Android API31
+    - name: Configure JDK 1.11
+      uses: actions/setup-java@v3
+      with:
+        distribution: "adopt"
+        java-version: "11" # minimum for Android API31
 
-      - name: Install Android Command Line Tools
+    - name: Install Android Command Line Tools
       uses: android-actions/setup-android@v2
 
-      # COULD_BE_BETTER: Consider turning this into a GitHub action - help the wider community
-      # NDK install (unzipping) is really noisy - silence the log spam with grep, while keeping errors
-      - name: Install NDK (silent)
-        run: .github/scripts/install_ndk.sh 22.0.7026061
+    # COULD_BE_BETTER: Consider turning this into a GitHub action - help the wider community
+    # NDK install (unzipping) is really noisy - silence the log spam with grep, while keeping errors
+    - name: Install NDK (silent)
+      run: .github/scripts/install_ndk.sh 22.0.7026061
 
-      - name: Update Gradle Wrapper
-        uses: gradle-update/update-gradle-wrapper-action@v1
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          set-distribution-checksum: false
+    - name: Update Gradle Wrapper
+      uses: gradle-update/update-gradle-wrapper-action@v1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        set-distribution-checksum: false
