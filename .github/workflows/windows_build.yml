@@ -24,7 +24,7 @@ jobs:
         java-version: "11" # minimum for Android API31
 
     - name: Install Android Command Line Tools
-      uses: mikehardy/setup-android@main
+      uses: android-actions/setup-android@v2
 
       # TODO: Ignore lines like we do in the Unix scripts, rather than all of them
     - name: Install NDK (silent)
