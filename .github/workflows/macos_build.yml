@@ -27,7 +27,7 @@ jobs:
         java-version: "11" # minimum for Android API31
 
     - name: Install Android Command Line Tools
-      uses: mikehardy/setup-android@main
+      uses: android-actions/setup-android@v2
 
     - name: Install NDK
       run: .github/scripts/install_ndk.sh 22.0.7026061
@@ -112,7 +112,7 @@ jobs:
         java-version: "11" # minimum for Android API31
 
     - name: Install Android Command Line Tools
-      uses: mikehardy/setup-android@main
+      uses: android-actions/setup-android@v2
 
     - name: Install NDK
       run: .github/scripts/install_ndk.sh 22.0.7026061
