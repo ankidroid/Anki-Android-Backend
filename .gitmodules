@@ -1,4 +1,4 @@
 [submodule "anki"]
 	path = rslib-bridge/anki
-	url = https://github.com/david-allison-1/anki
+	url = https://github.com/ankidroid/anki
 	branch = ankidroid-2-1-34
