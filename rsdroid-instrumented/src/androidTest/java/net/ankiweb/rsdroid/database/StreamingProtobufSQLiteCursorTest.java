@@ -20,7 +20,7 @@ import android.database.Cursor;
 
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
-import net.ankiweb.rsdroid.BackendV1;
+import net.ankiweb.rsdroid.Backend;
 import net.ankiweb.rsdroid.DatabaseIntegrationTests;
 import net.ankiweb.rsdroid.ankiutil.InstrumentedTest;
 
@@ -40,7 +40,7 @@ public class StreamingProtobufSQLiteCursorTest extends InstrumentedTest {
     @Test
     public void testPaging() throws IOException {
 
-        try (BackendV1 backend = super.getBackend("initial_version_2_12_1.anki2")) {
+        try (Backend backend = super.getBackend("initial_version_2_12_1.anki2")) {
             SupportSQLiteDatabase db = getWritableDatabase(backend);
 
             db.execSQL("create table tmp (id int)");
@@ -61,14 +61,14 @@ public class StreamingProtobufSQLiteCursorTest extends InstrumentedTest {
         }
     }
 
-    private SupportSQLiteDatabase getWritableDatabase(BackendV1 backend) {
+    private SupportSQLiteDatabase getWritableDatabase(Backend backend) {
         return new RustV11SupportSQLiteOpenHelper(backend).getWritableDatabase();
     }
 
     @Test
     public void testBackwards() throws IOException {
         Timber.w("This is much slower than forwards");
-        try (BackendV1 backend = super.getBackend("initial_version_2_12_1.anki2")) {
+        try (Backend backend = super.getBackend("initial_version_2_12_1.anki2")) {
             SupportSQLiteDatabase db = getWritableDatabase(backend);
 
             db.execSQL("create table tmp (id int)");
@@ -99,7 +99,7 @@ public class StreamingProtobufSQLiteCursorTest extends InstrumentedTest {
 
     @Test
     public void moveToPositionStart() throws IOException {
-        try (BackendV1 backend = super.getBackend("initial_version_2_12_1.anki2")) {
+        try (Backend backend = super.getBackend("initial_version_2_12_1.anki2")) {
             SupportSQLiteDatabase db = getWritableDatabase(backend);
 
             db.execSQL("create table tmp (id int)");
@@ -155,7 +155,7 @@ public class StreamingProtobufSQLiteCursorTest extends InstrumentedTest {
     public void testCorruptionIsHandled() throws IOException {
        int elements = DatabaseIntegrationTests.DB_PAGE_NUM_INT_ELEMENTS;
 
-        try (BackendV1 backend = super.getBackend("initial_version_2_12_1.anki2")) {
+        try (Backend backend = super.getBackend("initial_version_2_12_1.anki2")) {
             SupportSQLiteDatabase db = getWritableDatabase(backend);
 
             db.execSQL("create table tmp (id int)");
@@ -193,7 +193,7 @@ public class StreamingProtobufSQLiteCursorTest extends InstrumentedTest {
         int elements = 30; // 465
 
 
-        try (BackendV1 backend = super.getBackend("initial_version_2_12_1.anki2")) {
+        try (Backend backend = super.getBackend("initial_version_2_12_1.anki2")) {
             SupportSQLiteDatabase db = getWritableDatabase(backend);
 
             db.execSQL("create table tmp (id varchar)");
@@ -219,7 +219,7 @@ public class StreamingProtobufSQLiteCursorTest extends InstrumentedTest {
     public void variableLengthStringsReturnDifferentRowCounts() throws IOException {
         int elements = 50; // 1275 > 1000
 
-        try (BackendV1 backend = super.getBackend("initial_version_2_12_1.anki2")) {
+        try (Backend backend = super.getBackend("initial_version_2_12_1.anki2")) {
             SupportSQLiteDatabase db = getWritableDatabase(backend);
 
             db.execSQL("create table tmp (id varchar)");

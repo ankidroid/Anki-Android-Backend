@@ -22,11 +22,9 @@ import android.util.Log;
 
 import androidx.test.platform.app.InstrumentationRegistry;
 
-import net.ankiweb.rsdroid.BackendException;
 import net.ankiweb.rsdroid.BackendFactory;
 import net.ankiweb.rsdroid.BackendUtils;
-import net.ankiweb.rsdroid.BackendV1;
-import net.ankiweb.rsdroid.BackendV1Impl;
+import net.ankiweb.rsdroid.Backend;
 import net.ankiweb.rsdroid.NativeMethods;
 import net.ankiweb.rsdroid.RustBackendFailedException;
 import net.ankiweb.rsdroid.exceptions.BackendInvalidInputException;
@@ -48,7 +46,7 @@ public class InstrumentedTest {
         Log.e("InstrumentedTest", "Timber has been disabled.");
     }
 
-    private final List<BackendV1> backendList = new ArrayList<>();
+    private final List<Backend> backendList = new ArrayList<>();
 
     protected final static int TEST_PAGE_SIZE = 1000;
 
@@ -69,7 +67,7 @@ public class InstrumentedTest {
 
     @After
     public void after() {
-        for (BackendV1 b : backendList) {
+        for (Backend b : backendList) {
             if (b != null && b.isOpen()) {
                 
                 List<Integer> numbers;
@@ -122,21 +120,21 @@ public class InstrumentedTest {
     }
 
     @NotNull
-    protected BackendV1 getBackend(String fileName) {
+    protected Backend getBackend(String fileName) {
         String path = getAssetFilePath(fileName);
         return getBackendFromPath(path);
     }
 
     @NotNull
-    protected BackendV1 getBackendFromPath(String path) {
-        BackendV1 backendV1 = getClosedBackend();
+    protected Backend getBackendFromPath(String path) {
+        Backend backendV1 = getClosedBackend();
         backendV1.setPageSize(TEST_PAGE_SIZE);
         BackendUtils.openAnkiDroidCollection(backendV1, path, true);
         this.backendList.add(backendV1);
         return backendV1;
     }
 
-    protected BackendV1 getClosedBackend() {
+    protected Backend getClosedBackend() {
         try {
             return BackendFactory.createInstance().getBackend();
         } catch (RustBackendFailedException e) {

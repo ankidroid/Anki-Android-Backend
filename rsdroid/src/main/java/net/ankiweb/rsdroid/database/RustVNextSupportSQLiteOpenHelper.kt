@@ -18,19 +18,21 @@ package net.ankiweb.rsdroid.database
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.db.SupportSQLiteOpenHelper
 import net.ankiweb.rsdroid.BackendFactory
-import net.ankiweb.rsdroid.BackendV1
+import net.ankiweb.rsdroid.Backend
+import net.ankiweb.rsdroid.BackendUtils
+import net.ankiweb.rsdroid.BackendUtils.openAnkiDroidCollection
 import timber.log.Timber
 
 class RustVNextSupportSQLiteOpenHelper : RustSupportSQLiteOpenHelper {
     constructor(configuration: SupportSQLiteOpenHelper.Configuration, backendFactory: BackendFactory?) : super(configuration, backendFactory) {}
-    constructor(backend: BackendV1) : super(backend) {}
+    constructor(backend: Backend) : super(backend) {}
 
     override fun createRustSupportSQLiteDatabase(readOnly: Boolean): SupportSQLiteDatabase? {
         Timber.d("createRustSupportSQLiteDatabase")
         return if (configuration != null) {
             val backend = backendFactory!!.getBackend()
             // openCollection opens and upgrades the collection
-//            backend.openCollection(configuration.name, null, null, null);
+            openAnkiDroidCollection(backend, configuration.name, false)
             RustSupportSQLiteDatabase(backend, readOnly)
         } else {
             RustSupportSQLiteDatabase(backend, readOnly)

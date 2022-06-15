@@ -41,7 +41,7 @@ public class BackendDisposalTests extends InstrumentedTest {
         for (int i = 0; i < 10000; i++) {
 
             Timber.d("Iteration %d", i);
-            try (BackendV1 backend = super.getBackend("initial_version_2_12_1.anki2")) {
+            try (Backend backend = super.getBackend("initial_version_2_12_1.anki2")) {
                 SupportSQLiteDatabase db = new RustV11SupportSQLiteOpenHelper(backend).getWritableDatabase();
 
                 int count = DatabaseUtil.queryScalar(db, "select count(*) from revlog");

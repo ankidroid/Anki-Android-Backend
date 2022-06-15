@@ -18,7 +18,7 @@ package net.ankiweb.rsdroid;
 
 import androidx.annotation.VisibleForTesting;
 
-public class BackendForTesting extends BackendV1Impl {
+public class BackendForTesting extends Backend {
 
     BackendForTesting() {
         super();

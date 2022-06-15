@@ -18,11 +18,11 @@ package net.ankiweb.rsdroid.database
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.db.SupportSQLiteOpenHelper
 import net.ankiweb.rsdroid.BackendFactory
-import net.ankiweb.rsdroid.BackendV1
+import net.ankiweb.rsdroid.Backend
 
 abstract class RustSupportSQLiteOpenHelper : SupportSQLiteOpenHelper {
     protected val configuration: SupportSQLiteOpenHelper.Configuration?
-    protected val backend: BackendV1?
+    protected val backend: Backend?
     protected var backendFactory: BackendFactory? = null
     protected var database: SupportSQLiteDatabase? = null
 
@@ -32,7 +32,7 @@ abstract class RustSupportSQLiteOpenHelper : SupportSQLiteOpenHelper {
         backend = null
     }
 
-    constructor(backend: BackendV1) {
+    constructor(backend: Backend) {
         check(backend.isOpen()) { "Backend should be open" }
         this.backend = backend
         configuration = null

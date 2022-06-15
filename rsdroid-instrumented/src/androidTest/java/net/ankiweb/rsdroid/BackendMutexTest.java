@@ -36,7 +36,7 @@ public class BackendMutexTest extends InstrumentedTest {
     @Test
     public void ensureDatabaseInTransactionIsLocked() throws JSONException, InterruptedException {
 
-        BackendV1 b = (BackendV1) super.getBackend("initial_version_2_12_1.anki2");
+        Backend b = (Backend) super.getBackend("initial_version_2_12_1.anki2");
 
         b.fullQuery("create table test (id int)");
 

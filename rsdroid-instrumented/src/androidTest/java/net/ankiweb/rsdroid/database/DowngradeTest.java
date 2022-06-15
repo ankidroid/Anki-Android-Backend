@@ -17,7 +17,7 @@
 package net.ankiweb.rsdroid.database;
 
 import net.ankiweb.rsdroid.BackendException;
-import net.ankiweb.rsdroid.BackendV1;
+import net.ankiweb.rsdroid.Backend;
 import net.ankiweb.rsdroid.ankiutil.InstrumentedTest;
 
 import org.json.JSONArray;
@@ -39,17 +39,17 @@ public class DowngradeTest extends InstrumentedTest {
     public void downgradeWithLaterSchema() throws IOException, JSONException {
         String fileName = "schema_16.anki2";
         String path = getAssetFilePath(fileName);
-        try (BackendV1 backendV1 = super.getBackendFromPath(path) ){
+        try (Backend backendV1 = super.getBackendFromPath(path) ){
             assertSchemaVer(backendV1, 11);
         }
         fileName = "schema_17.anki2";
         path = getAssetFilePath(fileName);
-        try (BackendV1 backendV1 = super.getBackendFromPath(path) ){
+        try (Backend backendV1 = super.getBackendFromPath(path) ){
             assertSchemaVer(backendV1, 11);
         }
     }
 
-    private void assertSchemaVer(BackendV1 backendV1, @SuppressWarnings("SameParameterValue") int expectedVersion) throws JSONException {
+    private void assertSchemaVer(Backend backendV1, @SuppressWarnings("SameParameterValue") int expectedVersion) throws JSONException {
         JSONArray array = backendV1.fullQuery("select ver from col");
 
         assertThat(array.length(), is(1));
@@ -60,7 +60,7 @@ public class DowngradeTest extends InstrumentedTest {
 
     @SuppressWarnings({"unused", "RedundantSuppression"})
     private void assertOpeningFails(String path) {
-        try (BackendV1 unused = super.getBackendFromPath(path)) {
+        try (Backend unused = super.getBackendFromPath(path)) {
             fail();
         } catch (Exception e) {
             // ignore

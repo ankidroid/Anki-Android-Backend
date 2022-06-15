@@ -17,7 +17,6 @@ package net.ankiweb.rsdroid
 
 import androidx.sqlite.db.SupportSQLiteOpenHelper
 import net.ankiweb.rsdroid.NativeMethods.ensureSetup
-import net.ankiweb.rsdroid.RustBackendFailedException
 import net.ankiweb.rsdroid.database.RustV11SQLiteOpenHelperFactory
 
 class BackendV11Factory : BackendFactory() {
