@@ -16,15 +16,14 @@
 package net.ankiweb.rsdroid
 
 import androidx.sqlite.db.SupportSQLiteOpenHelper
-import net.ankiweb.rsdroid.RustBackendFailedException
 
 abstract class BackendFactory  // Force users to go through getInstance - for now we need to handle the backend failure
 protected constructor() {
-    private var backend: BackendV1? = null
+    private var backend: Backend? = null
     @Synchronized
-    fun getBackend(): BackendV1 {
+    fun getBackend(): Backend {
         if (backend == null) {
-            backend = BackendV1Impl()
+            backend = Backend()
         }
         return backend!!
     }

@@ -22,8 +22,8 @@ object BackendUtils {
      */
     // fixme: call backend directly
     @JvmStatic
-    fun openAnkiDroidCollection(backendV1: BackendV1, path: String?) {
-        backendV1.openCollection(path!!)
+    fun openAnkiDroidCollection(backendV1: Backend, path: String?, forceSchema11: Boolean) {
+        backendV1.openCollection(path ?: ":memory:", forceSchema11 = forceSchema11)
     }
 
     val ankiCommitHash: String

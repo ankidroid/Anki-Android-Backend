@@ -45,10 +45,10 @@ import android.util.Pair
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.db.SupportSQLiteQuery
 import androidx.sqlite.db.SupportSQLiteStatement
-import net.ankiweb.rsdroid.BackendV1
+import net.ankiweb.rsdroid.Backend
 import java.util.*
 
-class RustSupportSQLiteDatabase(backend: BackendV1?, readOnly: Boolean) : SupportSQLiteDatabase {
+class RustSupportSQLiteDatabase(backend: Backend?, readOnly: Boolean) : SupportSQLiteDatabase {
     private val sessionFactory: ThreadLocal<Session>
     private val isReadOnly: Boolean
     private var isOpen: Boolean
@@ -137,7 +137,7 @@ class RustSupportSQLiteDatabase(backend: BackendV1?, readOnly: Boolean) : Suppor
         return 0
     }
 
-    override fun update(table: String, conflictAlgorithm: Int, values: ContentValues, whereClause: String, whereArgs: Array<Any?>?): Int {
+    override fun update(table: String, conflictAlgorithm: Int, values: ContentValues, whereClause: String?, whereArgs: Array<Any?>?): Int {
         // taken from SQLiteDatabase class.
         require(!(values == null || values.size() == 0)) { "Empty values" }
         val sql = StringBuilder(120)
@@ -186,7 +186,7 @@ class RustSupportSQLiteDatabase(backend: BackendV1?, readOnly: Boolean) : Suppor
         throw NotImplementedException.Companion.todo()
     }
 
-    override fun getPath(): String {
+    override fun getPath(): String? {
         return session.getPath()
     }
 

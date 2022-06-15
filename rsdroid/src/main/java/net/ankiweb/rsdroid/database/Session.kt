@@ -67,7 +67,7 @@ class Session(private val backend: SQLHandler) : SQLHandler {
         backend.closeDatabase()
     }
 
-    override fun getPath(): String {
+    override fun getPath(): String? {
         return backend.getPath()
     }
 

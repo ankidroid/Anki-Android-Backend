@@ -36,7 +36,7 @@ interface SQLHandler {
     fun closeDatabase()
 
     @CheckResult
-    fun getPath(): String
+    fun getPath(): String?
 
     /* Protobuf-related (#6) */
     fun getNextSlice(startIndex: Long, sequenceNumber: Int): DBResponse

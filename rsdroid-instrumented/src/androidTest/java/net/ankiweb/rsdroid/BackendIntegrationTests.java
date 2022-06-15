@@ -52,9 +52,9 @@ public class BackendIntegrationTests extends InstrumentedTest {
     
     @Test
     public void testBackendException() {
-        BackendV1 backendV1 = getClosedBackend();
+        Backend Backend = getClosedBackend();
         try {
-            backendV1.closeCollection(true);
+            Backend.closeCollection(true);
             Assert.fail("call should have failed - needs an open collection");
         } catch (BackendException ex) {
             // OK
@@ -63,8 +63,8 @@ public class BackendIntegrationTests extends InstrumentedTest {
 
     @Test
     public void schedTimingTodayCall() {
-        BackendV1 backendV1 = getBackend("initial_version_2_12_1.anki2");
-        SchedTimingTodayResponse ret = backendV1.schedTimingTodayLegacy(1655258084, 0, 1655258084, 0, 0);
+        Backend backend = getBackend("initial_version_2_12_1.anki2");
+        SchedTimingTodayResponse ret = backend.schedTimingTodayLegacy(1655258084, 0, 1655258084, 0, 0);
         int elapsed = ret.getDaysElapsed();
         long nextDayAt = ret.getNextDayAt();
     }
@@ -73,7 +73,7 @@ public class BackendIntegrationTests extends InstrumentedTest {
     public void collectionIsVersion11AfterOpen() throws JSONException {
         // This test will be decomissioned, but before we get an upgrade strategy, we need to ensure we're not upgrading the database.
 
-        BackendV1 backendV1 = getBackend("initial_version_2_12_1.anki2");
+        Backend backendV1 = getBackend("initial_version_2_12_1.anki2");
 
         JSONArray array = backendV1.fullQuery("select ver from col");
 
@@ -86,13 +86,13 @@ public class BackendIntegrationTests extends InstrumentedTest {
 
     @Test
     public void fullQueryTest() {
-        BackendV1 backendV1 = getBackend("initial_version_2_12_1.anki2");
+        Backend backendV1 = getBackend("initial_version_2_12_1.anki2");
         JSONArray result = backendV1.fullQuery("select * from col");
     }
 
     @Test
     public void columnNamesTest() {
-        BackendV1 backendV1 = getBackend("initial_version_2_12_1.anki2");
+        Backend backendV1 = getBackend("initial_version_2_12_1.anki2");
         String[] names = backendV1.getColumnNames("select * from col");
 
         assertThat(names, is(new String[] { "id", "crt", "mod", "scm", "ver", "dty", "usn", "ls", "conf", "models", "decks", "dconf", "tags" }));

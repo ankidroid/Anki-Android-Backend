@@ -141,7 +141,7 @@ public class BackendSlowTests extends InstrumentedTest {
         at android.app.Instrumentation$InstrumentationThread.run(Instrumentation.java:1837)
          */
 
-        try (BackendV1 backend = super.getBackend("initial_version_2_12_1.anki2")) {
+        try (Backend backend = super.getBackend("initial_version_2_12_1.anki2")) {
             SupportSQLiteDatabase db = new RustV11SupportSQLiteOpenHelper(backend).getWritableDatabase();
 
             db.query("create table tmp (id varchar)");

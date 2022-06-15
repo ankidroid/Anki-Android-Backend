@@ -24,6 +24,7 @@ import anki.backend.GeneratedBackend
 import anki.generic.Int64
 import com.google.protobuf.ByteString
 import com.google.protobuf.InvalidProtocolBufferException
+import net.ankiweb.rsdroid.database.SQLHandler
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -32,15 +33,19 @@ import java.io.Closeable
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
-open class BackendV1Impl(langs: Iterable<String> = listOf("en")) : GeneratedBackend(), BackendV1, Closeable {
+open class Backend(langs: Iterable<String> = listOf("en")) : GeneratedBackend(), SQLHandler, Closeable {
     // Set on init; unset on .close(). Access via withBackend()
     private var backendPointer: Long? = null
     private val lock = ReentrantLock()
     // Only stored to satisfy .getPath() interface in SQL connection
     private var collectionPath: String? = null
 
-    override fun isOpen(): Boolean {
+    fun isOpen(): Boolean {
         return backendPointer != null
+    }
+
+    fun openCollection(collectionPath: String, forceSchema11: Boolean = true) {
+        openCollection(collectionPath, "", "", "", forceSchema11)
     }
 
     /**
@@ -149,8 +154,8 @@ open class BackendV1Impl(langs: Iterable<String> = listOf("en")) : GeneratedBack
         closeCollection(false)
     }
     
-    override fun getPath(): String {
-        return collectionPath!!
+    override fun getPath(): String? {
+        return collectionPath
     }
 
     @CheckResult
@@ -214,31 +219,6 @@ open class BackendV1Impl(langs: Iterable<String> = listOf("en")) : GeneratedBack
         Timber.i("Rust: getColumnNames %s", sql)
         return getColumnNamesFromQuery(sql).valsList.toTypedArray()
     }
-    
-    //    @Override
-    //    public AdBackend.SchedTimingTodayOut2 schedTimingTodayLegacy(long createdSecs, int createdMinsWest, long nowSecs, int nowMinsWest, int rolloverHour) {
-    //        return ankiDroidBackend.schedTimingTodayLegacy(createdSecs, createdMinsWest, nowSecs, nowMinsWest, rolloverHour);
-    //    }
-    //
-    //    @Override
-    //    public AdBackend.LocalMinutesWestOut localMinutesWestLegacy(long collectionCreationTime) {
-    //        return ankiDroidBackend.localMinutesWestLegacy(collectionCreationTime);
-    //    }
-    //
-    //    @Override
-    //    @RustCleanup("Architecture - backendPtr param is not required")
-    //    public AdBackend.DebugActiveDatabaseSequenceNumbersOut debugActiveDatabaseSequenceNumbers(long backendPtr) {
-    //        return ankiDroidBackend.debugActiveDatabaseSequenceNumbers(ensureBackend().toJni());
-    //    }
-    //
-    //    @Override
-    //    public void downgradeBackend(String collectionPath) {
-    //        if (!new File(collectionPath).exists()) {
-    //            throw new BackendException(collectionPath + " not found");
-    //        }
-    //
-    //        ankiDroidBackend.downgradeBackend(collectionPath);
-    //    }
 }
 
 /**
