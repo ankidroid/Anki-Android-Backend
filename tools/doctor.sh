@@ -62,9 +62,9 @@ else
 fi
 
 
-cecho $lgray "Installing rust 1.54.0" # nightly" - temporarily using 1.54.0 - see #168
-rustup install 1.54.0 #nightly
-rustup default 1.54.0
+cecho $lgray "Installing rust 1.58.1"
+rustup install 1.58.1
+rustup default 1.58.1
 
 
 cecho $lgray "Adding rust android targets"

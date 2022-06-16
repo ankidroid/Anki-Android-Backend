@@ -13,7 +13,7 @@ Install NDK:
 
 Install Rust:
 
-- rustup install 1.54.0
+- rustup install 1.58.1
 - rustup target add x86_64-linux-android
 - sudo ln -sf /usr/bin/gcc /usr/bin/x86_64--unknown-linux-gnu-gcc
 
