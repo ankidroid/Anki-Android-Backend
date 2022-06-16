@@ -11,61 +11,60 @@ jobs:
   build:
     runs-on: windows-latest
     steps:
-    
-    - uses: actions/checkout@v2
-    
-    - name: Fetch submodules
-      run:  git submodule update --init --recursive --remote --force
+      - uses: actions/checkout@v2
 
-    - name: Configure JDK 1.11
-      uses: actions/setup-java@v3
-      with:
-        distribution: "adopt"
-        java-version: "11" # minimum for Android API31
+      - name: Fetch submodules
+        run: git submodule update --init --recursive --remote --force
 
-    - name: Install Android Command Line Tools
-      uses: android-actions/setup-android@v2
+      - name: Configure JDK 1.11
+        uses: actions/setup-java@v3
+        with:
+          distribution: "adopt"
+          java-version: "11" # minimum for Android API31
 
-    - name: Install NDK (Windows - silent)
-      if: matrix.os == 'windows-latest'
-      run: |
-        Write-Host "NDK Install Started"
-        (. sdkmanager.bat --install "ndk;22.0.7026061" --sdk_root="$Env:ANDROID_SDK_ROOT") | out-null
-        Write-Host "NDK Install Completed"
+      - name: Install Android Command Line Tools
+        uses: android-actions/setup-android@v2
 
-    - name: Install Rust
-      uses: actions-rs/toolchain@v1.0.6
-      with:
-        toolchain: 1.58.1
-        override: true
-        components: rustfmt
+      - name: Install NDK (Windows - silent)
+        if: matrix.os == 'windows-latest'
+        run: |
+          Write-Host "NDK Install Started"
+          (. sdkmanager.bat --install "ndk;22.0.7026061" --sdk_root="$Env:ANDROID_SDK_ROOT") | out-null
+          Write-Host "NDK Install Completed"
 
-    # actions-rs only accepts "target" (although a "targets" param to be added in v2). We need 4 targets.
-    - name: Install Rust Targets
-      run: .github/scripts/install_rust_targets.sh
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1.0.6
+        with:
+          toolchain: 1.58.1
+          override: true
+          components: rustfmt
 
-    - name: Install Protoc
-      uses: arduino/setup-protoc@v1
-      with:
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
+      # actions-rs only accepts "target" (although a "targets" param to be added in v2). We need 4 targets.
+      - name: Install Rust Targets
+        run: .github/scripts/install_rust_targets.sh
 
-    - name: Install & Test Protobuf
-      run: |
-              Set-Alias -Name "python3" -Value "python"
-              pip3 install protobuf
-              python3 .github/scripts/protoc_gen_deps.py
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Rust Cache
-      uses: actions/cache@v2
-      with:
-        path: |
-          ~/.cargo/registry
-          ~/.cargo/git
-          rslib-bridge/target
-        key: ${{ runner.os }}-rust-v1-assembleRelease-${{ hashFiles('rslib-bridge/**/Cargo.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-rust-v1-assembleRelease
-          ${{ runner.os }}-rust-v1
+      - name: Install & Test Protobuf
+        run: |
+          Set-Alias -Name "python3" -Value "python"
+          pip3 install protobuf stringcase
+          python3 .github/scripts/protoc_gen_deps.py
 
-    - name: Build
-      run: ./gradlew clean assembleRelease -DtestBuildType=release
+      - name: Rust Cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            rslib-bridge/target
+          key: ${{ runner.os }}-rust-v1-assembleRelease-${{ hashFiles('rslib-bridge/**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-rust-v1-assembleRelease
+            ${{ runner.os }}-rust-v1
+
+      - name: Build
+        run: ./gradlew clean assembleRelease -DtestBuildType=release

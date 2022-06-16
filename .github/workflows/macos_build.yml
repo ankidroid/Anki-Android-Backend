@@ -16,72 +16,71 @@ jobs:
     runs-on: macos-latest
     timeout-minutes: 80
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - name: Fetch submodules
-      run:  git submodule update --init --recursive --remote --force
+      - name: Fetch submodules
+        run: git submodule update --init --recursive --remote --force
 
-    - name: Configure JDK 1.11
-      uses: actions/setup-java@v3
-      with:
-        distribution: "adopt"
-        java-version: "11" # minimum for Android API31
+      - name: Configure JDK 1.11
+        uses: actions/setup-java@v3
+        with:
+          distribution: "adopt"
+          java-version: "11" # minimum for Android API31
 
-    - name: Install Android Command Line Tools
-      uses: android-actions/setup-android@v2
+      - name: Install Android Command Line Tools
+        uses: android-actions/setup-android@v2
 
-    - name: Install NDK
-      run: .github/scripts/install_ndk.sh 22.0.7026061
+      - name: Install NDK
+        run: .github/scripts/install_ndk.sh 22.0.7026061
 
-    - name: Test NDK
-      run: echo "NDK set to $ANDROID_NDK_HOME"
+      - name: Test NDK
+        run: echo "NDK set to $ANDROID_NDK_HOME"
 
-    - name: Install Rust
-      uses: actions-rs/toolchain@v1.0.6
-      with:
-        toolchain: 1.58.1
-        override: true
-        components: rustfmt
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1.0.6
+        with:
+          toolchain: 1.58.1
+          override: true
+          components: rustfmt
 
-    # actions-rs only accepts "target" (although a "targets" param to be added in v2). We need 7 targets.
-    - name: Install Rust Targets
-      run: .github/scripts/install_rust_targets.sh
+      # actions-rs only accepts "target" (although a "targets" param to be added in v2). We need 7 targets.
+      - name: Install Rust Targets
+        run: .github/scripts/install_rust_targets.sh
 
-    - name: Install Protoc
-      uses: arduino/setup-protoc@v1
-      with:
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Install & Test Protobuf Compiler
-      run: |
-              pip3 install protobuf
-              python3 .github/scripts/protoc_gen_deps.py
+      - name: Install & Test Protobuf Compiler
+        run: |
+          pip3 install protobuf stringcase
+          python3 .github/scripts/protoc_gen_deps.py
 
-    - name: Rust Cache
-      uses: actions/cache@v2
-      with:
-        path: |
-          ~/.cargo/registry
-          ~/.cargo/git
-          rslib-bridge/target
-        key: ${{ runner.os }}-rust-v1-assembleDebug-${{ hashFiles('rslib-bridge/**/Cargo.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-rust-v1-assembleDebug
-          ${{ runner.os }}-rust-v1
+      - name: Rust Cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            rslib-bridge/target
+          key: ${{ runner.os }}-rust-v1-assembleDebug-${{ hashFiles('rslib-bridge/**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-rust-v1-assembleDebug
+            ${{ runner.os }}-rust-v1
 
-    - name: Build
-      run: ./gradlew clean assembleDebug -DtestBuildType=debug -Dorg.gradle.daemon=false -Dorg.gradle.console=plain
+      - name: Build
+        run: ./gradlew clean assembleDebug -DtestBuildType=debug -Dorg.gradle.daemon=false -Dorg.gradle.console=plain
 
-    - name: Build Instrumented Test APKs
-      run: ./gradlew rsdroid-instrumented:assembleDebug rsdroid-instrumented:assembleAndroidTest -DtestBuildType=debug -Dorg.gradle.daemon=false -Dorg.gradle.console=plain
+      - name: Build Instrumented Test APKs
+        run: ./gradlew rsdroid-instrumented:assembleDebug rsdroid-instrumented:assembleAndroidTest -DtestBuildType=debug -Dorg.gradle.daemon=false -Dorg.gradle.console=plain
 
-    - name: Upload APKs as Artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: rsdroid-instrumented
-        if-no-files-found: error
-        path: rsdroid-instrumented/build/outputs/apk
-
+      - name: Upload APKs as Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: rsdroid-instrumented
+          if-no-files-found: error
+          path: rsdroid-instrumented/build/outputs/apk
 
   test:
     needs: build
@@ -93,37 +92,37 @@ jobs:
         api-level: [21]
         arch: [x86, x86_64] # arm and arm64 are not supported by reactivecircus/android-emulator-runner
     steps:
-    - uses: actions/checkout@v2
-      name: Checkout
+      - uses: actions/checkout@v2
+        name: Checkout
 
-    # COULD_BE_BETTER: This may not be needed - tiny speed penalty
-    - name: Fetch submodules
-      run:  git submodule update --init --recursive --remote --force
+      # COULD_BE_BETTER: This may not be needed - tiny speed penalty
+      - name: Fetch submodules
+        run: git submodule update --init --recursive --remote --force
 
-    - name: Download APKs
-      uses: actions/download-artifact@v2
-      with:
-        name: rsdroid-instrumented
-        path: rsdroid-instrumented/build/outputs/apk
+      - name: Download APKs
+        uses: actions/download-artifact@v2
+        with:
+          name: rsdroid-instrumented
+          path: rsdroid-instrumented/build/outputs/apk
 
-    - name: Configure JDK 1.11
-      uses: actions/setup-java@v3
-      with:
-        distribution: "adopt"
-        java-version: "11" # minimum for Android API31
+      - name: Configure JDK 1.11
+        uses: actions/setup-java@v3
+        with:
+          distribution: "adopt"
+          java-version: "11" # minimum for Android API31
 
-    - name: Install Android Command Line Tools
-      uses: android-actions/setup-android@v2
+      - name: Install Android Command Line Tools
+        uses: android-actions/setup-android@v2
 
-    - name: Install NDK
-      run: .github/scripts/install_ndk.sh 22.0.7026061
+      - name: Install NDK
+        run: .github/scripts/install_ndk.sh 22.0.7026061
 
-    - name: run tests
-      uses: reactivecircus/android-emulator-runner@v2
-      timeout-minutes: 30
-      with:
-        api-level: ${{ matrix.api-level }}
-        target: default
-        arch: ${{ matrix.arch }}
-        profile: Nexus 6
-        script: ./gradlew rsdroid-instrumented:connectedCheck -x rsdroid-instrumented:packageDebugAndroidTest -x rsdroid-instrumented:packageDebug
+      - name: run tests
+        uses: reactivecircus/android-emulator-runner@v2
+        timeout-minutes: 30
+        with:
+          api-level: ${{ matrix.api-level }}
+          target: default
+          arch: ${{ matrix.arch }}
+          profile: Nexus 6
+          script: ./gradlew rsdroid-instrumented:connectedCheck -x rsdroid-instrumented:packageDebugAndroidTest -x rsdroid-instrumented:packageDebug

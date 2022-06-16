@@ -114,11 +114,12 @@ cargo install cross --git https://github.com/rust-embedded/cross --tag v0.2.1
 - macOS this should be `brew install python`
 - linux you may need to make sure `python` exists instead of just `python3`, for example `sudo apt install python-is-python3`
 
-#### Install protobuf package
+#### Install python packages
 
 ```bash
-pip install protobuf
+pip install protobuf stringcase
 ```
+
 
 ## Make sure it works
 

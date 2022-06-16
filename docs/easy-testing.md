@@ -20,7 +20,10 @@ Install Rust:
 Install protobuf:
 
 - Install protobuf with your package manager
-- pip install protobuf, or see the venv section below
+
+Install Python packages
+
+- pip install protobuf stringcase, or see the venv section below
 
 ## Limit build to x86_64
 
