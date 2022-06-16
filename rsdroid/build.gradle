@@ -41,6 +41,12 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
+    sourceSets {
+        main {
+            kotlin.srcDirs += "build/generated/source/fluent"
+        }
+    }
 }
 
 // Consider upgrade to DSL: https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
@@ -73,6 +79,17 @@ dependencies {
 
 }
 
+task generateTranslations(type: Exec) {
+    workingDir "$rootDir"
+    String genPath = System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows') ? 'tools\\genfluent\\genfluent.bat' : 'tools/genfluent/genfluent.sh'
+    if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
+        commandLine 'cmd', '/c', genPath
+    } else {
+        commandLine 'sh', '-c', genPath
+    }
+}
+
+preBuild.dependsOn "generateTranslations"
 preBuild.dependsOn "cargoBuild"
 
 signing {
