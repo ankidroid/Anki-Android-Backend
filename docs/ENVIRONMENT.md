@@ -61,11 +61,11 @@ You should open Android Studio and use the Tools --> SDK Manager to download the
 
 Install rust via [rustup](https://rustup.rs/)
 
-Configure rust to use version 1.54.0 since current does not work yet [#168](https://github.com/ankidroid/Anki-Android-Backend/issues/168)
+Install the Rust version the desktop code uses (later is probably fine too):
 
 ```bash
-rustup install 1.54.0
-rustup default 1.54.0
+rustup install 1.58.1
+rustup default 1.58.1
 ```
 
 #### Android targets
