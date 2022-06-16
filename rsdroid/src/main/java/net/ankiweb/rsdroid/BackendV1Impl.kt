@@ -23,7 +23,6 @@ import anki.backend.BackendInit
 import anki.backend.GeneratedBackend
 import anki.generic.Int64
 import com.google.protobuf.ByteString
-import com.google.protobuf.GeneratedMessageV3
 import com.google.protobuf.InvalidProtocolBufferException
 import org.json.JSONArray
 import org.json.JSONException
@@ -43,7 +42,6 @@ open class BackendV1Impl(langs: Iterable<String> = listOf("en")) : GeneratedBack
     override fun isOpen(): Boolean {
         return backendPointer != null
     }
-
 
     /**
      * Open a backend instance, loading the shared library if not already loaded.
@@ -79,7 +77,11 @@ open class BackendV1Impl(langs: Iterable<String> = listOf("en")) : GeneratedBack
      * Open a collection. There must not already be an open collection.
      */
     override fun openCollection(collectionPath: String, mediaFolderPath: String, mediaDbPath: String, logPath: String, forceSchema11: Boolean) {
-        super.openCollection(collectionPath, mediaFolderPath, mediaDbPath, logPath, forceSchema11)
+        try {
+            super<GeneratedBackend>.openCollection(collectionPath, mediaFolderPath, mediaDbPath, logPath, forceSchema11)
+        } catch (exc: BackendException.BackendDbException) {
+            throw exc.toSQLiteException("db open")
+        }
         this.collectionPath = collectionPath
     }
 
@@ -146,40 +148,41 @@ open class BackendV1Impl(langs: Iterable<String> = listOf("en")) : GeneratedBack
     override fun closeDatabase() {
         closeCollection(false)
     }
-
+    
     override fun getPath(): String {
         return collectionPath!!
     }
 
     @CheckResult
-    override fun fullQuery(sql: String, vararg args: Any?): JSONArray {
+    override fun fullQuery(sql: String, bindArgs: Array<Any?>?): JSONArray {
         return try {
             Timber.i("Rust: SQL query: '%s'", sql)
-            fullQueryInternal(sql, args as Array<Any?>)
+            fullQueryInternal(sql, bindArgs)
         } catch (e: JSONException) {
             throw RuntimeException(e)
         }
     }
 
     @Throws(JSONException::class)
-    private fun fullQueryInternal(sql: String, args: Array<Any?>): JSONArray {
-        return JSONArray(runDbCommand(dbRequestJson(sql, args)).json.toString())
+    private fun fullQueryInternal(sql: String, bindArgs: Array<Any?>?): JSONArray {
+        val output = runDbCommand(dbRequestJson(sql, bindArgs)).json.toStringUtf8()
+        return JSONArray(output)
     }
 
-    override fun insertForId(sql: String, args: Array<Any?>): Long {
+    override fun insertForId(sql: String, bindArgs: Array<Any?>?): Long {
         Timber.i("Rust: sql insert %s", sql)
-        return super.insertForId(dbRequestJson(sql, args)).`val`
+        return super.insertForId(dbRequestJson(sql, bindArgs)).`val`
     }
 
-    override fun executeGetRowsAffected(sql: String, args: Array<Any?>): Int {
+    override fun executeGetRowsAffected(sql: String, bindArgs: Array<Any?>?): Int {
         Timber.i("Rust: executeGetRowsAffected %s", sql)
-        return runDbCommandForRowCount(dbRequestJson(sql, args)).`val`.toInt()
+        return runDbCommandForRowCount(dbRequestJson(sql, bindArgs)).`val`.toInt()
     }
 
     /* Begin Protobuf-based database streaming methods (#6) */
-    override fun fullQueryProto(query: String, vararg args: Any?): DBResponse {
-        Timber.d("Rust: fullQueryProto %s", query)
-        return runDbCommandProto(dbRequestJson(query, args as Array<Any?>))
+    override fun fullQueryProto(query: String, bindArgs: Array<Any?>?): DBResponse {
+        Timber.e("Rust: fullQueryProto %s", query)
+        return runDbCommandProto(dbRequestJson(query, bindArgs))
     }
 
     override fun getNextSlice(startIndex: Long, sequenceNumber: Int): DBResponse {
@@ -241,11 +244,11 @@ open class BackendV1Impl(langs: Iterable<String> = listOf("en")) : GeneratedBack
 /**
  * Build a JSON DB request
  */
-private fun dbRequestJson(sql: String = "", args: Array<Any?> = arrayOf(), kind: DbRequestKind = DbRequestKind.Query, firstRowOnly: Boolean = false): ByteString {
+private fun dbRequestJson(sql: String = "", bindArgs: Array<Any?>? = null, kind: DbRequestKind = DbRequestKind.Query, firstRowOnly: Boolean = false): ByteString {
     val o = JSONObject()
     o.put("kind", kind.name.lowercase())
     o.put("sql", sql)
-    o.put("args", JSONArray(args))
+    o.put("args", JSONArray((bindArgs ?: arrayOf()).toList()))
     o.put("first_row_only", firstRowOnly)
     return ByteString.copyFromUtf8(o.toString())
 }
@@ -273,6 +276,7 @@ private fun unpackResult(result: Array<ByteArray?>?): ByteArray {
         } catch (invalidProtocolBufferException: InvalidProtocolBufferException) {
             throw BackendException.fromException(invalidProtocolBufferException)
         }
+        print(pbError)
         throw BackendException.fromError(pbError)
     } else if (successBytes != null) {
         return successBytes

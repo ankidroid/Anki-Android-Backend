@@ -1,10 +1,8 @@
 package net.ankiweb.rsdroid
 
-import net.ankiweb.rsdroid.RustBackendFailedException
 import android.os.Build
 import androidx.annotation.CheckResult
-import kotlin.Throws
-import net.ankiweb.rsdroid.NativeMethods
+import net.ankiweb.rsdroid.RustBackendFailedException
 
 object NativeMethods {
     private var hasSetUp = false

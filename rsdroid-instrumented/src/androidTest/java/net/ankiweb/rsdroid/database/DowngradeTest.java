@@ -36,62 +36,16 @@ public class DowngradeTest extends InstrumentedTest {
 
 
     @Test
-    public void downgradeWithV16() throws IOException, JSONException {
+    public void downgradeWithLaterSchema() throws IOException, JSONException {
         String fileName = "schema_16.anki2";
-
         String path = getAssetFilePath(fileName);
-
-        // opening the backend fails
-        assertOpeningFails(path);
-
-        downgrade(path);
-
-        // now it works
         try (BackendV1 backendV1 = super.getBackendFromPath(path) ){
             assertSchemaVer(backendV1, 11);
         }
-    }
-
-    @Test
-    public void downgradeWithV17FailsAsTooNew() {
-        String fileName = "schema_17.anki2";
-
-        String path = getAssetFilePath(fileName);
-
-        // opening the backend fails
-        assertOpeningFails(path);
-
-        try {
-            downgrade(path);
-            fail();
-        } catch (BackendException ex) {
-            assertThat(ex.getMessage(), containsString("FileTooNew"));
-        }
-    }
-
-
-    @Test
-    public void downgradeWithV11Fails() throws JSONException, IOException {
-        // A downgrade will throw an exception if the file is less than schema 16
-
-        String fileName = "initial_version_2_12_1.anki2";
-
-        String path = getAssetFilePath(fileName);
-
-        try (BackendV1 backend = getBackendFromPath(path)) {
-            assertSchemaVer(backend, 11);
-        }
-
-        try {
-            downgrade(path);
-            fail();
-        } catch (Exception e) {
-            assertThat(e.getMessage(), containsString("FileTooOld"));
-            assertThat(e.getMessage(), containsString("Schema11"));
-        }
-
-        try (BackendV1 backend = getBackendFromPath(path)) {
-            assertSchemaVer(backend, 11);
+        fileName = "schema_17.anki2";
+        path = getAssetFilePath(fileName);
+        try (BackendV1 backendV1 = super.getBackendFromPath(path) ){
+            assertSchemaVer(backendV1, 11);
         }
     }
 
@@ -102,11 +56,6 @@ public class DowngradeTest extends InstrumentedTest {
         JSONArray subArray = array.getJSONArray(0);
         assertThat(subArray.length(), is(1));
         assertThat(subArray.optInt(0, 0), is(expectedVersion));
-    }
-
-    private void downgrade(String collectionPath) {
-        BackendV1 backendV1 = getClosedBackend();
-        backendV1.downgradeBackend(collectionPath);
     }
 
     @SuppressWarnings({"unused", "RedundantSuppression"})

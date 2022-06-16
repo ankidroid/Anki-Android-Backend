@@ -22,12 +22,14 @@ import android.util.Log;
 
 import androidx.test.platform.app.InstrumentationRegistry;
 
+import net.ankiweb.rsdroid.BackendException;
 import net.ankiweb.rsdroid.BackendFactory;
 import net.ankiweb.rsdroid.BackendUtils;
 import net.ankiweb.rsdroid.BackendV1;
 import net.ankiweb.rsdroid.BackendV1Impl;
 import net.ankiweb.rsdroid.NativeMethods;
 import net.ankiweb.rsdroid.RustBackendFailedException;
+import net.ankiweb.rsdroid.exceptions.BackendInvalidInputException;
 
 import org.jetbrains.annotations.NotNull;
 import org.junit.After;
@@ -36,6 +38,7 @@ import org.junit.Before;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertThat;
 
@@ -62,14 +65,21 @@ public class InstrumentedTest {
         } catch (RustBackendFailedException e) {
             throw new RuntimeException(e);
         }
-        BackendV1Impl.setPageSizeForTesting(TEST_PAGE_SIZE);
     }
 
     @After
     public void after() {
         for (BackendV1 b : backendList) {
             if (b != null && b.isOpen()) {
-                assertThat("All database cursors should be closed", b.debugActiveDatabaseSequenceNumbers(0).getSequenceNumbersList(), empty());
+                
+                List<Integer> numbers;
+                try {
+                    numbers = b.getActiveSequenceNumbers().getNumbersList();
+                } catch (BackendInvalidInputException exc) {
+                    assertThat(exc.getLocalizedMessage(), containsString("CollectionNotOpen"));
+                    continue;
+                }
+                assertThat("All database cursors should be closed", numbers, empty());
             }
         }
         backendList.clear();
@@ -120,7 +130,8 @@ public class InstrumentedTest {
     @NotNull
     protected BackendV1 getBackendFromPath(String path) {
         BackendV1 backendV1 = getClosedBackend();
-        BackendUtils.openAnkiDroidCollection(backendV1, path);
+        backendV1.setPageSize(TEST_PAGE_SIZE);
+        BackendUtils.openAnkiDroidCollection(backendV1, path, true);
         this.backendList.add(backendV1);
         return backendV1;
     }
