@@ -107,13 +107,6 @@ jobs:
           if-no-files-found: error
           path: rsdroid-testing/build/libs/
 
-      - name: Upload fluent.proto
-        uses: actions/upload-artifact@v2
-        with:
-          name: anki-proto
-          if-no-files-found: error
-          path: rslib-bridge/anki/proto/
-
   test:
     needs: build
     runs-on: ${{matrix.os}}
@@ -133,20 +126,6 @@ jobs:
         with:
           name: rsdroid-testing
           path: rsdroid-testing/build/libs
-
-      - uses: actions/download-artifact@v2
-        name: Download fluent.proto
-        with:
-          name: anki-proto
-          path: rslib-bridge/anki/proto/
-
-      - name: Ensure fluent.proto exists
-        if: matrix.os != 'windows-latest'
-        run: |
-          if [ ! -f rslib-bridge/anki/proto/fluent.proto ]; then
-              echo "fluent.proto not generated"
-              exit 1
-          fi
 
       - name: Configure JDK 1.11
         uses: actions/setup-java@v3
