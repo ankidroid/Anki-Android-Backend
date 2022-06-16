@@ -9,54 +9,58 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - name: Fetch submodules
-      run:  git submodule update --init --recursive --remote --force
+      - name: Fetch submodules
+        run: git submodule update --init --recursive --remote --force
 
-    - name: Configure JDK 1.11
-      uses: actions/setup-java@v3
-      with:
-        distribution: "adopt"
-        java-version: "11" # minimum for Android API31
+      - name: Configure JDK 1.11
+        uses: actions/setup-java@v3
+        with:
+          distribution: "adopt"
+          java-version: "11" # minimum for Android API31
 
-    - name: Install Android Command Line Tools
-      uses: android-actions/setup-android@v2
+      - name: Install Android Command Line Tools
+        uses: android-actions/setup-android@v2
 
-    - name: Install NDK
-      run: .github/scripts/install_ndk.sh 22.0.7026061
+      - name: Install NDK
+        run: .github/scripts/install_ndk.sh 22.0.7026061
 
-    - name: Install linker
-      run: .github/scripts/linux_install_x86_64-unknown-linux-gnu-gcc.sh
+      - name: Install linker
+        run: .github/scripts/linux_install_x86_64-unknown-linux-gnu-gcc.sh
 
-    # install cargo
-    - name: Install Rust
-      uses: actions-rs/toolchain@v1.0.6
-      with:
-        toolchain: 1.58.1
-        override: true
-        components: rustfmt
+      # install cargo
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1.0.6
+        with:
+          toolchain: 1.58.1
+          override: true
+          components: rustfmt
 
-    # actions-rs only accepts "target" (although a "targets" param to be added in v2). We need 7 targets.
-    - name: Install Rust Targets
-      run: .github/scripts/install_rust_targets.sh
+      # actions-rs only accepts "target" (although a "targets" param to be added in v2). We need 7 targets.
+      - name: Install Rust Targets
+        run: .github/scripts/install_rust_targets.sh
 
-    - name: Install Protoc
-      uses: arduino/setup-protoc@v1
-      with:
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Build
-      run: ./gradlew clean assembleRelease -DtestBuildType=release -Dorg.gradle.daemon=false -Dorg.gradle.console=plain
-      
-    - name: Publish AAR to Maven
-      env:
-        ORG_GRADLE_PROJECT_SIGNING_PRIVATE_KEY: ${{ secrets.SIGNING_PRIVATE_KEY }}
-        ORG_GRADLE_PROJECT_SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
-        SONATYPE_NEXUS_USERNAME: david-allison-1
-        SONATYPE_NEXUS_PASSWORD: ${{ secrets.SONATYPE_NEXUS_PASSWORD }}
-      run: |
-             ./gradlew rsdroid:uploadArchives -DtestBuildType=release -Dorg.gradle.daemon=false -Dorg.gradle.console=plain
+      - name: Install Python libs
+        run: |
+          pip3 install stringcase
 
-    - name: ℹ️Additional Release Instructions (requires human interaction)
-      run: echo "Sign in to https://oss.sonatype.org/#stagingRepositories , close the repsository, then release it"
+      - name: Build
+        run: ./gradlew clean assembleRelease -DtestBuildType=release -Dorg.gradle.daemon=false -Dorg.gradle.console=plain
+
+      - name: Publish AAR to Maven
+        env:
+          ORG_GRADLE_PROJECT_SIGNING_PRIVATE_KEY: ${{ secrets.SIGNING_PRIVATE_KEY }}
+          ORG_GRADLE_PROJECT_SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+          SONATYPE_NEXUS_USERNAME: david-allison-1
+          SONATYPE_NEXUS_PASSWORD: ${{ secrets.SONATYPE_NEXUS_PASSWORD }}
+        run: |
+          ./gradlew rsdroid:uploadArchives -DtestBuildType=release -Dorg.gradle.daemon=false -Dorg.gradle.console=plain
+
+      - name: ℹ️Additional Release Instructions (requires human interaction)
+        run: echo "Sign in to https://oss.sonatype.org/#stagingRepositories , close the repsository, then release it"

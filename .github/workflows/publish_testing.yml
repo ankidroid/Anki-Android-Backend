@@ -35,6 +35,10 @@ jobs:
         override: true
         components: rustfmt
 
+    - name: Install Python libs
+      run: |
+        pip3 install stringcase
+
     # actions-rs only accepts "target" (although a "targets" param to be added in v2). We need 7 targets.
     - name: Install Rust Targets
       run: .github/scripts/install_rust_robolectric_targets.sh
