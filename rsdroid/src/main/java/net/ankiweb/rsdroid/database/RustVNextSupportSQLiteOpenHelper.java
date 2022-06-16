@@ -40,7 +40,7 @@ public class RustVNextSupportSQLiteOpenHelper extends RustSupportSQLiteOpenHelpe
         if (configuration != null) {
             BackendV1 backend = backendFactory.getBackend();
             // openCollection opens and upgrades the collection
-            backend.openCollection(configuration.name, null, null, null);
+//            backend.openCollection(configuration.name, null, null, null);
             return new RustSupportSQLiteDatabase(backend, readOnly);
         } else {
             return new RustSupportSQLiteDatabase(backend, readOnly);

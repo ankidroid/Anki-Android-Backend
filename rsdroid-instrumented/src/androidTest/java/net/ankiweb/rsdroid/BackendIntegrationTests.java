@@ -31,7 +31,7 @@ import org.junit.runner.RunWith;
 
 import java.util.concurrent.TimeUnit;
 
-import BackendProto.Backend.SchedTimingTodayOut;
+import anki.backend.SchedTimingTodayOut;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;

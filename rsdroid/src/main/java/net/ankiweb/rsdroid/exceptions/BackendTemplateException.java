@@ -18,14 +18,12 @@ package net.ankiweb.rsdroid.exceptions;
 
 import net.ankiweb.rsdroid.BackendException;
 
-import BackendProto.Backend;
-
 public class BackendTemplateException extends BackendException {
-    public BackendTemplateException(Backend.BackendError error) {
+    public BackendTemplateException(anki.backend.BackendError error) {
         super(error);
     }
 
-    public static BackendTemplateException fromTemplateError(Backend.BackendError error) {
+    public static BackendTemplateException fromTemplateError(anki.backend.BackendError error) {
 
         if (error.getLocalized() == null) {
             return new BackendTemplateException(error);
@@ -39,7 +37,7 @@ public class BackendTemplateException extends BackendException {
     }
 
     public static class BackendTemplateSaveException extends BackendTemplateException {
-        public BackendTemplateSaveException(Backend.BackendError error) {
+        public BackendTemplateSaveException(anki.backend.BackendError error) {
             super(error);
         }
     }

@@ -26,8 +26,6 @@ import net.ankiweb.rsdroid.utils.StringToLong;
 
 import java.util.Locale;
 
-import BackendProto.Sqlite;
-
 public class StreamingProtobufSQLiteCursor extends AnkiDatabaseCursor {
     /**
      * Rust Implementation:
@@ -41,7 +39,7 @@ public class StreamingProtobufSQLiteCursor extends AnkiDatabaseCursor {
 
     private final SQLHandler backend;
     private final String query;
-    private Sqlite.DBResponse results;
+    private anki.ankidroid.DBResponse results;
     /** The local position in the current slice */
     private int positionInSlice = -1;
     private String[] columnMapping;
@@ -167,7 +165,7 @@ public class StreamingProtobufSQLiteCursor extends AnkiDatabaseCursor {
 
     @Override
     public String getString(int columnIndex) {
-        Sqlite.SqlValue field = getFieldAtIndex(columnIndex);
+        anki.ankidroid.SqlValue field = getFieldAtIndex(columnIndex);
         switch (field.getDataCase()) {
             case BLOBVALUE: throw new SQLiteException("unknown error (code 0): Unable to convert BLOB to string");
             case LONGVALUE: return Long.toString(field.getLongValue());
@@ -180,7 +178,7 @@ public class StreamingProtobufSQLiteCursor extends AnkiDatabaseCursor {
 
     @Override
     public long getLong(int columnIndex) {
-        Sqlite.SqlValue field = getFieldAtIndex(columnIndex);
+        anki.ankidroid.SqlValue field = getFieldAtIndex(columnIndex);
         switch (field.getDataCase()) {
             case BLOBVALUE: throw new SQLiteException("unknown error (code 0): Unable to convert BLOB to long");
             case LONGVALUE: return field.getLongValue();
@@ -193,7 +191,7 @@ public class StreamingProtobufSQLiteCursor extends AnkiDatabaseCursor {
 
     @Override
     public double getDouble(int columnIndex) {
-        Sqlite.SqlValue field = getFieldAtIndex(columnIndex);
+        anki.ankidroid.SqlValue field = getFieldAtIndex(columnIndex);
         switch (field.getDataCase()) {
             case BLOBVALUE: throw new SQLiteException("unknown error (code 0): Unable to convert BLOB to double");
             case LONGVALUE: return field.getLongValue();
@@ -219,13 +217,13 @@ public class StreamingProtobufSQLiteCursor extends AnkiDatabaseCursor {
         return (float) getDouble(columnIndex);
     }
 
-    private boolean isNull(Sqlite.SqlValue field) {
-        return field.getDataCase() == Sqlite.SqlValue.DataCase.DATA_NOT_SET;
+    private boolean isNull(anki.ankidroid.SqlValue field) {
+        return field.getDataCase() == anki.ankidroid.SqlValue.DataCase.DATA_NOT_SET;
     }
 
     @Override
     public boolean isNull(int columnIndex) {
-        Sqlite.SqlValue field = getFieldAtIndex(columnIndex);
+        anki.ankidroid.SqlValue field = getFieldAtIndex(columnIndex);
         return isNull(field);
     }
 
@@ -242,7 +240,7 @@ public class StreamingProtobufSQLiteCursor extends AnkiDatabaseCursor {
 
     @Override
     public int getType(int columnIndex) {
-        Sqlite.SqlValue field = getFieldAtIndex(columnIndex);
+        anki.ankidroid.SqlValue field = getFieldAtIndex(columnIndex);
         switch (field.getDataCase()) {
             case BLOBVALUE: return FIELD_TYPE_BLOB;
             case LONGVALUE: return FIELD_TYPE_INTEGER;
@@ -253,8 +251,8 @@ public class StreamingProtobufSQLiteCursor extends AnkiDatabaseCursor {
         }
     }
 
-    protected Sqlite.Row getRowAtCurrentPosition() {
-        Sqlite.DBResult result = results.getResult();
+    protected anki.ankidroid.Row getRowAtCurrentPosition() {
+        anki.ankidroid.DbResult result = results.getResult();
         int rowCount = getCurrentSliceRowCount();
         if (positionInSlice < 0 || positionInSlice >= rowCount) {
             throw new CursorIndexOutOfBoundsException(String.format(Locale.ROOT, "Index %d requested, with a size of %d", positionInSlice, rowCount));
@@ -262,7 +260,7 @@ public class StreamingProtobufSQLiteCursor extends AnkiDatabaseCursor {
         return result.getRows(positionInSlice);
     }
 
-    private Sqlite.SqlValue getFieldAtIndex(int columnIndex) {
+    private anki.ankidroid.SqlValue getFieldAtIndex(int columnIndex) {
         return getRowAtCurrentPosition().getFields(columnIndex);
     }
 

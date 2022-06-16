@@ -18,7 +18,7 @@ package net.ankiweb.rsdroid;
 
 import androidx.annotation.NonNull;
 
-import BackendProto.Backend;
+import net.ankiweb.rsdroid.database.NotImplementedException;
 
 public class BackendUtils {
     /**
@@ -26,7 +26,8 @@ public class BackendUtils {
      * @throws android.database.sqlite.SQLiteDatabaseCorruptException If database is corrupt
      */
     public static void openAnkiDroidCollection(BackendV1 backendV1, String path) {
-        backendV1.openAnkiDroidCollection(Backend.OpenCollectionIn.newBuilder().setCollectionPath(path).build());
+        throw new NotImplementedException();
+//        backendV1.openAnkiDroidCollection(Backend.OpenCol.newBuilder().setCollectionPath(path).build());
     }
 
     @NonNull

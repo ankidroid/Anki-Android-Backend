@@ -12,7 +12,7 @@ crate_type = ["dylib"]
 [dependencies]
 jni = { version = "0.17.0", default-features = false }
 anki = { path = "anki/rslib" }
-prost = "0.6.1"
+prost = "0.9"
 serde = "1.0.114"
 serde_json = "1.0.56"
 serde_derive = "1.0.114"
@@ -22,10 +22,10 @@ itertools = "0.10.0"
 lexical-core = "0.7.5"
 
 # picked bundled - TODO: Is this correct?
-rusqlite = { version = "0.23.1", features = ["trace", "functions", "collation", "bundled"] }
+rusqlite = { version = "0.26.0", features = ["trace", "functions", "collation", "bundled"] }
 
 [features]
 no-android = []
 
 [build-dependencies]
-prost-build = "0.6.1"
+prost-build = "0.9"

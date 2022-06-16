@@ -17,47 +17,47 @@
 package net.ankiweb.rsdroid.exceptions;
 
 import net.ankiweb.rsdroid.BackendException;
-
-import BackendProto.Backend;
+import net.ankiweb.rsdroid.database.NotImplementedException;
 
 public class BackendNetworkException extends BackendException {
-    public BackendNetworkException(Backend.BackendError error) {
+    public BackendNetworkException(anki.backend.BackendError error) {
         super(error);
     }
 
-    public static BackendNetworkException fromNetworkError(Backend.BackendError error) {
+    public static BackendNetworkException fromNetworkError(anki.backend.BackendError error) {
+        throw new NotImplementedException();
 
-        if (!error.hasNetworkError()) {
-            return new BackendNetworkException(error);
-        }
-
-        Backend.NetworkError networkError = error.getNetworkError();
-
-        switch (networkError.getKind()) {
-            case OFFLINE: return new BackendNetworkOfflineException(error);
-            case TIMEOUT: return new BackendNetworkTimeoutException(error);
-            case PROXY_AUTH: return new BackendNetworkProxyAuthException(error);
-            case UNRECOGNIZED:
-            case OTHER:
-        }
-
-        return new BackendNetworkException(error);
+//        if (!error.hasNetworkError()) {
+//            return new BackendNetworkException(error);
+//        }
+//
+//        anki.backend.NetworkError networkError = error.getNetworkError();
+//
+//        switch (networkError.getKind()) {
+//            case OFFLINE: return new BackendNetworkOfflineException(error);
+//            case TIMEOUT: return new BackendNetworkTimeoutException(error);
+//            case PROXY_AUTH: return new BackendNetworkProxyAuthException(error);
+//            case UNRECOGNIZED:
+//            case OTHER:
+//        }
+//
+//        return new BackendNetworkException(error);
     }
 
     public static class BackendNetworkOfflineException extends BackendNetworkException {
-        public BackendNetworkOfflineException(Backend.BackendError error) {
+        public BackendNetworkOfflineException(anki.backend.BackendError error) {
             super(error);
         }
     }
 
     public static class BackendNetworkTimeoutException extends BackendNetworkException {
-        public BackendNetworkTimeoutException(Backend.BackendError error) {
+        public BackendNetworkTimeoutException(anki.backend.BackendError error) {
             super(error);
         }
     }
 
     public static class BackendNetworkProxyAuthException extends BackendNetworkException {
-        public BackendNetworkProxyAuthException(Backend.BackendError error) {
+        public BackendNetworkProxyAuthException(anki.backend.BackendError error) {
             super(error);
         }
     }

@@ -38,8 +38,6 @@ import org.json.JSONArray;
 
 import java.util.Stack;
 
-import BackendProto.Sqlite;
-
 /** Handles transaction state management */
 public class Session implements SQLHandler {
     private final SQLHandler backend;
@@ -86,12 +84,12 @@ public class Session implements SQLHandler {
     }
 
     @Override
-    public Sqlite.DBResponse getNextSlice(long startIndex, int sequenceNumber) {
+    public anki.ankidroid.DBResponse getNextSlice(long startIndex, int sequenceNumber) {
         return backend.getNextSlice(startIndex, sequenceNumber);
     }
 
     @Override
-    public Sqlite.DBResponse fullQueryProto(String query, Object... bindArgs) {
+    public anki.ankidroid.DBResponse fullQueryProto(String query, Object... bindArgs) {
         return backend.fullQueryProto(query, bindArgs);
     }
 

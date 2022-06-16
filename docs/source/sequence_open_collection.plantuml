@@ -37,7 +37,7 @@ BackendUtils -> RustBackend : openAnkiDroidCollection(OpenCollectionIn)
     rslibbridge -> NativeMethods: byte[]
     NativeMethods -> RustBackend: byte[]
     RustBackend -> RustBackend: Check for error
-    RustBackend -> RustBackend: Response is Backend.Empty.\nReturn void
+    RustBackend -> RustBackend: Response is Generic.Empty.\nReturn void
     end
     
 RustBackend -> user

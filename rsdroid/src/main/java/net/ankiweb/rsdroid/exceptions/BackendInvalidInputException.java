@@ -18,8 +18,6 @@ package net.ankiweb.rsdroid.exceptions;
 
 import net.ankiweb.rsdroid.BackendException;
 
-import BackendProto.Backend;
-
 /**
  * A lot of exceptions get converted to Invalid Input when returned:
  *
@@ -28,11 +26,11 @@ import BackendProto.Backend;
  * SearchError
  */
 public class BackendInvalidInputException extends BackendException {
-    public BackendInvalidInputException(Backend.BackendError error) {
+    public BackendInvalidInputException(anki.backend.BackendError error) {
         super(error);
     }
 
-    public static BackendInvalidInputException fromInvalidInputError(Backend.BackendError error) {
+    public static BackendInvalidInputException fromInvalidInputError(anki.backend.BackendError error) {
         switch (error.getLocalized()) {
             case "CollectionAlreadyOpen": return new BackendCollectionAlreadyOpenException(error);
             case "CollectionNotOpen": return new BackendCollectionNotOpenException(error);
@@ -43,19 +41,19 @@ public class BackendInvalidInputException extends BackendException {
     }
 
     public static class BackendCollectionAlreadyOpenException extends BackendInvalidInputException {
-        public BackendCollectionAlreadyOpenException(Backend.BackendError error) {
+        public BackendCollectionAlreadyOpenException(anki.backend.BackendError error) {
             super(error);
         }
     }
 
     public static class BackendCollectionNotOpenException extends BackendInvalidInputException {
-        public BackendCollectionNotOpenException(Backend.BackendError error) {
+        public BackendCollectionNotOpenException(anki.backend.BackendError error) {
             super(error);
         }
     }
 
     public static class BackendSearchException extends BackendInvalidInputException {
-        public BackendSearchException(Backend.BackendError error) {
+        public BackendSearchException(anki.backend.BackendError error) {
             super(error);
         }
     }

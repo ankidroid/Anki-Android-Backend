@@ -23,6 +23,7 @@ import android.database.sqlite.SQLiteFullException;
 
 import androidx.annotation.Nullable;
 
+import net.ankiweb.rsdroid.database.NotImplementedException;
 import net.ankiweb.rsdroid.exceptions.BackendDeckIsFilteredException;
 import net.ankiweb.rsdroid.exceptions.BackendExistingException;
 import net.ankiweb.rsdroid.exceptions.BackendInterruptedException;
@@ -39,14 +40,14 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import BackendProto.Backend;
+import anki.backend.BackendError.Kind;
 
 public class BackendException extends RuntimeException {
     @SuppressWarnings({"unused", "RedundantSuppression"})
     @Nullable
-    private final Backend.BackendError error;
+    private final anki.backend.BackendError error;
 
-    public BackendException(Backend.BackendError error)  {
+    public BackendException(anki.backend.BackendError error)  {
         super(error.getLocalized());
         this.error = error;
     }
@@ -56,40 +57,44 @@ public class BackendException extends RuntimeException {
         error = null;
     }
 
-    public static BackendException fromError(Backend.BackendError error) {
-        switch (error.getValueCase()) {
-            case DB_ERROR:
-                return BackendDbException.fromDbError(error);
-            case JSON_ERROR:
-                return new BackendJsonException(error.getJsonError());
-            case SYNC_ERROR:
-                return BackendSyncException.fromSyncError(error);
-            case FATAL_ERROR:
-                // This should have produced a hasFatalError property
-                throw new BackendFatalError(error.getFatalError());
-            case EXISTS:
-                return new BackendExistingException(error);
-            case DECK_IS_FILTERED:
-                return new BackendDeckIsFilteredException(error);
-            case INTERRUPTED:
-                return new BackendInterruptedException(error);
-            case PROTO_ERROR:
-                return new BackendProtoException(error);
-            case NOT_FOUND_ERROR:
-                return new BackendNotFoundException(error);
-            case INVALID_INPUT:
-                return BackendInvalidInputException.fromInvalidInputError(error);
-            case NETWORK_ERROR:
-                return BackendNetworkException.fromNetworkError(error);
-            case TEMPLATE_PARSE:
-                return BackendTemplateException.fromTemplateError(error);
-            case IO_ERROR:
-                return new BackendIoException(error);
-            case VALUE_NOT_SET:
-        }
+    public static BackendException fromError(anki.backend.BackendError error) {
+        throw new NotImplementedException();
+//        switch (error.getKindValue()) {
+//            case Kind.DB_ERROR.:
+//                return BackendDbException.fromDbError(error);
+////            case Kind.JSON_ERROR:
+////                return new BackendJsonException(error.getJsonError());
+//            case Kind.SYNC_AUTH_ERROR:
+//                return new BackendSyncException.BackendSyncAuthFailedException(error);
+//            case Kind.SYNC_OTHER_ERROR:
+//                return new BackendSyncException.BackendSyncException(error);
+//                return BackendSyncException.fromSyncError(error);
+//            case Kind.FATAL_ERROR:
+//                // This should have produced a hasFatalError property
+//                throw new BackendFatalError(error.getFatalError());
+//            case Kind.EXISTS:
+//                return new BackendExistingException(error);
+////            case Kind.DECK_IS_FILTERED:
+////                return new BackendDeckIsFilteredException(error);
+//            case Kind.INTERRUPTED:
+//                return new BackendInterruptedException(error);
+//            case Kind.PROTO_ERROR:
+//                return new BackendProtoException(error);
+//            case Kind.NOT_FOUND_ERROR:
+//                return new BackendNotFoundException(error);
+//            case Kind.INVALID_INPUT:
+//                return BackendInvalidInputException.fromInvalidInputError(error);
+//            case Kind.NETWORK_ERROR:
+//                return BackendNetworkException.fromNetworkError(error);
+//            case Kind.TEMPLATE_PARSE:
+//                return BackendTemplateException.fromTemplateError(error);
+//            case Kind.IO_ERROR:
+//                return new BackendIoException(error);
+//            case Kind.VALUE_NOT_SET:
+//        }
 
 
-        return new BackendException(error);
+//        return new BackendException(error);
     }
 
     public static RuntimeException fromException(Exception ex) {
@@ -104,14 +109,14 @@ public class BackendException extends RuntimeException {
 
     public static class BackendDbException extends BackendException {
 
-        public BackendDbException(Backend.BackendError error) {
+        public BackendDbException(anki.backend.BackendError error) {
             // This is very simple for now and matches Anki Desktop (error is currently text)
             // Later on, we may want to use structured error messages
             // DBError { info: "SqliteFailure(Error { code: Unknown, extended_code: 1 }, Some(\"no such table: aa\"))", kind: Other }
             super(error);
         }
 
-        public static BackendException fromDbError(Backend.BackendError error) {
+        public static BackendException fromDbError(anki.backend.BackendError error) {
 
             String localised = error.getLocalized();
 
@@ -170,25 +175,25 @@ public class BackendException extends RuntimeException {
         }
 
         public static class BackendDbFileTooNewException extends BackendException {
-            public BackendDbFileTooNewException(Backend.BackendError error) {
+            public BackendDbFileTooNewException(anki.backend.BackendError error) {
                 super(error);
             }
         }
 
         public static class BackendDbFileTooOldException extends BackendException {
-            public BackendDbFileTooOldException(Backend.BackendError error) {
+            public BackendDbFileTooOldException(anki.backend.BackendError error) {
                 super(error);
             }
         }
 
         public static class BackendDbLockedException extends BackendException {
-            public BackendDbLockedException(Backend.BackendError error) {
+            public BackendDbLockedException(anki.backend.BackendError error) {
                 super(error);
             }
         }
 
         public static class BackendDbMissingEntityException extends BackendException {
-            public BackendDbMissingEntityException(Backend.BackendError error) {
+            public BackendDbMissingEntityException(anki.backend.BackendError error) {
                 super(error);
             }
         }
