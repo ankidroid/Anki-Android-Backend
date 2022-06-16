@@ -170,18 +170,18 @@ open class Backend(langs: Iterable<String> = listOf("en")) : GeneratedBackend(),
 
     @Throws(JSONException::class)
     private fun fullQueryInternal(sql: String, bindArgs: Array<Any?>?): JSONArray {
-        val output = runDbCommand(dbRequestJson(sql, bindArgs)).json.toStringUtf8()
+        val output = runDbCommand(dbRequestJson(sql, bindArgs)).toStringUtf8()
         return JSONArray(output)
     }
 
     override fun insertForId(sql: String, bindArgs: Array<Any?>?): Long {
         Timber.i("Rust: sql insert %s", sql)
-        return super.insertForId(dbRequestJson(sql, bindArgs)).`val`
+        return super.insertForId(dbRequestJson(sql, bindArgs))
     }
 
     override fun executeGetRowsAffected(sql: String, bindArgs: Array<Any?>?): Int {
         Timber.i("Rust: executeGetRowsAffected %s", sql)
-        return runDbCommandForRowCount(dbRequestJson(sql, bindArgs)).`val`.toInt()
+        return runDbCommandForRowCount(dbRequestJson(sql, bindArgs)).toInt()
     }
 
     /* Begin Protobuf-based database streaming methods (#6) */
@@ -217,7 +217,7 @@ open class Backend(langs: Iterable<String> = listOf("en")) : GeneratedBackend(),
 
     override fun getColumnNames(sql: String): Array<String> {
         Timber.i("Rust: getColumnNames %s", sql)
-        return getColumnNamesFromQuery(sql).valsList.toTypedArray()
+        return getColumnNamesFromQuery(sql).toTypedArray()
     }
 }
 

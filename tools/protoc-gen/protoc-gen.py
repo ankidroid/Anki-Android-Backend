@@ -8,6 +8,8 @@ import stringcase
 
 from google.protobuf.compiler import plugin_pb2 as plugin
 
+TYPE_ENUM = 14
+
 # Needs map<> and Fluent import rather than Backend
 ignore_methods_accepting = ["TranslateStringIn"]
 
@@ -37,52 +39,67 @@ def get_annotation(type, optional=False):
     else:
         return "@NonNull"
 
+def is_repeating(field):
+    return field.label == 3
+
+def as_getter(field):
+    if is_repeating(field):
+        return f"{field.name}List"
+    else:
+        return field.json_name
+
+# https://developers.google.com/protocol-buffers/docs/reference/cpp/google.protobuf.descriptor
+def to_java_type(type, field, output=False):
+    ### Converts a given protobuf type to the Java Equivalent: (int, or List<Double> for example) ###
+    primitive_list = {
+        1: "Double",
+        2: "Float",
+        3: "Long",
+        # 4 : "uint64",
+        5: "Int",
+        8: "Boolean",
+        9: "String",
+        12: "com.google.protobuf.ByteString",
+        13: "Int",  # "uint32"
+        17: "Int",
+        18: "Long",
+    }
+
+    if is_repeating(field):
+        primitive_map = {
+            1: "Double",
+            2: "Float",
+            3: "Long",
+            5: "Int",
+            8: "Boolean",
+            13: "Int",
+        }
+        if type != 14 and type != 11:
+            new_type = (
+                primitive_map[type]
+                if type in primitive_map
+                else primitive_list[type]
+            )
+        else:
+            new_type = fix_namespace(field.type_name)
+
+        if output:
+            return "List<{}>".format(new_type)
+        else:
+            return "Iterable<{}>".format(new_type)
+
+    if type == 14 or type == 11:  # enum/message
+        return fix_namespace(field.type_name)
+
+    return primitive_list[type]
+
 class Message:
     def __init__(self, message, proto_file):
         self.method = message
         self.fields = message.field
         self.proto_file = proto_file
 
-    # https://developers.google.com/protocol-buffers/docs/reference/cpp/google.protobuf.descriptor
-    def to_java_type(self, type, field):
-        ### Converts a given protobuf type to the Java Equivalent: (int, or List<Double> for example) ###
-        primitive_list = {
-            1: "Double",
-            2: "Float",
-            3: "Long",
-            # 4 : "uint64",
-            5: "Int",
-            8: "Boolean",
-            9: "String",
-            12: "com.google.protobuf.ByteString",
-            13: "Int",  # "uint32"
-            17: "Int",
-            18: "Long",
-        }
 
-        if self.is_repeating(field):
-            primitive_map = {
-                1: "Double",
-                2: "Float",
-                3: "Long",
-                5: "Int",
-                8: "Boolean",
-                13: "Int",
-            }
-            if type != 14 and type != 11:
-                new_type = (
-                    primitive_map[type]
-                    if type in primitive_map
-                    else primitive_list[type]
-                )
-            else:
-                new_type = fix_namespace(field.type_name)
-            return "Iterable<{}>".format(new_type)
-
-        if type == 14 or type == 11:  # enum/message
-            return fix_namespace(field.type_name)
-
-        return primitive_list[type]
 
     def as_param(self, field):
         optional = getattr(field, "proto3_optional")
@@ -92,11 +109,8 @@ class Message:
             name = "`val`"
 
         return "{}: {}{}".format(
-           name, self.to_java_type(field.type, field), annotation, 
+           name, to_java_type(field.type, field), annotation, 
         )
-
-    def is_repeating(self, field):
-        return field.label == 3
 
     def as_setter_name(self, field):
         # We have a method: setXXX, so the first letter is uppercase
@@ -104,7 +118,7 @@ class Message:
 
     def as_setter(self, field):
         optional = getattr(field, "proto3_optional", False)
-        prefix = "set" if not self.is_repeating(field) else "addAll"
+        prefix = "set" if not is_repeating(field) else "addAll"
         name = field.json_name
         if name == "val":
             name = "`val`"
@@ -117,7 +131,7 @@ class Message:
         return [(self.as_setter(f), f) for f in self.fields]
 
     def is_primitive(self, field):
-        return not self.is_repeating(field) and field.type not in [9, 12, 11, 14]
+        return not is_repeating(field) and field.type not in [9, 12, 11, 14]
 
     def as_builder(self):
         # we can't set fields to null, so we can't use the builder fluent syntax.
@@ -183,6 +197,7 @@ class RPC:
 
     def __repr__(self):
         input_type_name = fix_namespace(self.method.input_type)
+        output_type_name = fix_namespace(self.method.output_type)
         input_msg = self.messages[input_type_name]
         out=self.get_output()
         name=self.method_name()
@@ -203,12 +218,24 @@ fun {name}Raw(input: ByteArray): ByteArray {{
             return buf
 
         if ((input_type_name.endswith("Request") or len(input_msg.fields) < 2) and not contains_oneof(input_msg)):
-            # unroll
+            # unroll input
             pass
         else:
-            # skip unroll
+            # skip unroll input
             inv=f"(input: {input_type_name})"
             deser = ""
+
+        output_msg = self.messages[output_type_name]
+        if (
+            len(output_msg.fields) == 1
+            and output_msg.fields[0].type != TYPE_ENUM
+        ):
+            # unwrap single return arg
+            f = output_msg.fields[0]
+            out = to_java_type(f.type, f, output=True)
+            single_attribute = f".`{as_getter(f)}`"
+        else:
+            single_attribute = ""
 
         if out == "void":
             return_segment = f"""
@@ -219,7 +246,7 @@ fun {name}Raw(input: ByteArray): ByteArray {{
             out_with_colon = f": {out}"
             return_segment = f"""\
 try {{
-    return {out}.parseFrom({name}Raw(input.toByteArray()));
+    return {output_type_name}.parseFrom({name}Raw(input.toByteArray())){single_attribute};
 }} catch (exc: com.google.protobuf.InvalidProtocolBufferException) {{
     throw BackendException("protobuf parsing failed");
 }}"""
