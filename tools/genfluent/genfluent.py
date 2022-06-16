@@ -9,6 +9,16 @@ from pathlib import Path
 import subprocess
 from typing import List, Literal, TypedDict
 import stringcase
+import re
+
+def ensure_i18n_module_correct():
+    reg = re.compile(r'(\s+)(\S+_(?:commit|zip_csum)) = "(.*)"')
+    for line in open("rslib-bridge/anki/repos.bzl").readlines():
+        if m := reg.match(line):
+            (indent, key, commit) = m.groups()
+            if key == "core_i18n_commit":
+                subprocess.run(["git", "checkout", commit], cwd="ftl/core", check=True)
+                break
 
 def get_strings():
     output_file = Path("output.json").absolute()
@@ -111,5 +121,5 @@ def get_args(args: list[Variable]) -> str:
         [f'"{arg["name"]}" to asTranslateArg(`{stringcase.camelcase(arg["name"])}`)' for arg in args]
     )
 
-
+ensure_i18n_module_correct()
 write_source()
