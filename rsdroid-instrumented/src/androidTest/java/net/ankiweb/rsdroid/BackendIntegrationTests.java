@@ -31,7 +31,7 @@ import org.junit.runner.RunWith;
 
 import java.util.concurrent.TimeUnit;
 
-import anki.backend.SchedTimingTodayOut;
+import anki.scheduler.SchedTimingTodayResponse;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -49,12 +49,12 @@ public class BackendIntegrationTests extends InstrumentedTest {
             throw new IllegalArgumentException("do not run on real device yet");
         }
     }
-
+    
     @Test
     public void testBackendException() {
         BackendV1 backendV1 = getClosedBackend();
         try {
-            SchedTimingTodayOut ret = backendV1.schedTimingToday();
+            backendV1.closeCollection(true);
             Assert.fail("call should have failed - needs an open collection");
         } catch (BackendException ex) {
             // OK
@@ -64,7 +64,7 @@ public class BackendIntegrationTests extends InstrumentedTest {
     @Test
     public void schedTimingTodayCall() {
         BackendV1 backendV1 = getBackend("initial_version_2_12_1.anki2");
-        SchedTimingTodayOut ret = backendV1.schedTimingToday();
+        SchedTimingTodayResponse ret = backendV1.schedTimingTodayLegacy(1655258084, 0, 1655258084, 0, 0);
         int elapsed = ret.getDaysElapsed();
         long nextDayAt = ret.getNextDayAt();
     }

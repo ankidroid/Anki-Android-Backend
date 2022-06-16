@@ -18,10 +18,6 @@ package net.ankiweb.rsdroid;
 
 import androidx.annotation.VisibleForTesting;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-
-import anki.backend;
-
 public class BackendForTesting extends BackendV1Impl {
 
     BackendForTesting() {
@@ -54,27 +50,16 @@ public class BackendForTesting extends BackendV1Impl {
     public enum ErrorType {
         InvalidInput,
         TemplateError,
-        TemplateSaveError,
-        IOError,
+        IoError,
         DbErrorFileTooNew,
         DbErrorFileTooOld,
         DbErrorMissingEntity,
         DbErrorCorrupt,
         DbErrorLocked,
         DbErrorOther,
-        NetworkErrorOffline,
-        NetworkErrorTimeout,
-        NetworkErrorProxyAuth,
-        NetworkErrorOther,
-        SyncErrorConflict,
-        SyncErrorServerError,
-        SyncErrorClientTooOld,
+        NetworkError,
         SyncErrorAuthFailed,
-        SyncErrorServerMessage,
-        SyncErrorClockIncorrect,
         SyncErrorOther,
-        SyncErrorResyncRequired,
-        SyncErrorDatabaseCheckRequired,
         JSONError,
         ProtoError,
         Interrupted,
@@ -82,80 +67,8 @@ public class BackendForTesting extends BackendV1Impl {
         CollectionAlreadyOpen,
         NotFound,
         Existing,
-        DeckIsFiltered,
+        FilteredDeckError,
         SearchError,
         FatalError;
-
-        public String toString() {
-            switch (this) {
-                case InvalidInput:
-                    return "InvalidInput";
-                case TemplateError:
-                    return "TemplateError";
-                case TemplateSaveError:
-                    return "TemplateSaveError";
-                case IOError:
-                    return "IOError";
-                case DbErrorFileTooNew:
-                    return "DbErrorFileTooNew";
-                case DbErrorFileTooOld:
-                    return "DbErrorFileTooOld";
-                case DbErrorMissingEntity:
-                    return "DbErrorMissingEntity";
-                case DbErrorCorrupt:
-                    return "DbErrorCorrupt";
-                case DbErrorLocked:
-                    return "DbErrorLocked";
-                case DbErrorOther:
-                    return "DbErrorOther";
-                case NetworkErrorOffline:
-                    return "NetworkErrorOffline";
-                case NetworkErrorTimeout:
-                    return "NetworkErrorTimeout";
-                case NetworkErrorProxyAuth:
-                    return "NetworkErrorProxyAuth";
-                case NetworkErrorOther:
-                    return "NetworkErrorOther";
-                case SyncErrorConflict:
-                    return "SyncErrorConflict";
-                case SyncErrorServerError:
-                    return "SyncErrorServerError";
-                case SyncErrorClientTooOld:
-                    return "SyncErrorClientTooOld";
-                case SyncErrorAuthFailed:
-                    return "SyncErrorAuthFailed";
-                case SyncErrorServerMessage:
-                    return "SyncErrorServerMessage";
-                case SyncErrorClockIncorrect:
-                    return "SyncErrorClockIncorrect";
-                case SyncErrorOther:
-                    return "SyncErrorOther";
-                case SyncErrorResyncRequired:
-                    return "SyncErrorResyncRequired";
-                case SyncErrorDatabaseCheckRequired:
-                    return "SyncErrorDatabaseCheckRequired";
-                case JSONError:
-                    return "JSONError";
-                case ProtoError:
-                    return "ProtoError";
-                case Interrupted:
-                    return "Interrupted";
-                case CollectionNotOpen:
-                    return "CollectionNotOpen";
-                case CollectionAlreadyOpen:
-                    return "CollectionAlreadyOpen";
-                case NotFound:
-                    return "NotFound";
-                case Existing:
-                    return "Existing";
-                case DeckIsFiltered:
-                    return "DeckIsFiltered";
-                case SearchError:
-                    return "SearchError";
-                case FatalError:
-                    return "FatalError";
-                default: throw new IllegalStateException("Unknown: " + this);
-            }
-        }
     }
 }

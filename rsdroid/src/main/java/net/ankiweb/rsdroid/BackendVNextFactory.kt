@@ -16,27 +16,25 @@
 package net.ankiweb.rsdroid
 
 import androidx.sqlite.db.SupportSQLiteOpenHelper
+import net.ankiweb.rsdroid.NativeMethods.ensureSetup
 import net.ankiweb.rsdroid.RustBackendFailedException
+import net.ankiweb.rsdroid.database.RustVNextSQLiteOpenHelperFactory
 
-abstract class BackendFactory  // Force users to go through getInstance - for now we need to handle the backend failure
-protected constructor() {
-    private var backend: BackendV1? = null
-    @Synchronized
-    fun getBackend(): BackendV1 {
-        if (backend == null) {
-            backend = BackendV1Impl()
-        }
-        return backend!!
-    }
-
-    abstract val sQLiteOpener: SupportSQLiteOpenHelper.Factory?
+/** A factory for the latest version of the backend (v16 currently)  */
+class BackendVNextFactory : BackendFactory() {
+    override val sQLiteOpener: SupportSQLiteOpenHelper.Factory
+        get() = RustVNextSQLiteOpenHelperFactory(this)
 
     companion object {
-        @JvmStatic
-        @RustCleanup("Use BackendV[11/Next]Factory")
+        /**
+         * Obtains an instance of BackendFactory which will connect to rsdroid.
+         * Each call will generate a separate instance which can handle a new Anki collection
+         */
+        @RustV1Cleanup("RustBackendFailedException may be moved to a more appropriate location")
         @Throws(RustBackendFailedException::class)
-        open fun createInstance(): BackendFactory {
-            return BackendV11Factory.createInstance()
+        fun createInstance(): BackendVNextFactory {
+            ensureSetup()
+            return BackendVNextFactory()
         }
     }
 }

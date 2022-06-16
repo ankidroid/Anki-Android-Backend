@@ -13,30 +13,16 @@
  * You should have received a copy of the GNU General Public License along with
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.ankiweb.rsdroid
+package net.ankiweb.rsdroid.database
 
 import androidx.sqlite.db.SupportSQLiteOpenHelper
-import net.ankiweb.rsdroid.RustBackendFailedException
+import net.ankiweb.rsdroid.BackendFactory
 
-abstract class BackendFactory  // Force users to go through getInstance - for now we need to handle the backend failure
-protected constructor() {
-    private var backend: BackendV1? = null
-    @Synchronized
-    fun getBackend(): BackendV1 {
-        if (backend == null) {
-            backend = BackendV1Impl()
-        }
-        return backend!!
-    }
-
-    abstract val sQLiteOpener: SupportSQLiteOpenHelper.Factory?
-
-    companion object {
-        @JvmStatic
-        @RustCleanup("Use BackendV[11/Next]Factory")
-        @Throws(RustBackendFailedException::class)
-        open fun createInstance(): BackendFactory {
-            return BackendV11Factory.createInstance()
-        }
+/**
+ * Implementation of [SupportSQLiteOpenHelper.Factory] using the Anki Desktop backend
+ */
+class RustV11SQLiteOpenHelperFactory(private val backendFactory: BackendFactory) : SupportSQLiteOpenHelper.Factory {
+    override fun create(configuration: SupportSQLiteOpenHelper.Configuration): SupportSQLiteOpenHelper {
+        return RustV11SupportSQLiteOpenHelper(configuration, backendFactory)
     }
 }

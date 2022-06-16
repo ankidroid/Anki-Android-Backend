@@ -18,6 +18,7 @@ package net.ankiweb.rsdroid.database;
 
 import android.database.sqlite.SQLiteDatabaseCorruptException;
 
+import net.ankiweb.rsdroid.BackendException;
 import net.ankiweb.rsdroid.database.testutils.DatabaseCorruption;
 
 import org.junit.runner.RunWith;
@@ -35,7 +36,11 @@ public class DatabaseRegularCorruptionTest extends DatabaseCorruption {
     protected void assertCorruption(Exception setupException) {
         // Rust: net.ankiweb.rsdroid.BackendException$BackendDbException: DBError { info: "SqliteFailure(Error { code: DatabaseCorrupt, extended_code: 11 }, Some(\"database disk image is malformed\"))", kind: Other }
         // Java: database disk image is malformed (code 11): , while compiling: PRAGMA journal_mode
+
+//        assertThat(setupException.getClass(), typeCompatibleWith(BackendException.BackendDbException.class));
         assertThat(setupException.getClass(), typeCompatibleWith(SQLiteDatabaseCorruptException.class));
+
+        // this mapping to an unrelated exception should be done at a higher level
 
         assertThat(setupException.getLocalizedMessage(), containsString("database disk image is malformed"));
         assertThat(setupException.getLocalizedMessage(), containsString("11"));

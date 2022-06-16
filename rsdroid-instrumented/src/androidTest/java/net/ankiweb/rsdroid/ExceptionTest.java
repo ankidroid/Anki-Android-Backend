@@ -16,8 +16,6 @@
 
 package net.ankiweb.rsdroid;
 
-import android.database.sqlite.SQLiteDatabaseCorruptException;
-
 import net.ankiweb.rsdroid.database.NotImplementedException;
 import net.ankiweb.rsdroid.exceptions.BackendDeckIsFilteredException;
 import net.ankiweb.rsdroid.exceptions.BackendExistingException;
@@ -67,14 +65,6 @@ public class ExceptionTest {
             { BackendForTesting.ErrorType.SearchError, NOT_POSSIBLE },
 
             { BackendForTesting.ErrorType.SyncErrorAuthFailed, BackendSyncException.BackendSyncAuthFailedException.class },
-            { BackendForTesting.ErrorType.SyncErrorClientTooOld, BackendSyncException.BackendSyncClientTooOldException.class },
-            { BackendForTesting.ErrorType.SyncErrorClockIncorrect, BackendSyncException.BackendSyncClockIncorrectException.class },
-            { BackendForTesting.ErrorType.SyncErrorConflict, BackendSyncException.BackendSyncConflictException.class },
-            { BackendForTesting.ErrorType.SyncErrorDatabaseCheckRequired, BackendSyncException.BackendSyncDatabaseCheckRequiredException.class },
-            { BackendForTesting.ErrorType.SyncErrorResyncRequired, BackendSyncException.BackendSyncResyncRequiredException.class },
-            { BackendForTesting.ErrorType.SyncErrorServerMessage, BackendSyncException.BackendSyncServerMessageException.class },
-            { BackendForTesting.ErrorType.SyncErrorServerError, BackendSyncException.BackendSyncServerErrorException.class },
-
             { BackendForTesting.ErrorType.SyncErrorOther, BackendSyncException.class },
 
             { BackendForTesting.ErrorType.DbErrorCorrupt, NOT_POSSIBLE },
@@ -83,26 +73,17 @@ public class ExceptionTest {
             { BackendForTesting.ErrorType.DbErrorFileTooOld, BackendException.BackendDbException.BackendDbFileTooOldException.class},
             { BackendForTesting.ErrorType.DbErrorLocked, BackendException.BackendDbException.BackendDbLockedException.class},
             { BackendForTesting.ErrorType.DbErrorMissingEntity, BackendException.BackendDbException.BackendDbMissingEntityException.class},
-
             { BackendForTesting.ErrorType.DbErrorOther, BackendException.BackendDbException.class},
-
-
-            { BackendForTesting.ErrorType.NetworkErrorOffline, BackendNetworkException.BackendNetworkOfflineException.class},
-            { BackendForTesting.ErrorType.NetworkErrorProxyAuth, BackendNetworkException.BackendNetworkProxyAuthException.class},
-            { BackendForTesting.ErrorType.NetworkErrorTimeout, BackendNetworkException.BackendNetworkTimeoutException.class},
-
-            { BackendForTesting.ErrorType.NetworkErrorOther, BackendNetworkException.class},
-
-            { BackendForTesting.ErrorType.DeckIsFiltered, BackendDeckIsFilteredException.class },
+            { BackendForTesting.ErrorType.NetworkError, BackendNetworkException.class},
+            { BackendForTesting.ErrorType.FilteredDeckError, BackendDeckIsFilteredException.class },
             { BackendForTesting.ErrorType.Existing, BackendExistingException.class },
             { BackendForTesting.ErrorType.FatalError, BackendFatalError.class },
             { BackendForTesting.ErrorType.Interrupted, BackendInterruptedException.class},
             { BackendForTesting.ErrorType.InvalidInput, BackendInvalidInputException.class},
-            { BackendForTesting.ErrorType.IOError, BackendIoException.class},
+            { BackendForTesting.ErrorType.IoError, BackendIoException.class},
             { BackendForTesting.ErrorType.JSONError, BackendJsonException.class },
             { BackendForTesting.ErrorType.ProtoError, BackendProtoException.class },
             { BackendForTesting.ErrorType.TemplateError, BackendTemplateException.class},
-            { BackendForTesting.ErrorType.TemplateSaveError, BackendTemplateException.BackendTemplateSaveException.class},
 
             { BackendForTesting.ErrorType.NotFound, BackendNotFoundException.class},
         });
