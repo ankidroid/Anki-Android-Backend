@@ -109,11 +109,11 @@ index 2a2d94034..b21c7caff 100644
 -    implementation "io.github.david-allison-1:anki-android-backend:$ankidroid_backend_version"
 -    testImplementation "io.github.david-allison-1:anki-android-backend-testing:$ankidroid_backend_version"
 -    // implementation files("../../Anki-Android-Backend/rsdroid/build/outputs/aar/rsdroid-release.aar")
--    // testImplementation files("../../Anki-Android-Backend/rsdroid-testing/build/libs/rsdroid-testing-0.1.11.jar")
+-    // testImplementation files("../../Anki-Android-Backend/rsdroid-testing/build/libs/rsdroid-testing-0.1.12.jar")
 +    // implementation "io.github.david-allison-1:anki-android-backend:$ankidroid_backend_version"
 +    // testImplementation "io.github.david-allison-1:anki-android-backend-testing:$ankidroid_backend_version"
 +    implementation files("../../Anki-Android-Backend/rsdroid/build/outputs/aar/rsdroid-release.aar")
-+    testImplementation files("../../Anki-Android-Backend/rsdroid-testing/build/libs/rsdroid-testing-0.1.11.jar")
++    testImplementation files("../../Anki-Android-Backend/rsdroid-testing/build/libs/rsdroid-testing-0.1.12.jar")
 
      // On Windows, you can use something like
      // implementation files("C:\\GitHub\\Rust-Test\\rsdroid\\build\\outputs\\aar\\rsdroid-release.aar")
