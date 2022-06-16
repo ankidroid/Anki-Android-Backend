@@ -147,6 +147,10 @@ jobs:
           (. sdkmanager.bat --install "ndk;22.0.7026061" --sdk_root="$Env:ANDROID_SDK_ROOT") | out-null
           Write-Host "NDK Install Completed"
 
+      - name: Install linker
+        if: matrix.os == 'ubuntu-latest'
+        run: .github/scripts/linux_install_x86_64-unknown-linux-gnu-gcc.sh
+
       - name: Install Python Setuptools
         if: matrix.os == 'ubuntu-latest'
         run: sudo apt-get install python3-setuptools
