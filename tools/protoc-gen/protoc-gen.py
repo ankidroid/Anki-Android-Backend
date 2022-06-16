@@ -133,7 +133,7 @@ class Message:
                     field.json_name, setter
                 )
 
-        ret += "    val protobuf = builder.build();\n".format(
+        ret += "    val input = builder.build();\n".format(
             self.proto_file.package, self.method.name
         )
         return ret.replace("I18n.", "I18N.")
@@ -182,14 +182,14 @@ class RPC:
         return 'case {}: return "{}";'.format(self.command_num, self.method_name())
 
     def __repr__(self):
-        k = fix_namespace(self.method.input_type)
-
+        input_type_name = fix_namespace(self.method.input_type)
+        input_msg = self.messages[input_type_name]
         out=self.get_output()
         name=self.method_name()
-        inv="({})".format(self.messages[k].as_params())
+        inv="({})".format(self.messages[input_type_name].as_params())
         service=self.service_index
         method=self.command_num
-        deser=self.messages[k].as_builder()
+        deser=self.messages[input_type_name].as_builder()
 
         buf = f"""
 @Throws(BackendException::class)
@@ -198,29 +198,40 @@ fun {name}Raw(input: ByteArray): ByteArray {{
 }}
 """
 
-        if k != "anki.i18n.TranslateStringRequest":
+        if input_type_name == "anki.i18n.TranslateStringRequest":
             # maps not currently supported
-            if out == "void":
-                return_segment = f"""
-    {name}Raw(protobuf.toByteArray());
-                """
-                out_with_colon = ""
-            else:
-                out_with_colon = f": {out}"
-                return_segment = f"""\
-    try {{
-        return {out}.parseFrom({name}Raw(protobuf.toByteArray()));
-    }} catch (exc: com.google.protobuf.InvalidProtocolBufferException) {{
-        throw BackendException("protobuf parsing failed");
-    }}"""
+            return buf
 
-            buf += f"""
+        if ((input_type_name.endswith("Request") or len(input_msg.fields) < 2) and not contains_oneof(input_msg)):
+            # unroll
+            pass
+        else:
+            # skip unroll
+            inv=f"(input: {input_type_name})"
+            deser = ""
+
+        if out == "void":
+            return_segment = f"""
+{name}Raw(input.toByteArray());
+            """
+            out_with_colon = ""
+        else:
+            out_with_colon = f": {out}"
+            return_segment = f"""\
+try {{
+    return {out}.parseFrom({name}Raw(input.toByteArray()));
+}} catch (exc: com.google.protobuf.InvalidProtocolBufferException) {{
+    throw BackendException("protobuf parsing failed");
+}}"""
+
+        buf += f"""
 @Throws(BackendException::class)
 open fun {name}{inv}{out_with_colon} {{
     {deser}
     {return_segment}
 }}
             """
+
         return buf
 
     def method_name(self):
@@ -298,6 +309,11 @@ protected abstract fun runMethodRaw(service: Int, method: Int, input: ByteArray)
     f.name = "GeneratedBackend.kt"
     f.content = "\n".join(file_contents)
 
+def contains_oneof(msg):
+    for field in msg.fields:
+        if field.oneof_index:
+            return True
+    return False
 
 if __name__ == "__main__":
     # Read request message from stdin
