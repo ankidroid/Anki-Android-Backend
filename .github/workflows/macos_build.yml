@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Fetch submodules
-        run: git submodule update --init --recursive --remote --force
+        run: git submodule update --init --recursive
 
       - name: Configure JDK 1.11
         uses: actions/setup-java@v3
@@ -97,7 +97,7 @@ jobs:
 
       # COULD_BE_BETTER: This may not be needed - tiny speed penalty
       - name: Fetch submodules
-        run: git submodule update --init --recursive --remote --force
+        run: git submodule update --init --recursive
 
       - name: Download APKs
         uses: actions/download-artifact@v2

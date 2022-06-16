@@ -52,7 +52,7 @@ jobs:
           $Env:ANDROID_HOME
 
       - name: Fetch submodules
-        run: git submodule update --init --recursive --remote --force
+        run: git submodule update --init --recursive
 
       - name: Install Rust
         uses: actions-rs/toolchain@v1.0.6
