@@ -159,14 +159,14 @@ jobs:
       - name: Install & Test Protobuf Compiler
         if: matrix.os != 'windows-latest'
         run: |
-          pip3 install protobuf stringcase
+          pip3 install --upgrade protobuf stringcase
           python3 .github/scripts/protoc_gen_deps.py
 
       - name: Install & Test Protobuf Compiler (win)
         if: matrix.os == 'windows-latest'
         run: |
           Set-Alias -Name "python3" -Value "python"
-          pip3 install protobuf stringcase
+          pip3 install --upgrade protobuf stringcase
           python3 .github/scripts/protoc_gen_deps.py
 
       - name: Run Tests

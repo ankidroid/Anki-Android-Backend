@@ -77,7 +77,7 @@ jobs:
       - name: Install & Test Protobuf
         run: |
           Set-Alias -Name "python3" -Value "python"
-          pip3 install protobuf stringcase
+          pip3 install --upgrade protobuf stringcase
           python3 .github/scripts/protoc_gen_deps.py
 
       - name: Rust Cache

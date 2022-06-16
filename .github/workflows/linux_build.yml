@@ -56,7 +56,7 @@ jobs:
 
       - name: Install Python libs
         run: |
-          pip3 install stringcase
+          pip3 install --upgrade protobuf stringcase
 
       - name: Rust Cache
         uses: actions/cache@v2
