@@ -72,7 +72,7 @@ public class InstrumentedTest {
                 
                 List<Integer> numbers;
                 try {
-                    numbers = b.getActiveSequenceNumbers().getNumbersList();
+                    numbers = b.getActiveSequenceNumbers();
                 } catch (BackendInvalidInputException exc) {
                     assertThat(exc.getLocalizedMessage(), containsString("CollectionNotOpen"));
                     continue;
