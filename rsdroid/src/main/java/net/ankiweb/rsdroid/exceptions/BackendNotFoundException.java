@@ -18,11 +18,9 @@ package net.ankiweb.rsdroid.exceptions;
 
 import net.ankiweb.rsdroid.BackendException;
 
-import BackendProto.Backend;
-
 /** An item was not found (example: a deck from backend.get_deck_legacy) */
 public class BackendNotFoundException extends BackendException {
-    public BackendNotFoundException(Backend.BackendError error) {
+    public BackendNotFoundException(anki.backend.BackendError error) {
         super(error);
     }
 }

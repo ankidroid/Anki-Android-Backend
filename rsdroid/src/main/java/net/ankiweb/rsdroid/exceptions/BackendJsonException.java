@@ -18,10 +18,8 @@ package net.ankiweb.rsdroid.exceptions;
 
 import net.ankiweb.rsdroid.BackendException;
 
-import BackendProto.Backend;
-
 public class BackendJsonException extends BackendException {
-    public BackendJsonException(Backend.BackendError error) {
+    public BackendJsonException(anki.backend.BackendError error) {
         super(error);
     }
 

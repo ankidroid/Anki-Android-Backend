@@ -20,7 +20,7 @@ import androidx.annotation.VisibleForTesting;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
-import BackendProto.Backend;
+import anki.backend;
 
 public class BackendForTesting extends BackendV1Impl {
 
@@ -46,21 +46,8 @@ public class BackendForTesting extends BackendV1Impl {
      */
     @VisibleForTesting
     public void debugProduceError(ErrorType error) {
-        byte[] result = null;
-        try {
-            Pointer backendPointer = ensureBackend();
-            result = NativeMethods.debugProduceError(backendPointer.toJni(), error.toString());
-
-            // This should fail validate
-            Backend.Empty message = Backend.Empty.parseFrom(result);
-            validateMessage(result, message);
-
-            throw new IllegalStateException("An exception should have been thrown");
-
-        } catch (InvalidProtocolBufferException ex) {
-            validateResult(result);
-            throw BackendException.fromException(ex);
-        }
+        super.debugProduceError(error.toString());
+        throw new IllegalStateException("An exception should have been thrown");
     }
 
 

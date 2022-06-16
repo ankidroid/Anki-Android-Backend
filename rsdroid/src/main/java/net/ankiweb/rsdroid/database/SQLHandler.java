@@ -20,8 +20,6 @@ import androidx.annotation.CheckResult;
 
 import org.json.JSONArray;
 
-import BackendProto.Sqlite;
-
 public interface SQLHandler {
     @CheckResult
     JSONArray fullQuery(String query, Object... bindArgs);
@@ -41,8 +39,8 @@ public interface SQLHandler {
     String getPath();
 
     /* Protobuf-related (#6) */
-    Sqlite.DBResponse getNextSlice(long startIndex, int sequenceNumber);
-    Sqlite.DBResponse fullQueryProto(String query, Object... bindArgs);
+    anki.ankidroid.DBResponse getNextSlice(long startIndex, int sequenceNumber);
+    anki.ankidroid.DBResponse fullQueryProto(String query, Object... bindArgs);
 
     void cancelCurrentProtoQuery(int sequenceNumber);
     void cancelAllProtoQueries();

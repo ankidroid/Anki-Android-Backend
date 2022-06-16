@@ -18,10 +18,8 @@ package net.ankiweb.rsdroid.exceptions;
 
 import net.ankiweb.rsdroid.BackendException;
 
-import BackendProto.Backend;
-
 public class BackendDeckIsFilteredException extends BackendException {
-    public BackendDeckIsFilteredException(Backend.BackendError error) {
+    public BackendDeckIsFilteredException(anki.backend.BackendError error) {
         super(error);
     }
 }

@@ -18,101 +18,17 @@ package net.ankiweb.rsdroid.exceptions;
 
 import net.ankiweb.rsdroid.BackendException;
 
-import BackendProto.Backend;
-
 public class BackendSyncException extends BackendException {
 
-    public BackendSyncException(Backend.BackendError error) {
+    public BackendSyncException(anki.backend.BackendError error) {
         super(error);
     }
 
-
-    public static BackendSyncException fromSyncError(Backend.BackendError error) {
-
-        switch (error.getSyncError().getKind()) {
-            case CONFLICT:
-                throw new BackendSyncConflictException(error);
-            case AUTH_FAILED:
-                throw new BackendSyncAuthFailedException(error);
-            case SERVER_ERROR:
-                throw new BackendSyncServerErrorException(error);
-            case UNRECOGNIZED:
-                throw new BackendSyncUnrecognizedException(error);
-            case CLIENT_TOO_OLD:
-                throw new BackendSyncClientTooOldException(error);
-            case SERVER_MESSAGE:
-                throw new BackendSyncServerMessageException(error);
-            case CLOCK_INCORRECT:
-                throw new BackendSyncClockIncorrectException(error);
-            case RESYNC_REQUIRED:
-                throw new BackendSyncResyncRequiredException(error);
-            case MEDIA_CHECK_REQUIRED:
-                throw new BackendSyncMediaCheckRequiredException(error);
-            case DATABASE_CHECK_REQUIRED:
-                throw new BackendSyncDatabaseCheckRequiredException(error);
-            case OTHER:
-            default:
-                throw new BackendSyncException(error);
-        }
-    }
-
-    public static class BackendSyncConflictException extends BackendSyncException {
-        public BackendSyncConflictException(Backend.BackendError error) {
-            super(error);
-        }
-    }
-
     public static class BackendSyncAuthFailedException extends BackendSyncException {
-        public BackendSyncAuthFailedException(Backend.BackendError error) {
+        public BackendSyncAuthFailedException(anki.backend.BackendError error) {
             super(error);
         }
     }
 
-    public static class BackendSyncServerErrorException extends BackendSyncException {
-        public BackendSyncServerErrorException(Backend.BackendError error) {
-            super(error);
-        }
-    }
 
-    public static class BackendSyncUnrecognizedException extends BackendSyncException {
-        public BackendSyncUnrecognizedException(Backend.BackendError error) {
-            super(error);
-        }
-    }
-
-    public static class BackendSyncClientTooOldException extends BackendSyncException {
-        public BackendSyncClientTooOldException(Backend.BackendError error) {
-            super(error);
-        }
-    }
-
-    public static class BackendSyncClockIncorrectException extends BackendSyncException {
-        public BackendSyncClockIncorrectException(Backend.BackendError error) {
-            super(error);
-        }
-    }
-
-    public static class BackendSyncServerMessageException extends BackendSyncException {
-        public BackendSyncServerMessageException(Backend.BackendError error) {
-            super(error);
-        }
-    }
-
-    public static class BackendSyncResyncRequiredException extends BackendSyncException {
-        public BackendSyncResyncRequiredException(Backend.BackendError error) {
-            super(error);
-        }
-    }
-
-    public static class BackendSyncMediaCheckRequiredException extends BackendSyncException {
-        public BackendSyncMediaCheckRequiredException(Backend.BackendError error) {
-            super(error);
-        }
-    }
-
-    public static class BackendSyncDatabaseCheckRequiredException extends BackendSyncException {
-        public BackendSyncDatabaseCheckRequiredException(Backend.BackendError error) {
-            super(error);
-        }
-    }
 }

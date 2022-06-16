@@ -18,13 +18,11 @@ package net.ankiweb.rsdroid.exceptions;
 
 import net.ankiweb.rsdroid.BackendException;
 
-import BackendProto.Backend;
-
 /**
  * TODO: Document this
  */
 public class BackendExistingException extends BackendException {
-    public BackendExistingException(Backend.BackendError error) {
+    public BackendExistingException(anki.backend.BackendError error) {
         super(error);
     }
 }
