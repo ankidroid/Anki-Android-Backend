@@ -37,7 +37,7 @@ jobs:
 
       - name: Install Python libs
         run: |
-          pip3 install stringcase
+          pip3 install --upgrade protobuf stringcase
 
       # actions-rs only accepts "target" (although a "targets" param to be added in v2). We need 7 targets.
       - name: Install Rust Targets

@@ -48,7 +48,7 @@ jobs:
 
       - name: Install Python libs
         run: |
-          pip3 install stringcase
+          pip3 install --upgrade protobuf stringcase
 
       - name: Build
         run: ./gradlew clean assembleRelease -DtestBuildType=release -Dorg.gradle.daemon=false -Dorg.gradle.console=plain
