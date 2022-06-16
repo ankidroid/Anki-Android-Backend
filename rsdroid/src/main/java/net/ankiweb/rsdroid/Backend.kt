@@ -37,8 +37,13 @@ open class Backend(langs: Iterable<String> = listOf("en")) : GeneratedBackend(),
     // Set on init; unset on .close(). Access via withBackend()
     private var backendPointer: Long? = null
     private val lock = ReentrantLock()
+
     // Only stored to satisfy .getPath() interface in SQL connection
     private var collectionPath: String? = null
+
+    val tr: Translations by lazy {
+        Translations(this)
+    }
 
     fun isOpen(): Boolean {
         return backendPointer != null
@@ -107,7 +112,7 @@ open class Backend(langs: Iterable<String> = listOf("en")) : GeneratedBackend(),
             unpackResult(NativeMethods.runMethodRaw(it, service, method, input))
         }
     }
-    
+
     /**
      * Run the provided closure with locked access to the backend.
      * The backend maintains its own lock for backend commands, so this extra
@@ -153,7 +158,7 @@ open class Backend(langs: Iterable<String> = listOf("en")) : GeneratedBackend(),
     override fun closeDatabase() {
         closeCollection(false)
     }
-    
+
     override fun getPath(): String? {
         return collectionPath
     }
@@ -207,7 +212,7 @@ open class Backend(langs: Iterable<String> = listOf("en")) : GeneratedBackend(),
 
     private fun performTransaction(kind: DbRequestKind) {
         Timber.i("Rust: transaction %s", kind)
-        runDbCommand(dbRequestJson(kind=kind))
+        runDbCommand(dbRequestJson(kind = kind))
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.NONE)

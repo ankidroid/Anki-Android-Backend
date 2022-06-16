@@ -1,0 +1,3 @@
+[env]
+RSLIB_FTL_ROOT = { value = "ftl/core/l10n.toml", relative = true }
+
