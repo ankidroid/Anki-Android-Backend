@@ -16,8 +16,8 @@
 package net.ankiweb.rsdroid.database
 
 class NotImplementedException : RuntimeException {
-    constructor(message: String?) : super(message) {}
-    constructor() {}
+    constructor(message: String?) : super(message)
+    constructor()
 
     companion object {
         /** A method which we should implement  */

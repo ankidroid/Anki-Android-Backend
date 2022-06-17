@@ -94,7 +94,7 @@ class RustSQLiteStatement(private val database: RustSupportSQLiteDatabase, priva
     private fun max(integerSet: Set<Int>): Int {
         var max = -1
         for (i in integerSet) {
-            max = Math.max(max, i)
+            max = kotlin.math.max(max, i)
         }
         return max
     }

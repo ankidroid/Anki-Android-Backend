@@ -25,6 +25,7 @@ interface SQLHandler {
     fun fullQuery(query: String): JSONArray {
         return fullQuery(query, null)
     }
+
     fun executeGetRowsAffected(sql: String, bindArgs: Array<Any?>?): Int
     fun insertForId(sql: String, bindArgs: Array<Any?>?): Long
     fun beginTransaction()

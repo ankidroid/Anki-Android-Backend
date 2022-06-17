@@ -15,12 +15,9 @@
  */
 package net.ankiweb.rsdroid
 
-import java.lang.annotation.Retention
-import java.lang.annotation.RetentionPolicy
-
 /** A collection of RustCleanup attributes. Not to be used directly
  * Allows multiple instances of @RustCleanup on a class
  * See [java.lang.annotation.Repeatable].
  */
-@Retention(RetentionPolicy.SOURCE)
+@kotlin.annotation.Retention(AnnotationRetention.SOURCE)
 annotation class RustCleanupCollection(vararg val value: RustCleanup)

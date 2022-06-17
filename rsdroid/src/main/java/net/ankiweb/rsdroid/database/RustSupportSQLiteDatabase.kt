@@ -81,11 +81,11 @@ class RustSupportSQLiteDatabase(backend: Backend?, readOnly: Boolean) : SupportS
     }
 
     override fun getVersion(): Int {
-        throw NotImplementedException.Companion.todo()
+        throw NotImplementedException.todo()
     }
 
     override fun setVersion(version: Int) {
-        throw NotImplementedException.Companion.todo()
+        throw NotImplementedException.todo()
     }
 
     override fun query(query: String): Cursor {
@@ -97,11 +97,11 @@ class RustSupportSQLiteDatabase(backend: Backend?, readOnly: Boolean) : SupportS
     }
 
     override fun query(query: SupportSQLiteQuery): Cursor {
-        throw NotImplementedException.Companion.todo()
+        throw NotImplementedException.todo()
     }
 
     override fun query(query: SupportSQLiteQuery, cancellationSignal: CancellationSignal): Cursor {
-        throw NotImplementedException.Companion.todo()
+        throw NotImplementedException.todo()
     }
 
     @Throws(SQLException::class)
@@ -113,7 +113,7 @@ class RustSupportSQLiteDatabase(backend: Backend?, readOnly: Boolean) : SupportS
         sql.append(table)
         sql.append('(')
         var bindArgs: Array<Any?>? = null
-        val size = if (values != null && values.size() > 0) values.size() else 0
+        val size = values.size()
         if (size > 0) {
             bindArgs = arrayOfNulls(size)
             var i = 0
@@ -139,7 +139,7 @@ class RustSupportSQLiteDatabase(backend: Backend?, readOnly: Boolean) : SupportS
 
     override fun update(table: String, conflictAlgorithm: Int, values: ContentValues, whereClause: String?, whereArgs: Array<Any?>?): Int {
         // taken from SQLiteDatabase class.
-        require(!(values == null || values.size() == 0)) { "Empty values" }
+        require(values.size() > 0) { "Empty values" }
         val sql = StringBuilder(120)
         sql.append("UPDATE ")
         sql.append(CONFLICT_VALUES[conflictAlgorithm])
@@ -183,7 +183,7 @@ class RustSupportSQLiteDatabase(backend: Backend?, readOnly: Boolean) : SupportS
 
     override fun needUpgrade(newVersion: Int): Boolean {
         // needed for metaDB, but not for Anki DB
-        throw NotImplementedException.Companion.todo()
+        throw NotImplementedException.todo()
     }
 
     override fun getPath(): String? {
@@ -199,11 +199,11 @@ class RustSupportSQLiteDatabase(backend: Backend?, readOnly: Boolean) : SupportS
     }
 
     override fun isDatabaseIntegrityOk(): Boolean {
-        val pragma_integrity_check = query("pragma integrity_check")
-        if (!pragma_integrity_check.moveToFirst()) {
+        val pragmaIntegrityCheck = query("pragma integrity_check")
+        if (!pragmaIntegrityCheck.moveToFirst()) {
             return false
         }
-        val value = pragma_integrity_check.getString(0)
+        val value = pragmaIntegrityCheck.getString(0)
         return "ok" == value
     }
 
@@ -231,7 +231,7 @@ class RustSupportSQLiteDatabase(backend: Backend?, readOnly: Boolean) : SupportS
 
     /** Helper methods  */
     private val session: Session
-        private get() = sessionFactory.get()
+        get() = sessionFactory.get()!!
 
     /** Confirmed that the below are not used for our code  */
     override fun delete(table: String, whereClause: String, whereArgs: Array<Any>): Int {

@@ -305,6 +305,8 @@ def generate_code(request, response):
         """
 /* Auto-generated from the .proto files in AnkiDroidBackend. */
 
+@file:Suppress("NAME_SHADOWING")
+
 package anki.backend;
 
 import com.google.protobuf.InvalidProtocolBufferException;
