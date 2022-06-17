@@ -88,7 +88,7 @@ open class Backend(langs: Iterable<String> = listOf("en")) : GeneratedBackend(),
      */
     override fun openCollection(collectionPath: String, mediaFolderPath: String, mediaDbPath: String, logPath: String, forceSchema11: Boolean) {
         try {
-            super<GeneratedBackend>.openCollection(collectionPath, mediaFolderPath, mediaDbPath, logPath, forceSchema11)
+            super.openCollection(collectionPath, mediaFolderPath, mediaDbPath, logPath, forceSchema11)
         } catch (exc: BackendException.BackendDbException) {
             throw exc.toSQLiteException("db open")
         }
@@ -164,10 +164,10 @@ open class Backend(langs: Iterable<String> = listOf("en")) : GeneratedBackend(),
     }
 
     @CheckResult
-    override fun fullQuery(sql: String, bindArgs: Array<Any?>?): JSONArray {
+    override fun fullQuery(query: String, bindArgs: Array<Any?>?): JSONArray {
         return try {
-            Timber.i("Rust: SQL query: '%s'", sql)
-            fullQueryInternal(sql, bindArgs)
+            Timber.i("Rust: SQL query: '%s'", query)
+            fullQueryInternal(query, bindArgs)
         } catch (e: JSONException) {
             throw RuntimeException(e)
         }
@@ -216,8 +216,9 @@ open class Backend(langs: Iterable<String> = listOf("en")) : GeneratedBackend(),
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.NONE)
-    override fun setPageSize(pageSizeInBytes: Long) {
-        super.setPageSize(pageSizeInBytes)
+    @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
+    override fun setPageSize(pageSizeBytes: Long) {
+        super.setPageSize(pageSizeBytes)
     }
 
     override fun getColumnNames(sql: String): Array<String> {

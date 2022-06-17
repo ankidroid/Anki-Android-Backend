@@ -51,7 +51,7 @@ open class StreamingProtobufSQLiteCursor(
 
     /**The current index into the collection or rows  */
     private val sliceStartIndex: Int
-        private get() = results!!.startIndex.toInt()
+        get() = results!!.startIndex.toInt()
 
     private fun loadPage(startingAtIndex: Long) {
         try {
@@ -60,7 +60,7 @@ open class StreamingProtobufSQLiteCursor(
             positionInSlice = if (startingAtIndex == -1L) -1 else 0
             check(results!!.sequenceNumber == sequenceNumber) { "rsdroid does not currently handle nested cursor-based queries. Please change the code to avoid holding a reference to the query, or implement the functionality in rsdroid" }
         } catch (e: BackendException) {
-            throw e.toSQLiteException(query)!!
+            throw e.toSQLiteException(query)
         }
     }
 
@@ -123,7 +123,7 @@ open class StreamingProtobufSQLiteCursor(
     }
 
     private val columnNamesInternal: Array<String>
-        private get() {
+        get() {
             if (columnMapping == null) {
                 columnMapping = backend.getColumnNames(query)
                 checkNotNull(columnMapping) { "unable to obtain column mapping" }
@@ -143,8 +143,8 @@ open class StreamingProtobufSQLiteCursor(
         val field = getFieldAtIndex(columnIndex)
         return when (field.dataCase) {
             DataCase.BLOBVALUE -> throw SQLiteException("unknown error (code 0): Unable to convert BLOB to string")
-            DataCase.LONGVALUE -> java.lang.Long.toString(field.longValue)
-            DataCase.DOUBLEVALUE -> java.lang.Double.toString(field.doubleValue)
+            DataCase.LONGVALUE -> field.longValue.toString()
+            DataCase.DOUBLEVALUE -> field.doubleValue.toString()
             DataCase.STRINGVALUE -> field.stringValue
             DataCase.DATA_NOT_SET -> null
             else -> throw IllegalStateException("Unknown data case: " + field.dataCase)
@@ -218,7 +218,7 @@ open class StreamingProtobufSQLiteCursor(
     }
 
     protected val rowAtCurrentPosition: Row
-        protected get() {
+        get() {
             val result = results!!.result
             val rowCount = currentSliceRowCount
             if (positionInSlice < 0 || positionInSlice >= rowCount) {
@@ -232,7 +232,7 @@ open class StreamingProtobufSQLiteCursor(
     }
 
     protected val currentSliceRowCount: Int
-        protected get() = results!!.result.rowsCount
+        get() = results!!.result.rowsCount
 
     private fun strtoll(stringValue: String): Long {
         return try {
@@ -256,7 +256,7 @@ open class StreamingProtobufSQLiteCursor(
             sequenceNumber = results!!.sequenceNumber
             rowCount = results!!.rowCount
         } catch (e: BackendException) {
-            throw e.toSQLiteException(query)!!
+            throw e.toSQLiteException(query)
         }
     }
 }

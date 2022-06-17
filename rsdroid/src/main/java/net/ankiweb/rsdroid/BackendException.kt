@@ -36,23 +36,23 @@ open class BackendException : RuntimeException {
         error = null
     }
 
-    open fun toSQLiteException(query: String?): RuntimeException {
+    open fun toSQLiteException(query: String): RuntimeException {
         val message = String.format(Locale.ROOT, "error while compiling: \"%s\": %s", query, this.localizedMessage)
         return SQLiteException(message, this)
     }
 
     class BackendDbException(error: BackendError) : BackendException(error) {
-        override fun toSQLiteException(query: String?): RuntimeException {
+        override fun toSQLiteException(query: String): RuntimeException {
             val message = this.localizedMessage
             if (message == null) {
                 val outMessage = String.format(Locale.ROOT, "Unknown error while compiling: \"%s\"", query)
                 return SQLiteException(outMessage, this)
             }
             if (message.contains("InvalidParameterCount")) {
-                val p = Pattern.compile("InvalidParameterCount\\((\\d*), (\\d*)\\)").matcher(this.message)
+                val p = Pattern.compile("InvalidParameterCount\\((\\d*), (\\d*)\\)").matcher(message)
                 if (p.find()) {
-                    val givenParams = p.group(1).toInt()
-                    val expectedParams = p.group(2).toInt()
+                    val givenParams = p.group(1)!!.toInt()
+                    val expectedParams = p.group(2)!!.toInt()
                     val errorMessage = String.format(Locale.ROOT, "Cannot bind argument at index %d because the index is out of range.  The statement has %d parameters.", givenParams, expectedParams)
                     return IllegalArgumentException(errorMessage, this)
                 }
@@ -95,14 +95,17 @@ open class BackendException : RuntimeException {
         }
     }
 
+    class BackendSearchException(error: BackendError) : BackendException(error)
+    class BackendFatalError(error: BackendError) : BackendException(error)
+
     companion object {
         fun fromError(error: BackendError): BackendException {
-            when (error.kind) {
+            when (error.kind!!) {
                 BackendError.Kind.DB_ERROR -> return BackendDbException.fromDbError(error)
                 BackendError.Kind.JSON_ERROR -> return BackendJsonException(error)
                 BackendError.Kind.SYNC_AUTH_ERROR -> return BackendSyncAuthFailedException(error)
                 BackendError.Kind.SYNC_OTHER_ERROR -> return BackendSyncException(error)
-                BackendError.Kind.FATAL_ERROR -> throw BackendFatalError(error.localized)
+                BackendError.Kind.FATAL_ERROR -> return BackendFatalError(error)
                 BackendError.Kind.EXISTS -> return BackendExistingException(error)
                 BackendError.Kind.FILTERED_DECK_ERROR -> return BackendDeckIsFilteredException(error)
                 BackendError.Kind.INTERRUPTED -> return BackendInterruptedException(error)
@@ -112,8 +115,15 @@ open class BackendException : RuntimeException {
                 BackendError.Kind.NETWORK_ERROR -> return BackendNetworkException(error)
                 BackendError.Kind.TEMPLATE_PARSE -> return BackendTemplateException.fromTemplateError(error)
                 BackendError.Kind.IO_ERROR -> return BackendIoException(error)
+                BackendError.Kind.SEARCH_ERROR -> return BackendSearchException(error)
+
+                BackendError.Kind.UNDO_EMPTY -> return BackendException(error)
+                BackendError.Kind.CUSTOM_STUDY_ERROR -> return BackendException(error)
+                BackendError.Kind.IMPORT_ERROR -> return BackendException(error)
+                BackendError.Kind.DELETED -> return BackendException(error)
+                BackendError.Kind.CARD_TYPE_ERROR -> return BackendException(error)
+                BackendError.Kind.UNRECOGNIZED -> return BackendException(error)
             }
-            return BackendException(error)
         }
 
         fun fromException(ex: Exception?): RuntimeException {

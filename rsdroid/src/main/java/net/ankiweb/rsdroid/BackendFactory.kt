@@ -20,6 +20,7 @@ import androidx.sqlite.db.SupportSQLiteOpenHelper
 abstract class BackendFactory  // Force users to go through getInstance - for now we need to handle the backend failure
 protected constructor() {
     private var backend: Backend? = null
+
     @Synchronized
     fun getBackend(): Backend {
         if (backend == null) {
@@ -34,7 +35,7 @@ protected constructor() {
         @JvmStatic
         @RustCleanup("Use BackendV[11/Next]Factory")
         @Throws(RustBackendFailedException::class)
-        open fun createInstance(): BackendFactory {
+        fun createInstance(): BackendFactory {
             return BackendV11Factory.createInstance()
         }
     }

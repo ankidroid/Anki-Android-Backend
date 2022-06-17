@@ -43,6 +43,7 @@ abstract class AnkiDatabaseCursor : Cursor {
     abstract override fun getCount(): Int
     abstract override fun getPosition(): Int
     abstract override fun getColumnIndex(columnName: String): Int
+
     @Throws(IllegalArgumentException::class)
     abstract override fun getColumnIndexOrThrow(columnName: String): Int
     abstract override fun getColumnName(columnIndex: Int): String
@@ -100,7 +101,7 @@ abstract class AnkiDatabaseCursor : Cursor {
         throw NotImplementedException()
     }
 
-    abstract override fun moveToPosition(position: Int): Boolean
+    abstract override fun moveToPosition(nextPositionGlobal: Int): Boolean
     override fun registerContentObserver(observer: ContentObserver) {
         Timber.w("Not implemented: registerContentObserver - shouldn't matter unless requery() is called")
     }
@@ -149,5 +150,5 @@ abstract class AnkiDatabaseCursor : Cursor {
     }
 
     protected val lastPosition: Int
-        protected get() = count - 1
+        get() = count - 1
 }

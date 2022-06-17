@@ -19,6 +19,5 @@ import anki.backend.BackendError
 import net.ankiweb.rsdroid.BackendException
 
 class BackendJsonException : BackendException {
-    constructor(error: BackendError?) : super(error!!) {}
-    constructor(message: String?) : super(message) {}
+    constructor(error: BackendError?) : super(error!!)
 }

@@ -22,6 +22,6 @@ package net.ankiweb.rsdroid
         "Once we prove this to be incorrect (or fix the bugs), we could remove this and assume that" +
         "rsdroid will always load without issue")
 class RustBackendFailedException : Exception {
-    constructor(error: Throwable?) : super(error) {}
-    constructor(message: String?) : super(message) {}
+    constructor(error: Throwable?) : super(error)
+    constructor(message: String?) : super(message)
 }

@@ -17,8 +17,8 @@ package net.ankiweb.rsdroid.database
 
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.db.SupportSQLiteOpenHelper
-import net.ankiweb.rsdroid.BackendFactory
 import net.ankiweb.rsdroid.Backend
+import net.ankiweb.rsdroid.BackendFactory
 
 abstract class RustSupportSQLiteOpenHelper : SupportSQLiteOpenHelper {
     protected val configuration: SupportSQLiteOpenHelper.Configuration?
