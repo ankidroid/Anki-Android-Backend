@@ -48,16 +48,23 @@ import androidx.sqlite.db.SupportSQLiteStatement
 import net.ankiweb.rsdroid.Backend
 import java.util.*
 
-class RustSupportSQLiteDatabase(backend: Backend?, readOnly: Boolean) : SupportSQLiteDatabase {
+/**
+ * A wrapper that allows the Rust backend to act like a standard Android
+ * database. Key differences:
+ * - the backend must be instructed to open the collection by the caller
+ * - .close() is a no-op - you should call .close() on the collection (or
+ *   backend directly in testing) instead
+ * - isOpen and getPath return dummy data
+ */ 
+class RustSupportSQLiteDatabase(backend: Backend) : SupportSQLiteDatabase {
     private val sessionFactory: ThreadLocal<Session>
-    private val isReadOnly: Boolean
-    private var isOpen: Boolean
+
     override fun isReadOnly(): Boolean {
-        return isReadOnly
+        return false
     }
 
     override fun isOpen(): Boolean {
-        return isOpen
+        return true
     }
 
     override fun compileStatement(sql: String): SupportSQLiteStatement {
@@ -186,8 +193,8 @@ class RustSupportSQLiteDatabase(backend: Backend?, readOnly: Boolean) : SupportS
         throw NotImplementedException.todo()
     }
 
-    override fun getPath(): String? {
-        return session.getPath()
+    override fun getPath(): String {
+        return "<rust>"
     }
 
     override fun isWriteAheadLoggingEnabled(): Boolean {
@@ -208,8 +215,7 @@ class RustSupportSQLiteDatabase(backend: Backend?, readOnly: Boolean) : SupportS
     }
 
     override fun close() {
-        isOpen = false
-        session.closeDatabase()
+        // no-op
     }
 
     /* Not part of interface */
@@ -304,9 +310,6 @@ class RustSupportSQLiteDatabase(backend: Backend?, readOnly: Boolean) : SupportS
     }
 
     init {
-        requireNotNull(backend) { "backend was null" }
         sessionFactory = SessionThreadLocal(backend)
-        isReadOnly = readOnly
-        isOpen = true
     }
 }

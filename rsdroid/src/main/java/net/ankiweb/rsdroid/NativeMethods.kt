@@ -1,34 +1,39 @@
 package net.ankiweb.rsdroid
 
+import android.content.Context
 import android.os.Build
+import android.system.Os
 import androidx.annotation.CheckResult
-import net.ankiweb.rsdroid.RustBackendFailedException
+import java.lang.RuntimeException
 
 object NativeMethods {
     private var hasSetUp = false
-    private var setupException: RustBackendFailedException? = null
     val isRoboUnitTest: Boolean
         get() = "robolectric" == Build.FINGERPRINT
 
     @JvmStatic
     @Synchronized
-    @Throws(RustBackendFailedException::class)
-    fun ensureSetup() {
+    fun ensureSetup(context: Context) {
         if (hasSetUp) {
-            if (setupException != null) {
-                throw setupException!!
-            }
             return
         }
+
+        // Prevent sqlite throwing error 6410 due to the lack of /tmp
+        if (!isRoboUnitTest) {
+            val dir = context.cacheDir
+            Os.setenv("TMPDIR", dir.path, false)
+        }
+
         try {
             System.loadLibrary("rsdroid")
         } catch (e: UnsatisfiedLinkError) {
             if (!isRoboUnitTest) {
-                setupException = RustBackendFailedException(e)
-                throw setupException!!
+                throw RuntimeException("backend load failed")
             }
             // In Robolectric, assume setup works (setupException == null) if the library throws.
             // As the library is loaded at a later time (or a failure will be quickly found).
+            
+            // fixme: is this roboelectric special case still required?
         } finally {
             hasSetUp = true
         }

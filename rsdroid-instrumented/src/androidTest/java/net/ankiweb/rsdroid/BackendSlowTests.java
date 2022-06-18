@@ -21,7 +21,7 @@ import android.database.Cursor;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import net.ankiweb.rsdroid.ankiutil.InstrumentedTest;
-import net.ankiweb.rsdroid.database.RustV11SupportSQLiteOpenHelper;
+import net.ankiweb.rsdroid.database.AnkiSupportSQLiteDatabase;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -142,7 +142,7 @@ public class BackendSlowTests extends InstrumentedTest {
          */
 
         try (Backend backend = super.getBackend("initial_version_2_12_1.anki2")) {
-            SupportSQLiteDatabase db = new RustV11SupportSQLiteOpenHelper(backend).getWritableDatabase();
+            SupportSQLiteDatabase db = AnkiSupportSQLiteDatabase.withRustBackend(backend);
 
             db.query("create table tmp (id varchar)");
 

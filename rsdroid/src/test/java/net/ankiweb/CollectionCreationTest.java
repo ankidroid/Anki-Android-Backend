@@ -10,8 +10,9 @@ import androidx.sqlite.db.SupportSQLiteOpenHelper.Configuration;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import net.ankiweb.rsdroid.Backend;
 import net.ankiweb.rsdroid.BackendFactory;
-import net.ankiweb.rsdroid.database.RustV11SupportSQLiteOpenHelper;
+import net.ankiweb.rsdroid.database.AnkiSupportSQLiteDatabase;
 import net.ankiweb.rsdroid.testing.RustBackendLoader;
 
 import org.junit.Before;
@@ -38,13 +39,13 @@ public class CollectionCreationTest {
         // We use this routine in AnkiDroid to create the collection, therefore we need to ensure
         // that the database is valid, open, and the values returned match how the Java used to work
 
-        BackendFactory backendV1 = TestUtil.getBackendFactory();
-
         String path = new File(getTargetContext().getFilesDir(), "collection.anki2").getAbsolutePath();
 
         Configuration config = getConfiguration(path);
 
-        SupportSQLiteDatabase database = new RustV11SupportSQLiteOpenHelper(config, backendV1).getWritableDatabase();
+        Backend backend = BackendFactory.getBackend(getTargetContext());
+        backend.openCollection(":memory:");
+        SupportSQLiteDatabase database = AnkiSupportSQLiteDatabase.withRustBackend(backend);
 
         database.beginTransaction();
         try {

@@ -96,7 +96,7 @@ public class RustDatabaseIntegrationTests extends InstrumentedTest {
         try {
             Backend backendV1 = getBackend(fileName);
             boolean readOnly = false;
-            return new RustSupportSQLiteDatabase(backendV1, readOnly);
+            return new RustSupportSQLiteDatabase(backendV1);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

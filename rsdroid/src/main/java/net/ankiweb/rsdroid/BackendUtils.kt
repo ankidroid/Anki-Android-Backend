@@ -16,16 +16,6 @@
 package net.ankiweb.rsdroid
 
 object BackendUtils {
-    /**
-     *
-     * @throws android.database.sqlite.SQLiteDatabaseCorruptException If database is corrupt
-     */
-    // fixme: call backend directly
-    @JvmStatic
-    fun openAnkiDroidCollection(backendV1: Backend, path: String?, forceSchema11: Boolean) {
-        backendV1.openCollection(path ?: ":memory:", forceSchema11 = forceSchema11)
-    }
-
     val ankiCommitHash: String
         get() = BuildConfig.ANKI_COMMIT_HASH
 }
