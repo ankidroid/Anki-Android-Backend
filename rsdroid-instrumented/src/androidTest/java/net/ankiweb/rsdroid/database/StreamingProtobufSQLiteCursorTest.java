@@ -62,7 +62,7 @@ public class StreamingProtobufSQLiteCursorTest extends InstrumentedTest {
     }
 
     private SupportSQLiteDatabase getWritableDatabase(Backend backend) {
-        return new RustV11SupportSQLiteOpenHelper(backend).getWritableDatabase();
+        return AnkiSupportSQLiteDatabase.withRustBackend(backend);
     }
 
     @Test

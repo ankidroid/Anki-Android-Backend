@@ -23,10 +23,7 @@ import android.util.Log;
 import androidx.test.platform.app.InstrumentationRegistry;
 
 import net.ankiweb.rsdroid.BackendFactory;
-import net.ankiweb.rsdroid.BackendUtils;
 import net.ankiweb.rsdroid.Backend;
-import net.ankiweb.rsdroid.NativeMethods;
-import net.ankiweb.rsdroid.RustBackendFailedException;
 import net.ankiweb.rsdroid.exceptions.BackendInvalidInputException;
 
 import org.jetbrains.annotations.NotNull;
@@ -57,12 +54,6 @@ public class InstrumentedTest {
         Timber.uprootAll();
         Timber.plant(new Timber.DebugTree());
         */
-
-        try {
-            NativeMethods.ensureSetup();
-        } catch (RustBackendFailedException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     @After
@@ -127,18 +118,14 @@ public class InstrumentedTest {
 
     @NotNull
     protected Backend getBackendFromPath(String path) {
-        Backend backendV1 = getClosedBackend();
-        backendV1.setPageSize(TEST_PAGE_SIZE);
-        BackendUtils.openAnkiDroidCollection(backendV1, path, true);
-        this.backendList.add(backendV1);
-        return backendV1;
+        Backend backend = getClosedBackend();
+        backend.setPageSize(TEST_PAGE_SIZE);
+        backend.openCollection(path);
+        backendList.add(backend);
+        return backend;
     }
 
     protected Backend getClosedBackend() {
-        try {
-            return BackendFactory.createInstance().getBackend();
-        } catch (RustBackendFailedException e) {
-            throw new RuntimeException(e);
-        }
+        return BackendFactory.getBackend(getContext());
     }
 }

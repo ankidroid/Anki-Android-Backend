@@ -21,7 +21,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import net.ankiweb.rsdroid.ankiutil.DatabaseUtil;
 import net.ankiweb.rsdroid.ankiutil.InstrumentedTest;
-import net.ankiweb.rsdroid.database.RustV11SupportSQLiteOpenHelper;
+import net.ankiweb.rsdroid.database.AnkiSupportSQLiteDatabase;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -42,7 +42,7 @@ public class BackendDisposalTests extends InstrumentedTest {
 
             Timber.d("Iteration %d", i);
             try (Backend backend = super.getBackend("initial_version_2_12_1.anki2")) {
-                SupportSQLiteDatabase db = new RustV11SupportSQLiteOpenHelper(backend).getWritableDatabase();
+                SupportSQLiteDatabase db = AnkiSupportSQLiteDatabase.withRustBackend(BackendFactory.getBackend(getContext()));
 
                 int count = DatabaseUtil.queryScalar(db, "select count(*) from revlog");
             }

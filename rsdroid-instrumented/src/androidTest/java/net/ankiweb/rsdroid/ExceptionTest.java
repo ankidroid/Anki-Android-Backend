@@ -40,6 +40,10 @@ import java.util.Arrays;
 
 import static org.junit.Assert.fail;
 
+import android.content.Context;
+
+import androidx.test.platform.app.InstrumentationRegistry;
+
 @RunWith(Parameterized.class)
 public class ExceptionTest {
 
@@ -92,7 +96,11 @@ public class ExceptionTest {
 
     @Before
     public void errorProducesNamedException() {
-        backend = BackendForTesting.create();
+        backend = BackendForTesting.create(getContext());
+    }
+
+    protected Context getContext() {
+        return InstrumentationRegistry.getInstrumentation().getTargetContext();
     }
 
     @Test

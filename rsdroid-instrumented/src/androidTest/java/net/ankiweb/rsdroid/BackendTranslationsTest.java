@@ -24,11 +24,11 @@ public class BackendTranslationsTest extends InstrumentedTest {
 
     @Test
     public void ensureI18nWorks() {
-        Backend b = new Backend(Arrays.asList("en"));
+        Backend b = BackendFactory.getBackend(getContext());
         assertThat(withoutIsolation(b.getTr().mediaCheckTrashCount(5, 10)), equalTo("Trash folder: 5 files, 10MB"));
         assertThat(withoutIsolation(b.getTr().mediaCheckTrashCount(5, 10.0)), equalTo("Trash folder: 5 files, 10MB"));
         assertThat(withoutIsolation(b.getTr().mediaCheckTrashCount(5, "foo")), equalTo("Trash folder: 5 files, fooMB"));
-        b = new Backend(Arrays.asList("fr"));
+        b = BackendFactory.getBackend(getContext(),  Arrays.asList("fr"));
         assertThat(withoutIsolation(b.getTr().mediaCheckTrashCount(5, 10)), equalTo("Corbeille : 5 fichiers, 10 Mo"));
     }
 }

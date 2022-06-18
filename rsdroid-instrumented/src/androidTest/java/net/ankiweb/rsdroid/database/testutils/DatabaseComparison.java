@@ -19,12 +19,11 @@ package net.ankiweb.rsdroid.database.testutils;
 import androidx.annotation.NonNull;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 import androidx.sqlite.db.SupportSQLiteOpenHelper;
-import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory;
 
+import net.ankiweb.rsdroid.Backend;
 import net.ankiweb.rsdroid.BackendFactory;
 import net.ankiweb.rsdroid.ankiutil.InstrumentedTest;
-import net.ankiweb.rsdroid.RustBackendFailedException;
-import net.ankiweb.rsdroid.database.RustV11SQLiteOpenHelperFactory;
+import net.ankiweb.rsdroid.database.AnkiSupportSQLiteDatabase;
 
 import org.junit.Before;
 import org.junit.runners.Parameterized;
@@ -40,7 +39,7 @@ public class DatabaseComparison extends InstrumentedTest {
     @Parameterized.Parameters(name = "{0}")
     public static java.util.Collection<Object[]> initParameters() {
         // This does one run with schedVersion injected as 1, and one run as 2
-        return Arrays.asList(new Object[][] { { DatabaseType.FRAMEWORK }, { DatabaseType.RUST } });
+        return Arrays.asList(new Object[][]{{DatabaseType.FRAMEWORK}, {DatabaseType.RUST_LEGACY}, {DatabaseType.RUST_NEW}});
     }
 
     @Before
@@ -60,23 +59,17 @@ public class DatabaseComparison extends InstrumentedTest {
     }
 
     protected SupportSQLiteDatabase getDatabase() {
-        SupportSQLiteOpenHelper.Configuration config = SupportSQLiteOpenHelper.Configuration.builder(getContext())
-                .callback(new DefaultCallback())
-                .name(getDatabasePath())
-                .build();
-
         switch (schedVersion) {
-            case RUST:
-                BackendFactory mBackendFactory;
-                try {
-                    mBackendFactory = BackendFactory.createInstance();
-                } catch (RustBackendFailedException e) {
-                    throw new RuntimeException(e);
-                }
-                // This throws on corruption
-                return new RustV11SQLiteOpenHelperFactory(mBackendFactory).create(config).getWritableDatabase();
+            case RUST_LEGACY:
+                Backend backend = BackendFactory.getBackend(getContext(), Arrays.asList("en"), true);
+                backend.openCollection(getDatabasePath());
+                return AnkiSupportSQLiteDatabase.withRustBackend(backend);
+            case RUST_NEW:
+                Backend backend2 = BackendFactory.getBackend(getContext(), Arrays.asList("en"), false);
+                backend2.openCollection(getDatabasePath());
+                return AnkiSupportSQLiteDatabase.withRustBackend(backend2);
             case FRAMEWORK:
-                return new FrameworkSQLiteOpenHelperFactory().create(config).getWritableDatabase();
+                return AnkiSupportSQLiteDatabase.withFramework(getContext(), getDatabasePath());
         }
         throw new IllegalStateException();
     }
@@ -85,9 +78,13 @@ public class DatabaseComparison extends InstrumentedTest {
         // TODO: look into this - null should work
         try {
             switch (schedVersion) {
-                case RUST: return ":memory:";
-                case FRAMEWORK: return null;
-                default: return null;
+                case RUST_LEGACY:
+                case RUST_NEW:
+                    return ":memory:";
+                case FRAMEWORK:
+                    return null;
+                default:
+                    return null;
             }
         } catch (NullPointerException ex) {
             throw new IllegalStateException("Class is not annotated with @RunWith(Parameterized.class)", ex);
@@ -96,9 +93,9 @@ public class DatabaseComparison extends InstrumentedTest {
 
     public enum DatabaseType {
         FRAMEWORK,
-        RUST
+        RUST_LEGACY,
+        RUST_NEW,
     }
-
 
 
     private static class DefaultCallback extends SupportSQLiteOpenHelper.Callback {

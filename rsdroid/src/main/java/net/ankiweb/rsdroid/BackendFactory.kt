@@ -13,30 +13,62 @@
  * You should have received a copy of the GNU General Public License along with
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package net.ankiweb.rsdroid
 
-import androidx.sqlite.db.SupportSQLiteOpenHelper
+import android.content.Context
+import java.util.*
 
-abstract class BackendFactory  // Force users to go through getInstance - for now we need to handle the backend failure
-protected constructor() {
-    private var backend: Backend? = null
+typealias CustomBackendCreator = (context: Context, languages: Iterable<String>, legacySchema: Boolean) -> Backend
 
-    @Synchronized
-    fun getBackend(): Backend {
-        if (backend == null) {
-            backend = Backend()
-        }
-        return backend!!
+object BackendFactory {
+    /**
+     * If enabled, collections are upgraded to the latest schema version on open, and different
+     * code paths are used to access the collection, eg the major 'col' classes: models, decks, dconf,
+     * conf, tags are replaced with updated variants.
+     *
+     * UNSTABLE: DO NOT USE THIS ON A COLLECTION YOU CARE ABOUT.
+     */
+    @JvmStatic
+    var defaultLegacySchema: Boolean = true
+
+    /**
+     * The language(es) the backend uses for translations.
+     */
+    var defaultLanguages: Iterable<String> = listOf("en")
+
+    @JvmStatic
+    private var backendForTesting: CustomBackendCreator? = null
+
+    @JvmStatic
+    @JvmOverloads
+    fun getBackend(context: Context, languages: Iterable<String>? = null, legacySchema: Boolean? = null): Backend {
+        val langs = languages ?: defaultLanguages
+        val legacy = legacySchema ?: defaultLegacySchema
+        return backendForTesting?.invoke(context, langs, legacy) ?: Backend(
+                context,
+                langs,
+                legacy
+        )
     }
 
-    abstract val sQLiteOpener: SupportSQLiteOpenHelper.Factory?
+    @JvmStatic
+    fun setDefaultLanguagesFromLocales(locales: Iterable<Locale>) {
+        defaultLanguages = locales.map { localeToBackendCode(it) }
+    }
 
-    companion object {
-        @JvmStatic
-        @RustCleanup("Use BackendV[11/Next]Factory")
-        @Throws(RustBackendFailedException::class)
-        fun createInstance(): BackendFactory {
-            return BackendV11Factory.createInstance()
+    private fun localeToBackendCode(locale: Locale): String {
+        // TODO: this needs checking that all language codes match the ones
+        // shown here: https://i18n.ankiweb.net/teams/
+        return when (locale.language) {
+            Locale("heb").language -> "he"
+            Locale("yue").language -> "zh-TW"
+            else -> locale.language
         }
+    }
+
+    /** Allows overriding the returned backend for unit tests */
+    fun setOverride(creator: CustomBackendCreator?) {
+        backendForTesting = creator
     }
 }

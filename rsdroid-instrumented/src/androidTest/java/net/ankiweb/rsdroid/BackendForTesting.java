@@ -16,21 +16,21 @@
 
 package net.ankiweb.rsdroid;
 
+import android.content.Context;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
+
+import java.util.Arrays;
 
 public class BackendForTesting extends Backend {
 
-    BackendForTesting() {
-        super();
+    public BackendForTesting(@NonNull Context context, @NonNull Iterable<String> langs, boolean legacySchema) {
+        super(context, langs, legacySchema);
     }
 
-    public static BackendForTesting create() {
-        try {
-            NativeMethods.ensureSetup();
-        } catch (RustBackendFailedException e) {
-            throw new RuntimeException(e);
-        }
-        return new BackendForTesting();
+    public static BackendForTesting create(@NonNull Context context) {
+        return new BackendForTesting(context, Arrays.asList("en"), true);
     }
 
 

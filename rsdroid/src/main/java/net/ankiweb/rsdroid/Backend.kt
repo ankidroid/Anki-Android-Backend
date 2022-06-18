@@ -15,6 +15,7 @@
  */
 package net.ankiweb.rsdroid
 
+import android.content.Context
 import androidx.annotation.CheckResult
 import androidx.annotation.VisibleForTesting
 import anki.ankidroid.DBResponse
@@ -24,6 +25,7 @@ import anki.backend.GeneratedBackend
 import anki.generic.Int64
 import com.google.protobuf.ByteString
 import com.google.protobuf.InvalidProtocolBufferException
+import net.ankiweb.rsdroid.database.NotImplementedException
 import net.ankiweb.rsdroid.database.SQLHandler
 import org.json.JSONArray
 import org.json.JSONException
@@ -33,13 +35,10 @@ import java.io.Closeable
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
-open class Backend(langs: Iterable<String> = listOf("en")) : GeneratedBackend(), SQLHandler, Closeable {
+open class Backend(val context: Context, langs: Iterable<String> = listOf("en"), val legacySchema: Boolean = true) : GeneratedBackend(), SQLHandler, Closeable {
     // Set on init; unset on .close(). Access via withBackend()
     private var backendPointer: Long? = null
     private val lock = ReentrantLock()
-
-    // Only stored to satisfy .getPath() interface in SQL connection
-    private var collectionPath: String? = null
 
     val tr: Translations by lazy {
         Translations(this)
@@ -49,16 +48,16 @@ open class Backend(langs: Iterable<String> = listOf("en")) : GeneratedBackend(),
         return backendPointer != null
     }
 
-    fun openCollection(collectionPath: String, forceSchema11: Boolean = true) {
-        openCollection(collectionPath, "", "", "", forceSchema11)
+    fun openCollection(collectionPath: String) {
+        openCollection(collectionPath, "", "", "", legacySchema)
     }
 
     /**
      * Open a backend instance, loading the shared library if not already loaded.
      */
     init {
-        NativeMethods.ensureSetup()
         Timber.i("Opening rust backend with lang=$langs")
+        NativeMethods.ensureSetup(context)
         val input = BackendInit.newBuilder()
                 .addAllPreferredLangs(langs)
                 .build()
@@ -92,7 +91,6 @@ open class Backend(langs: Iterable<String> = listOf("en")) : GeneratedBackend(),
         } catch (exc: BackendException.BackendDbException) {
             throw exc.toSQLiteException("db open")
         }
-        this.collectionPath = collectionPath
     }
 
     /**
@@ -100,7 +98,6 @@ open class Backend(langs: Iterable<String> = listOf("en")) : GeneratedBackend(),
      */
     override fun closeCollection(downgradeToSchema11: Boolean) {
         cancelAllProtoQueries()
-        collectionPath = null
         super.closeCollection(downgradeToSchema11)
     }
 
@@ -156,11 +153,11 @@ open class Backend(langs: Iterable<String> = listOf("en")) : GeneratedBackend(),
     // other DB methods
 
     override fun closeDatabase() {
-        closeCollection(false)
+        throw NotImplementedException("should close collection, not db")
     }
 
     override fun getPath(): String? {
-        return collectionPath
+        throw NotImplementedException()
     }
 
     @CheckResult
@@ -244,7 +241,6 @@ enum class DbRequestKind {
     Begin,
     Commit,
     Rollback,
-    ExecuteMany
 }
 
 /**

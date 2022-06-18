@@ -70,6 +70,7 @@ dependencies {
     api "com.google.protobuf:protobuf-java:${rootProject.ext.protobufVersion}"
     implementation "androidx.sqlite:sqlite:${rootProject.ext.sqliteVersion}"
     implementation 'com.jakewharton.timber:timber:5.0.1'
+    implementation 'androidx.sqlite:sqlite-framework:2.2.0'
 
     testImplementation 'junit:junit:4.13.2'
     testImplementation "org.robolectric:robolectric:4.8.1"
