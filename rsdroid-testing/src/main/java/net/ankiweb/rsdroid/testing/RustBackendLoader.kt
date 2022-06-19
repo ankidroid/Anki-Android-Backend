@@ -130,17 +130,36 @@ object RustBackendLoader {
             return FILENAME_TO_PATH_CACHE[fullFilename]!!
         }
 
-        val bytes = RustBackendLoader::class.java.classLoader!!.getResourceAsStream(fullFilename).use { stream ->
-            stream.readAllBytes()
+
+        val buffer = ByteArray(8 * 1024)
+        val checksum = withStream(fullFilename) { stream ->
+            val digest = MessageDigest.getInstance("SHA-1")
+            var bytesRead: Int
+            while (stream.read(buffer).also { bytesRead = it } != -1) {
+                digest.update(buffer, 0, bytesRead)
+            }
+            digest.digest().joinToString("") { "%02x".format(it) }
         }
-        val checksum = MessageDigest.getInstance("SHA-1").digest(bytes).joinToString("") { "%02x".format(it) }
         val expectedFile = File(System.getProperty("java.io.tmpdir"), "$fileName-$checksum$extension")
         if (!expectedFile.exists()) {
             val tempFile = File.createTempFile(fileName, extension)
-            tempFile.writeBytes(bytes)
+            tempFile.outputStream().use { outStream ->
+                withStream(fullFilename) { inStream ->
+                    var bytesRead: Int
+                    while (inStream.read(buffer).also { bytesRead = it } != -1) {
+                        outStream.write(buffer, 0, bytesRead)
+                    }
+                }
+                outStream.flush()
+                outStream.close()
+            }
             tempFile.renameTo(expectedFile)
         }
         FILENAME_TO_PATH_CACHE[fullFilename] = expectedFile.path
         return expectedFile.absolutePath
+    }
+
+    private fun <T> withStream(fullFilename: String, func: (InputStream) -> T): T {
+        return func(RustBackendLoader::class.java.classLoader!!.getResourceAsStream(fullFilename))
     }
 }
