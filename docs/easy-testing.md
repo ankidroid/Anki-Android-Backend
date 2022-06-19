@@ -99,7 +99,7 @@ Tell gradle to load the compiled .aar and .jar files from disk:
 
 ```diff
 diff --git a/AnkiDroid/build.gradle b/AnkiDroid/build.gradle
-index 2a2d94034..b21c7caff 100644
+index c1a697f64..07b34189d 100644
 --- a/AnkiDroid/build.gradle
 +++ b/AnkiDroid/build.gradle
 @@ -271,10 +271,10 @@ dependencies {
@@ -109,15 +109,30 @@ index 2a2d94034..b21c7caff 100644
 -    implementation "io.github.david-allison-1:anki-android-backend:$ankidroid_backend_version"
 -    testImplementation "io.github.david-allison-1:anki-android-backend-testing:$ankidroid_backend_version"
 -    // implementation files("../../Anki-Android-Backend/rsdroid/build/outputs/aar/rsdroid-release.aar")
--    // testImplementation files("../../Anki-Android-Backend/rsdroid-testing/build/libs/rsdroid-testing-0.1.12.jar")
+-    // testImplementation files("../../Anki-Android-Backend/rsdroid-testing/build/libs/rsdroid-testing-${ankidroid_backend_version}.jar")
 +    // implementation "io.github.david-allison-1:anki-android-backend:$ankidroid_backend_version"
 +    // testImplementation "io.github.david-allison-1:anki-android-backend-testing:$ankidroid_backend_version"
 +    implementation files("../../Anki-Android-Backend/rsdroid/build/outputs/aar/rsdroid-release.aar")
-+    testImplementation files("../../Anki-Android-Backend/rsdroid-testing/build/libs/rsdroid-testing-0.1.12.jar")
++    testImplementation files("../../Anki-Android-Backend/rsdroid-testing/build/libs/rsdroid-testing-${ankidroid_backend_version}.jar")
 
      // On Windows, you can use something like
      // implementation files("C:\\GitHub\\Rust-Test\\rsdroid\\build\\outputs\\aar\\rsdroid-release.aar")
+diff --git a/AnkiDroid/src/main/java/com/ichi2/anki/AnkiDroidApp.java b/AnkiDroid/src/main/java/com/ichi2/anki/AnkiDroidApp.java
+index 3cfd04408..525490e8f 100644
+--- a/AnkiDroid/src/main/java/com/ichi2/anki/AnkiDroidApp.java
++++ b/AnkiDroid/src/main/java/com/ichi2/anki/AnkiDroidApp.java
+@@ -142,6 +142,7 @@ public class AnkiDroidApp extends Application {
+      */
+     @Override
+     public void onCreate() {
++        BackendFactory.setDefaultLegacySchema(false);
+         super.onCreate();
+         if (sInstance != null) {
+             Timber.i("onCreate() called multiple times");
 ```
+
+Also make sure ext.ankidroid_backend_version in AnkiDroid/build.gradle matches the version
+of the backend you're testing.
 
 After making the change, force a gradle sync, and then you should be able to build
 and run the project on an x86_64 emulator/device, and run unit tests.
