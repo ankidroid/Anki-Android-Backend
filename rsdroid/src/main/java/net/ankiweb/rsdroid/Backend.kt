@@ -32,6 +32,7 @@ import org.json.JSONException
 import org.json.JSONObject
 import timber.log.Timber
 import java.io.Closeable
+import java.io.File
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
@@ -49,7 +50,21 @@ open class Backend(val context: Context, langs: Iterable<String> = listOf("en"),
     }
 
     fun openCollection(collectionPath: String) {
-        openCollection(collectionPath, "", "", "", legacySchema)
+        val (mediaFolder, mediaDb) = if (legacySchema || collectionPath == ":memory:") {
+            listOf("", "")
+        } else {
+            listOf(collectionPath.replace(".anki2", ".media"),
+                    collectionPath.replace(".anki2", ".media.db"))
+        }
+        openCollection(collectionPath, mediaFolder, mediaDb, "", legacySchema)
+    }
+    
+    /** Forces a full media check on next sync. Only valid with new backend. */
+    fun removeMediaDb(colPath: String) {
+        val file = File(colPath.replace(".anki2", ".media.db"))
+        if (file.exists()) {
+            file.delete()
+        }
     }
 
     /**
