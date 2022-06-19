@@ -12,14 +12,18 @@ use prost::Message;
 use std::any::Any;
 use std::panic::{catch_unwind, AssertUnwindSafe};
 
+mod logging;
+
 #[no_mangle]
 pub unsafe extern "C" fn Java_net_ankiweb_rsdroid_NativeMethods_openBackend(
     env: JNIEnv,
     _: JClass,
     args: jbyteArray,
 ) -> jarray {
+    let logger = logging::setup_logging();
+
     let input = env.convert_byte_array(args).unwrap();
-    let result = init_backend(&input, None)
+    let result = init_backend(&input, Some(logger))
         .map(|backend| {
             let backend_ptr = Box::into_raw(Box::new(backend)) as i64;
             Int64 { val: backend_ptr }.encode_to_vec()
