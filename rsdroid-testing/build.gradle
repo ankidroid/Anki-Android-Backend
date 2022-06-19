@@ -15,6 +15,7 @@
  */
 
 apply plugin: 'java-library'
+apply plugin: 'kotlin'
 apply plugin: 'signing'
 apply plugin: 'com.vanniktech.maven.publish'
 
@@ -22,6 +23,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     // obtaining the OS
     implementation 'org.apache.commons:commons-exec:1.3'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 }
 
 jar {
@@ -213,5 +215,23 @@ signing {
         def pwd = System.getenv("ORG_GRADLE_PROJECT_SIGNING_PASSWORD")
 
         logger.warn("$message: ${hasPrivate}, ${hasPassword}, ${pk == null || "" == pk}, ${pwd == null || "" == pwd}")
+    }
+}
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
     }
 }
