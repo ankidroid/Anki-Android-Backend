@@ -56,7 +56,7 @@ open class Backend(val context: Context, langs: Iterable<String> = listOf("en"),
      * Open a backend instance, loading the shared library if not already loaded.
      */
     init {
-        Timber.i("Opening rust backend with lang=$langs")
+        Timber.d("Opening rust backend with lang=$langs")
         NativeMethods.ensureSetup(context)
         val input = BackendInit.newBuilder()
                 .addAllPreferredLangs(langs)
@@ -70,7 +70,7 @@ open class Backend(val context: Context, langs: Iterable<String> = listOf("en"),
      * Close the backend, and any open collection. This object can not be used after this.
      */
     override fun close() {
-        Timber.i("Closing rust backend")
+        Timber.d("Closing rust backend")
         lock.withLock {
             // Must be checked inside lock to avoid race
             if (backendPointer != null) {
@@ -174,7 +174,7 @@ open class Backend(val context: Context, langs: Iterable<String> = listOf("en"),
     @CheckResult
     override fun fullQuery(query: String, bindArgs: Array<Any?>?): JSONArray {
         return try {
-            Timber.i("Rust: SQL query: '%s'", query)
+            Timber.d("Rust: SQL query: '%s'", query)
             fullQueryInternal(query, bindArgs)
         } catch (e: JSONException) {
             throw RuntimeException(e)
@@ -188,18 +188,17 @@ open class Backend(val context: Context, langs: Iterable<String> = listOf("en"),
     }
 
     override fun insertForId(sql: String, bindArgs: Array<Any?>?): Long {
-        Timber.i("Rust: sql insert %s", sql)
+        Timber.d("Rust: sql insert %s", sql)
         return super.insertForId(dbRequestJson(sql, bindArgs))
     }
 
     override fun executeGetRowsAffected(sql: String, bindArgs: Array<Any?>?): Int {
-        Timber.i("Rust: executeGetRowsAffected %s", sql)
+        Timber.d("Rust: executeGetRowsAffected %s", sql)
         return runDbCommandForRowCount(dbRequestJson(sql, bindArgs)).toInt()
     }
 
     /* Begin Protobuf-based database streaming methods (#6) */
     override fun fullQueryProto(query: String, bindArgs: Array<Any?>?): DBResponse {
-        Timber.e("Rust: fullQueryProto %s", query)
         return runDbCommandProto(dbRequestJson(query, bindArgs))
     }
 
@@ -209,17 +208,15 @@ open class Backend(val context: Context, langs: Iterable<String> = listOf("en"),
     }
 
     override fun cancelCurrentProtoQuery(sequenceNumber: Int) {
-        Timber.d("cancelCurrentProtoQuery")
         flushQuery(sequenceNumber)
     }
 
     override fun cancelAllProtoQueries() {
-        Timber.d("cancelAllProtoQueries")
         flushAllQueries()
     }
 
     private fun performTransaction(kind: DbRequestKind) {
-        Timber.i("Rust: transaction %s", kind)
+        Timber.d("Rust: transaction %s", kind)
         runDbCommand(dbRequestJson(kind = kind))
     }
 
@@ -230,7 +227,7 @@ open class Backend(val context: Context, langs: Iterable<String> = listOf("en"),
     }
 
     override fun getColumnNames(sql: String): Array<String> {
-        Timber.i("Rust: getColumnNames %s", sql)
+        Timber.d("Rust: getColumnNames %s", sql)
         return getColumnNamesFromQuery(sql).toTypedArray()
     }
 }
