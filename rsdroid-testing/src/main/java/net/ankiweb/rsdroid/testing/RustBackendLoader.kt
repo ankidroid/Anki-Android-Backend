@@ -20,6 +20,7 @@ import java.io.*
 import java.lang.Exception
 import java.lang.IllegalStateException
 import java.lang.RuntimeException
+import java.security.MessageDigest
 import java.util.HashMap
 import kotlin.Throws
 
@@ -91,13 +92,8 @@ object RustBackendLoader {
      * @throws RuntimeException Failure when extracting library to load
      */
     private fun load(fileName: String, extension: String) {
-        val path: String?
-        path = try {
-            getPathFromResourceStream(fileName, extension)
-        } catch (e: IOException) {
-            throw RuntimeException(e)
-        }
-        loadPath(path!!)
+        val path = getPathFromResourceStream(fileName, extension)
+        loadPath(path)
     }
 
     private fun loadPath(path: String) {
@@ -124,45 +120,27 @@ object RustBackendLoader {
      * @throws IOException Error copying the file to the filesystem
      */
     @Throws(IOException::class)
-    private fun getPathFromResourceStream(fileName: String, extension: String): String? {
+    private fun getPathFromResourceStream(fileName: String, extension: String): String {
         // TODO: Ensure that this is reasonably handled without too much copying.
         // Note: this will leave some data in the temp folder.
         val fullFilename = fileName + extension
 
         // maintain a cache to the files so we reduce IO activity if a file has already been extracted.
         if (FILENAME_TO_PATH_CACHE.containsKey(fullFilename)) {
-            return FILENAME_TO_PATH_CACHE[fullFilename]
+            return FILENAME_TO_PATH_CACHE[fullFilename]!!
         }
-        val path = File.createTempFile(fileName, extension).absolutePath
-        val targetFile = File(path)
 
-        // If our temp file already exists, return it
-        // Likely a logical impossibility due to the implementation of createTempFile
-        if (targetFile.exists() && targetFile.length() > 0) {
-            return path
+        val bytes = RustBackendLoader::class.java.classLoader!!.getResourceAsStream(fullFilename).use { stream ->
+            stream.readAllBytes()
         }
-        RustBackendLoader::class.java.classLoader!!.getResourceAsStream(fullFilename).use { rsdroid ->
-            checkNotNull(rsdroid) { "Could not find $fullFilename" }
-            convertToOutputStream(targetFile).use { outStream ->
-                val buffer = ByteArray(8 * 1024)
-                var bytesRead: Int
-                while (rsdroid.read(buffer).also { bytesRead = it } != -1) {
-                    outStream.write(buffer, 0, bytesRead)
-                }
-            }
+        val checksum = MessageDigest.getInstance("SHA-1").digest(bytes).joinToString("") { "%02x".format(it) }
+        val expectedFile = File(System.getProperty("java.io.tmpdir"), "$fileName-$checksum$extension")
+        if (!expectedFile.exists()) {
+            val tempFile = File.createTempFile(fileName, extension)
+            tempFile.writeBytes(bytes)
+            tempFile.renameTo(expectedFile)
         }
-        FILENAME_TO_PATH_CACHE[fullFilename] = path
-        return path
-    }
-
-    @Throws(IOException::class)
-    private fun convertToOutputStream(targetFile: File): OutputStream {
-        val outStream: OutputStream
-        outStream = try {
-            FileOutputStream(targetFile)
-        } catch (e: Exception) {
-            throw IOException("Could not open output file: {}", e)
-        }
-        return outStream
+        FILENAME_TO_PATH_CACHE[fullFilename] = expectedFile.path
+        return expectedFile.absolutePath
     }
 }
