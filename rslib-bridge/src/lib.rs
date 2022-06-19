@@ -83,9 +83,7 @@ where
 {
     let result = match catch_unwind(AssertUnwindSafe(func)) {
         Ok(result) => result,
-        Err(panic) => Err(panic_to_anki_error(&panic)
-            .into_protobuf(tr)
-            .encode_to_vec()),
+        Err(panic) => Err(panic_to_anki_error(panic).into_protobuf(tr).encode_to_vec()),
     };
     pack_result(result, env)
 }
@@ -114,12 +112,15 @@ fn pack_result(result: Result<Vec<u8>, Vec<u8>>, env: &JNIEnv) -> jarray {
     outer_array
 }
 
-fn panic_to_anki_error(s: &(dyn Any + Send)) -> AnkiError {
-    if let Some(msg) = s.downcast_ref::<String>() {
-        AnkiError::FatalError(msg.to_string())
-    } else {
-        // The TypeId (the only thing you can reasonably get from Any) doesn't carry the type name
-        // Confirm an as_ref() rather than a borrow was passed in here.
-        AnkiError::FatalError("panic with unknown info".to_string())
-    }
+fn panic_to_anki_error(panic: Box<dyn Any + Send>) -> AnkiError {
+    AnkiError::FatalError(
+        match panic.downcast_ref::<&'static str>() {
+            Some(msg) => *msg,
+            None => match panic.downcast_ref::<String>() {
+                Some(msg) => msg.as_str(),
+                None => "unknown panic",
+            },
+        }
+        .to_string(),
+    )
 }
