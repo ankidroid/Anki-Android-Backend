@@ -206,10 +206,15 @@ class RPC:
         method=self.command_num
         deser=self.messages[input_type_name].as_builder()
 
+        if name in ("latestProgress", "syncMedia", "translateString"):
+            raw_method = "runMethodRawNoLock"
+        else:
+            raw_method = "runMethodRaw"
+
         buf = f"""
 @Throws(BackendException::class)
 fun {name}Raw(input: ByteArray): ByteArray {{
-    return runMethodRaw({service}, {method}, input);
+    return {raw_method}({service}, {method}, input);
 }}
 """
 
@@ -318,6 +323,8 @@ public abstract class GeneratedBackend {
 
 @Throws(BackendException::class)
 protected abstract fun runMethodRaw(service: Int, method: Int, input: ByteArray): ByteArray;
+@Throws(BackendException::class)
+protected abstract fun runMethodRawNoLock(service: Int, method: Int, input: ByteArray): ByteArray;
 
 """
     ]

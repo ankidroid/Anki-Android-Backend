@@ -102,12 +102,23 @@ open class Backend(val context: Context, langs: Iterable<String> = listOf("en"),
     }
 
     /**
-     * All backend methods (except for backend init/close) flow through this.
+     * All backend methods (except for backend init/close, and those explicitly
+     * excluded from the mutex) flow through this.
      */
     override fun runMethodRaw(service: Int, method: Int, input: ByteArray): ByteArray {
         return withBackend {
             unpackResult(NativeMethods.runMethodRaw(it, service, method, input))
         }
+    }
+
+    /**
+     * Translations, progress fetching, and media sync do not require an outer lock.
+     */
+    override fun runMethodRawNoLock(service: Int, method: Int, input: ByteArray): ByteArray {
+        if (backendPointer == null) {
+            throw BackendException("Backend has been closed")
+        }
+        return unpackResult(NativeMethods.runMethodRaw(backendPointer!!, service, method, input))
     }
 
     /**
