@@ -1,3 +1,4 @@
 [env]
 RSLIB_FTL_ROOT = { value = "ftl/core/l10n.toml", relative = true }
-
+BUILDINFO = { value = "rslib-bridge/buildinfo.txt", relative = true }
+BAZEL = "1"
