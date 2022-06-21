@@ -206,7 +206,7 @@ class RPC:
         method=self.command_num
         deser=self.messages[input_type_name].as_builder()
 
-        if name in ("latestProgress", "syncMedia", "translateString"):
+        if name in ("latestProgress", "syncMedia", "translateString", "awaitBackupCompletion"):
             raw_method = "runMethodRawNoLock"
         else:
             raw_method = "runMethodRaw"
