@@ -1,5 +1,8 @@
 # Testing changes with AnkiDroid on an X86_64 sim (Linux)
 
+It is possible to limit the build to the current architecture, to avoid having
+to use Docker or to cross-compile for multiple platforms.
+
 A similar approach may work on Mac and Windows, but this has only been tested on Linux
 so far.
 
@@ -24,11 +27,7 @@ Install protobuf:
 
 - Install protobuf with your package manager
 
-Install Python packages
-
-- pip install protobuf stringcase, or see the venv section below
-
-## Using a custom python venv
+## Optional Python venv
 
 If you don't want to `pip install protobuf` globally, you can
 symlink the python bin from a venv into `python` at the top of
@@ -36,6 +35,12 @@ the project folder:
 
 ```
 $ ln -sf /path/to/venv/bin/python python
+```
+
+## Install Python packages
+
+```
+pip install protobuf stringcase
 ```
 
 ## Build

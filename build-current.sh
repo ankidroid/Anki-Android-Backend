@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Builds for the current architecture only. See docs/easy-testing.md
+# Builds for the current architecture only. See docs/TESTING.md
 #
 
 set -e

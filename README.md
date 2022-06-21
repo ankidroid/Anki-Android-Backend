@@ -17,14 +17,9 @@ Adapter allowing AnkiDroid to leverage Anki Desktop's Rust-based business logic 
 
 ## How to use it in a project
 
-Pre-built version:
-
-```gradle
-    implementation "io.github.david-allison-1:anki-android-backend:0.1.13-anki2.1.53"
-    testImplementation "io.github.david-allison-1:anki-android-backend-testing:0.1.13-anki2.1.53"
-```
-
-See ./docs for info on building a version for testing.
+AnkiDroid uses a pre-built version of this library, and includes it in AnkiDroid/build.gradle.
+To build a local version of this library and tell AnkiDroid to use it, please see the instructions
+in docs/TESTING.md
 
 ## Folders
 
