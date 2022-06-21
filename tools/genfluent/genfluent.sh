@@ -1,3 +1,4 @@
 #!/bin/bash
 
-./tools/genfluent/genfluent.py
+. tools/setup-python
+$PYTHON ./tools/genfluent/genfluent.py

@@ -65,3 +65,6 @@ AnkiDroid/ACRA-INSTALLATION
 .DS_Store
 .externalNativeBuild
 .cxx
+
+# optional symlink to venv
+python
