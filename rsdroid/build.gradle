@@ -91,7 +91,14 @@ task generateTranslations(type: Exec) {
 }
 
 preBuild.dependsOn "generateTranslations"
-preBuild.dependsOn "cargoBuild"
+
+Boolean wantAllPlatforms = System.getenv("CURRENT_ONLY") != "true"
+
+if (wantAllPlatforms) {
+    preBuild.dependsOn "cargoBuild"
+} else {
+    preBuild.dependsOn "cargoBuildX86_64"
+}
 
 signing {
     def hasPrivate = project.hasProperty('SIGNING_PRIVATE_KEY')

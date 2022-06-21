@@ -183,18 +183,22 @@ task copyWindowsOutput(type: Copy) {
 // TODO: check for cargo
 // check for targets: x86_64-apple-darwin, x86_64-pc-windows-gnu, TODO: Linux
 
-processResources.dependsOn preBuildWindows
-processResources.dependsOn copyWindowsOutput
-// To fix: "toolchain 'nightly-x86_64-unknown-linux-gnu' is not installed"
-// execute in bash: rustup toolchain install nightly-x86_64-unknown-linux-gnu
-// "linker `x86_64-unknown-linux-gnu-gcc` not found"
-// sudo ln -s /usr/bin/cc /usr/local/bin/x86_64-unknown-linux-gnu-gcc
+Boolean wantAllPlatforms = System.getenv("CURRENT_ONLY") != "true"
 
-// rustup target add x86_64-pc-windows-gnu --toolchain nightly
-// brew install mingw-w64 && x86_64-w64-mingw32-gcc -v
-processResources.dependsOn preBuildLinux
-processResources.dependsOn copyLinuxOutput
-
+if (wantAllPlatforms || org.gradle.internal.os.OperatingSystem.current().isWindows()) {
+    processResources.dependsOn preBuildWindows
+    processResources.dependsOn copyWindowsOutput
+}
+if (wantAllPlatforms || org.gradle.internal.os.OperatingSystem.current().isLinux()) {
+    // rustup target add x86_64-pc-windows-gnu --toolchain nightly
+    // brew install mingw-w64 && x86_64-w64-mingw32-gcc -v
+    // To fix: "toolchain 'nightly-x86_64-unknown-linux-gnu' is not installed"
+    // execute in bash: rustup toolchain install nightly-x86_64-unknown-linux-gnu
+    // "linker `x86_64-unknown-linux-gnu-gcc` not found"
+    // sudo ln -s /usr/bin/cc /usr/local/bin/x86_64-unknown-linux-gnu-gcc
+    processResources.dependsOn preBuildLinux
+    processResources.dependsOn copyLinuxOutput
+}
 if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
     // due to restrictions on downloading the MacOS SDK, we can only build for MacOS on MacOS
     // > Install a reasonable number of copies of the Apple Software on Apple-branded computers
