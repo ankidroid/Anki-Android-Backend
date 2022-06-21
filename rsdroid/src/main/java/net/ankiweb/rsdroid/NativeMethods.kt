@@ -18,25 +18,17 @@ object NativeMethods {
             return
         }
 
-        // Prevent sqlite throwing error 6410 due to the lack of /tmp
         if (!isRoboUnitTest) {
+            // Prevent sqlite throwing error 6410 due to the lack of /tmp
             val dir = context.cacheDir
             Os.setenv("TMPDIR", dir.path, false)
+            // Then load library
+            System.loadLibrary("rsdroid")
+        } else {
+            // Test harness will load the library for us.
         }
 
-        try {
-            System.loadLibrary("rsdroid")
-        } catch (e: UnsatisfiedLinkError) {
-            if (!isRoboUnitTest) {
-                throw RuntimeException("backend load failed")
-            }
-            // In Robolectric, assume setup works (setupException == null) if the library throws.
-            // As the library is loaded at a later time (or a failure will be quickly found).
-            
-            // fixme: is this roboelectric special case still required?
-        } finally {
-            hasSetUp = true
-        }
+        hasSetUp = true
     }
 
     @CheckResult

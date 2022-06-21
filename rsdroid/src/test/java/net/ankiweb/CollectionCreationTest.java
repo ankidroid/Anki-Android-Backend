@@ -31,7 +31,7 @@ public class CollectionCreationTest {
 
     @Before
     public void loadLibrary() {
-        RustBackendLoader.init();
+        RustBackendLoader.ensureSetup(null);
     }
 
     @Test
