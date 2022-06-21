@@ -1,2 +1,4 @@
 #!/bin/bash
-./tools/protoc-gen/protoc-gen.py
+
+. tools/setup-python
+$PYTHON ./tools/protoc-gen/protoc-gen.py

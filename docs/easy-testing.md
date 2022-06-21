@@ -31,18 +31,11 @@ Install Python packages
 ## Using a custom python venv
 
 If you don't want to `pip install protobuf` globally, you can
-switch to a venv:
+symlink the python bin from a venv into `python` at the top of
+the project folder:
 
-```diff
-diff --git a/tools/protoc-gen/protoc-gen.sh b/tools/protoc-gen/protoc-gen.sh
-index d4039ec..3ac5d29 100755
---- a/tools/protoc-gen/protoc-gen.sh
-+++ b/tools/protoc-gen/protoc-gen.sh
-@@ -1,2 +1,3 @@
- #!/bin/bash
--./tools/protoc-gen/protoc-gen.py
-+
-+$HOME/Local/python/misc/bin/python3 ./tools/protoc-gen/protoc-gen.py
+```
+$ ln -sf /path/to/venv/bin/python python
 ```
 
 ## Build
