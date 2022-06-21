@@ -45,29 +45,8 @@ android {
     sourceSets {
         main {
             kotlin.srcDirs += "build/generated/source/fluent"
-            resources {
-                srcDirs "src/main/resources", "build/generated/anki_artifacts"
-            }
         }
     }
-}
-
-def artifactZipUrl = "https://apps.ankiweb.net/downloads/anki_artifacts.zip"
-def artifactZipLocation = "build/artifacts.zip"
-def artifactExtractLocation = "build/generated/anki_artifacts"
-
-task downloadAndPrepareArtifacts {
-    doLast {
-        def file = new File("rsdroid/" + artifactZipLocation)
-        new URL(artifactZipUrl).withInputStream{ i -> file.withOutputStream{ it << i }}
-        new File(artifactExtractLocation).deleteDir()
-    }
-}
-
-tasks.register('unpackAnkiArtifacts', Copy) {
-    dependsOn(downloadAndPrepareArtifacts)
-    from zipTree(artifactZipLocation)
-    into artifactExtractLocation
 }
 
 // Consider upgrade to DSL: https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
@@ -98,6 +77,7 @@ dependencies {
     testImplementation 'androidx.test:core:1.4.0'
     testImplementation "androidx.test.ext:junit:${rootProject.ext.androidxTestJunitVersion}"
     testImplementation project(path: ':rsdroid-testing')
+
 }
 
 task generateTranslations(type: Exec) {
@@ -114,7 +94,6 @@ preBuild.dependsOn "generateTranslations"
 
 Boolean wantAllPlatforms = System.getenv("CURRENT_ONLY") != "true"
 
-preBuild.dependsOn("unpackAnkiArtifacts")
 if (wantAllPlatforms) {
     preBuild.dependsOn "cargoBuild"
 } else {
