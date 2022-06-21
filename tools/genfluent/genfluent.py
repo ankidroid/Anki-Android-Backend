@@ -14,7 +14,8 @@ import re
 def ensure_i18n_module_correct():
     reg = re.compile(r'(\s+)(\S+_(?:commit|zip_csum)) = "(.*)"')
     for line in open("rslib-bridge/anki/repos.bzl").readlines():
-        if m := reg.match(line):
+        m = reg.match(line)
+        if m:
             (indent, key, commit) = m.groups()
             if key == "core_i18n_commit":
                 subprocess.run(["git", "checkout", commit], cwd="ftl/core", check=True)
