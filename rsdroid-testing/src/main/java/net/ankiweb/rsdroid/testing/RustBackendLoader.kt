@@ -17,7 +17,6 @@ package net.ankiweb.rsdroid.testing
 
 import org.apache.commons.exec.OS
 import java.io.*
-import java.lang.Exception
 import java.lang.IllegalStateException
 import java.lang.RuntimeException
 import java.security.MessageDigest
@@ -28,7 +27,7 @@ import kotlin.Throws
  * Loads a librsdroid.so alternative to allow testing of rsdroid under a Robolectric-based environment
  */
 object RustBackendLoader {
-    private var alreadyLoaded = false
+    private var hasSetUp = false
     private val FILENAME_TO_PATH_CACHE = HashMap<String, String>()
     var PRINT_DEBUG = false
 
@@ -38,14 +37,22 @@ object RustBackendLoader {
      *
      * This call is cached and is a no-op if called multiple times.
      *
+     * Note the @Synchronized label is misleading - see the docs for loadPath()
+     * 
      * @throws IllegalStateException OS is not Windows, Linux or macOS
      * @throws RuntimeException Failure when extracting library to load
      * @throws UnsatisfiedLinkError The library could not be loaded
      */
     @JvmStatic
-    fun init() {
-        if (!alreadyLoaded) {
-
+    @Synchronized
+    fun ensureSetup(customPath: String?) {
+        if (hasSetUp) {
+            return;
+        }
+        if (customPath != null) {
+            print("loading rsdroid-testing with path $customPath")
+            loadRsdroid(customPath)
+        } else {
             // This should help diagnose some issues,
             print("loading rsdroid-testing for: " + System.getProperty("os.name"))
             if (OS.isFamilyWindows()) {
@@ -58,8 +65,8 @@ object RustBackendLoader {
                 val osName = System.getProperty("os.name")
                 throw IllegalStateException(String.format("Could not determine OS Type for: '%s'", osName))
             }
-            alreadyLoaded = true
         }
+        hasSetUp = true
     }
 
     private fun print(message: String) {
@@ -74,12 +81,8 @@ object RustBackendLoader {
      *
      * @param filePath A full path to the compiled .dll/.dylib/.so
      */
-    fun loadRsdroid(filePath: String) {
-        if (alreadyLoaded) {
-            return
-        }
+    private fun loadRsdroid(filePath: String) {
         loadPath(filePath)
-        alreadyLoaded = true
     }
 
     /**
@@ -96,6 +99,15 @@ object RustBackendLoader {
         loadPath(path)
     }
 
+    /**
+     * Subtle behaviour alert: while the routine that calls this is protected with a
+     * @Synchronized attribution, the lock it uses is based on the classloader that is
+     * active at the time. JUnit and Robolectric will alter the classloader for different tests
+     * (eg some do not use Robolectric's classloader at all, and other tests like BindingAndroidTest
+     * will use multiple classloader instances due to the use of @Config). This means this code
+     * is not guaranteed to execute only once, and after the first invocation, an "already loaded"
+     * error will be thrown by Java, which we have to swallow.
+     */
     private fun loadPath(path: String) {
         try {
             Runtime.getRuntime().load(path)
@@ -106,6 +118,8 @@ object RustBackendLoader {
             }
             if (e.message == null || !e.message!!.contains("already loaded in another classloader")) {
                 throw e
+            } else {
+                // native library loaded by a different classloader in the same process
             }
         }
     }
@@ -129,7 +143,6 @@ object RustBackendLoader {
         if (FILENAME_TO_PATH_CACHE.containsKey(fullFilename)) {
             return FILENAME_TO_PATH_CACHE[fullFilename]!!
         }
-
 
         val buffer = ByteArray(8 * 1024)
         val checksum = withStream(fullFilename) { stream ->
