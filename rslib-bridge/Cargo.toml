@@ -26,6 +26,7 @@ rusqlite = { version = "0.26.0", features = ["trace", "functions", "collation", 
 android_logger = "0.11.0"
 log = "0.4.17"
 slog = "2.7.0"
+gag = "1.0.0"
 
 [features]
 no-android = []
