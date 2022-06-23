@@ -16,6 +16,7 @@
 package net.ankiweb.rsdroid
 
 import android.content.Context
+import android.os.Looper
 import androidx.annotation.CheckResult
 import androidx.annotation.VisibleForTesting
 import anki.ankidroid.DBResponse
@@ -189,7 +190,6 @@ open class Backend(val context: Context, langs: Iterable<String> = listOf("en"),
     @CheckResult
     override fun fullQuery(query: String, bindArgs: Array<Any?>?): JSONArray {
         return try {
-            Timber.d("Rust: SQL query: '%s'", query)
             fullQueryInternal(query, bindArgs)
         } catch (e: JSONException) {
             throw RuntimeException(e)
@@ -198,27 +198,28 @@ open class Backend(val context: Context, langs: Iterable<String> = listOf("en"),
 
     @Throws(JSONException::class)
     private fun fullQueryInternal(sql: String, bindArgs: Array<Any?>?): JSONArray {
+        checkMainThread(sql)
         val output = runDbCommand(dbRequestJson(sql, bindArgs)).toStringUtf8()
         return JSONArray(output)
     }
 
     override fun insertForId(sql: String, bindArgs: Array<Any?>?): Long {
-        Timber.d("Rust: sql insert %s", sql)
+        checkMainThread(sql)
         return super.insertForId(dbRequestJson(sql, bindArgs))
     }
 
     override fun executeGetRowsAffected(sql: String, bindArgs: Array<Any?>?): Int {
-        Timber.d("Rust: executeGetRowsAffected %s", sql)
+        checkMainThread(sql)
         return runDbCommandForRowCount(dbRequestJson(sql, bindArgs)).toInt()
     }
 
     /* Begin Protobuf-based database streaming methods (#6) */
     override fun fullQueryProto(query: String, bindArgs: Array<Any?>?): DBResponse {
+        checkMainThread(query)
         return runDbCommandProto(dbRequestJson(query, bindArgs))
     }
 
     override fun getNextSlice(startIndex: Long, sequenceNumber: Int): DBResponse {
-        Timber.d("Rust: getNextSlice %d", startIndex)
         return getNextResultPage(sequenceNumber, startIndex)
     }
 
@@ -231,7 +232,6 @@ open class Backend(val context: Context, langs: Iterable<String> = listOf("en"),
     }
 
     private fun performTransaction(kind: DbRequestKind) {
-        Timber.d("Rust: transaction %s", kind)
         runDbCommand(dbRequestJson(kind = kind))
     }
 
@@ -242,8 +242,17 @@ open class Backend(val context: Context, langs: Iterable<String> = listOf("en"),
     }
 
     override fun getColumnNames(sql: String): Array<String> {
-        Timber.d("Rust: getColumnNames %s", sql)
         return getColumnNamesFromQuery(sql).toTypedArray()
+    }
+    
+    private fun checkMainThread(query: String) {
+        try {
+            if (Looper.getMainLooper().isCurrentThread) {
+                Timber.w("SQL on UI thread: %s", query)
+            }
+        } catch (exc: NoSuchMethodError) {
+            // running outside Android
+        }
     }
 }
 
