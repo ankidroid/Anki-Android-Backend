@@ -57,6 +57,7 @@ open class Backend(val context: Context, langs: Iterable<String> = listOf("en"),
             listOf(collectionPath.replace(".anki2", ".media"),
                     collectionPath.replace(".anki2", ".media.db"))
         }
+        checkMainThreadOp()
         openCollection(collectionPath, mediaFolder, mediaDb, "", legacySchema)
     }
     
@@ -72,6 +73,7 @@ open class Backend(val context: Context, langs: Iterable<String> = listOf("en"),
      * Open a backend instance, loading the shared library if not already loaded.
      */
     init {
+        checkMainThreadOp()
         Timber.d("Opening rust backend with lang=$langs")
         NativeMethods.ensureSetup(context)
         val input = BackendInit.newBuilder()
@@ -86,6 +88,7 @@ open class Backend(val context: Context, langs: Iterable<String> = listOf("en"),
      * Close the backend, and any open collection. This object can not be used after this.
      */
     override fun close() {
+        checkMainThreadOp()
         Timber.d("Closing rust backend")
         lock.withLock {
             // Must be checked inside lock to avoid race
@@ -122,6 +125,7 @@ open class Backend(val context: Context, langs: Iterable<String> = listOf("en"),
      * excluded from the mutex) flow through this.
      */
     override fun runMethodRaw(service: Int, method: Int, input: ByteArray): ByteArray {
+        checkMainThreadOp()
         return withBackend {
             unpackResult(NativeMethods.runMethodRaw(it, service, method, input))
         }
@@ -198,24 +202,24 @@ open class Backend(val context: Context, langs: Iterable<String> = listOf("en"),
 
     @Throws(JSONException::class)
     private fun fullQueryInternal(sql: String, bindArgs: Array<Any?>?): JSONArray {
-        checkMainThread(sql)
+        checkMainThreadSQL(sql)
         val output = runDbCommand(dbRequestJson(sql, bindArgs)).toStringUtf8()
         return JSONArray(output)
     }
 
     override fun insertForId(sql: String, bindArgs: Array<Any?>?): Long {
-        checkMainThread(sql)
+        checkMainThreadSQL(sql)
         return super.insertForId(dbRequestJson(sql, bindArgs))
     }
 
     override fun executeGetRowsAffected(sql: String, bindArgs: Array<Any?>?): Int {
-        checkMainThread(sql)
+        checkMainThreadSQL(sql)
         return runDbCommandForRowCount(dbRequestJson(sql, bindArgs)).toInt()
     }
 
     /* Begin Protobuf-based database streaming methods (#6) */
     override fun fullQueryProto(query: String, bindArgs: Array<Any?>?): DBResponse {
-        checkMainThread(query)
+        checkMainThreadSQL(query)
         return runDbCommandProto(dbRequestJson(query, bindArgs))
     }
 
@@ -244,14 +248,37 @@ open class Backend(val context: Context, langs: Iterable<String> = listOf("en"),
     override fun getColumnNames(sql: String): Array<String> {
         return getColumnNamesFromQuery(sql).toTypedArray()
     }
+
+    private fun checkMainThreadOp() {
+        checkMainThread {
+            val stackTraceElements = Thread.currentThread().stackTrace
+            val firstElem = stackTraceElements.filter {
+                val klass = it.className
+                for (text in listOf("rsdroid", "libanki", "java.lang", "dalvik", "anki.backend")) {
+                    if (text in klass) {
+                        return@filter false
+                    }
+                }
+                true
+            }.first()
+            Timber.w("Op on UI thread: %s", firstElem)
+        }
+    }
+
     
-    private fun checkMainThread(query: String) {
+    private fun checkMainThreadSQL(query: String) {
+        checkMainThread {
+            Timber.w("SQL on UI thread: %s", query)
+        }
+    }
+
+    private fun checkMainThread(func: () -> Unit) {
         try {
             if (Looper.getMainLooper().isCurrentThread) {
-                Timber.w("SQL on UI thread: %s", query)
+                func()
             }
         } catch (exc: NoSuchMethodError) {
-            // running outside Android
+            // running outside Android, or old API
         }
     }
 }
