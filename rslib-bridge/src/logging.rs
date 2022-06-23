@@ -62,11 +62,24 @@ fn monitor_io_handle(handle: BufferRedirect) {
                     // currently EOF
                     std::thread::sleep(Duration::from_secs(1));
                 }
-                Ok(_) => log::debug!("{}", buf),
+                Ok(_) => {
+                    if !should_ignore_line(&buf) {
+                        log::debug!("{}", buf)
+                    }
+                }
                 Err(err) => log::debug!("stdio err: {}", err),
             }
         }
     });
+}
+
+fn should_ignore_line(buf: &str) -> bool {
+    // quieten simulator noise
+    if buf.starts_with("s_glBindAttribLocation") {
+        true
+    } else {
+        false
+    }
 }
 
 pub(crate) fn setup_logging() -> Logger {
