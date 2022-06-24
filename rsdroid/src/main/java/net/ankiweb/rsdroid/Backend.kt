@@ -60,7 +60,7 @@ open class Backend(val context: Context, langs: Iterable<String> = listOf("en"),
         checkMainThreadOp()
         openCollection(collectionPath, mediaFolder, mediaDb, "", legacySchema)
     }
-    
+
     /** Forces a full media check on next sync. Only valid with new backend. */
     fun removeMediaDb(colPath: String) {
         val file = File(colPath.replace(".anki2", ".media.db"))
@@ -249,12 +249,13 @@ open class Backend(val context: Context, langs: Iterable<String> = listOf("en"),
         return getColumnNamesFromQuery(sql).toTypedArray()
     }
 
-    private fun checkMainThreadOp() {
+    private fun checkMainThreadOp(sql: String? = null) {
         checkMainThread {
             val stackTraceElements = Thread.currentThread().stackTrace
             val firstElem = stackTraceElements.filter {
                 val klass = it.className
-                for (text in listOf("rsdroid", "libanki", "java.lang", "dalvik", "anki.backend")) {
+                for (text in listOf("rsdroid", "libanki", "java.lang", "dalvik", "anki.backend",
+                        "DatabaseChangeDecorator")) {
                     if (text in klass) {
                         return@filter false
                     }
@@ -262,14 +263,15 @@ open class Backend(val context: Context, langs: Iterable<String> = listOf("en"),
                 true
             }.first()
             Timber.w("Op on UI thread: %s", firstElem)
+            sql?.let {
+                Timber.w("%s", sql)
+            }
         }
     }
 
-    
+
     private fun checkMainThreadSQL(query: String) {
-        checkMainThread {
-            Timber.w("SQL on UI thread: %s", query)
-        }
+        checkMainThreadOp(query)
     }
 
     private fun checkMainThread(func: () -> Unit) {
