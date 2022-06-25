@@ -346,10 +346,7 @@ protected abstract fun runMethodRawNoLock(service: Int, method: Int, input: Byte
     f.content = "\n".join(file_contents)
 
 def contains_oneof(msg):
-    for field in msg.fields:
-        if field.oneof_index:
-            return True
-    return False
+    return msg.method.oneof_decl
 
 if __name__ == "__main__":
     # Read request message from stdin
