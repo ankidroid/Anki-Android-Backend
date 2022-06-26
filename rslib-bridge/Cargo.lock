@@ -1639,6 +1639,7 @@ dependencies = [
  "serde_derive",
  "serde_json",
  "slog",
+ "slog-envlogger",
 ]
 
 [[package]]
