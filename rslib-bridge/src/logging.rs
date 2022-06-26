@@ -3,7 +3,7 @@
 //! It also captures stdout/stderr output, and feeds it to logcat, to make it
 //! easier to debug issues with dbg!()/println!()
 
-use android_logger::Config;
+use android_logger::{Config, FilterBuilder};
 use log::Level;
 use slog::*;
 use std::io::{BufRead, BufReader};
@@ -85,6 +85,15 @@ fn should_ignore_line(buf: &str) -> bool {
 pub(crate) fn setup_logging() -> Logger {
     // failure is expected after the first backend invocation
     let _ = redirect_io();
-    android_logger::init_once(Config::default().with_min_level(Level::Debug));
-    Logger::root(AndroidDrain {}.fuse(), slog_o!())
+
+    let filter = format!(
+        "{},rsdroid::logging=debug",
+        std::env::var("RUST_LOG").unwrap_or_else(|_| "error".into())
+    );
+    android_logger::init_once(
+        Config::default()
+            .with_min_level(Level::Debug)
+            .with_filter(FilterBuilder::new().parse(&filter).build()),
+    );
+    Logger::root(slog_envlogger::new(AndroidDrain {}).fuse(), slog_o!())
 }
