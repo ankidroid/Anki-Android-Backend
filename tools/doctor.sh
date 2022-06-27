@@ -91,3 +91,9 @@ else
     echo -e "Try installing with python 3.7"
     error_echo "Failed installing Protobuf python libraries"
 fi
+
+if [[ $(pip3 install stringcase) ]]; then
+  ok_echo "Stringcase is installed"
+else
+  error_echo "Failed installing stringcase python library"
+fi
