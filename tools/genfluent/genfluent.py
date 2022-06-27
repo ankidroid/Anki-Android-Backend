@@ -18,6 +18,7 @@ def ensure_i18n_module_correct():
         if m:
             (indent, key, commit) = m.groups()
             if key == "core_i18n_commit":
+                subprocess.run(["git", "fetch"], cwd="ftl/core", check=True)
                 subprocess.run(["git", "checkout", commit], cwd="ftl/core", check=True)
                 break
 
