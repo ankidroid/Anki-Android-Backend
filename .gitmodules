@@ -1,7 +1,6 @@
 [submodule "anki"]
 	path = rslib-bridge/anki
 	url = https://github.com/ankidroid/anki
-	branch = ankidroid-2-1-34
 [submodule "ftl/core"]
 	path = ftl/core
 	url = https://github.com/ankitects/anki-core-i18n.git
