@@ -44,6 +44,9 @@ protobuf {
                     // which is confusing and of no use to us
                     // option "lite"
                 }
+                kotlin {
+
+                }
             }
             task.plugins {
                 anki { }
