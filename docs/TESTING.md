@@ -29,9 +29,9 @@ Install protobuf:
 
 ## Optional Python venv
 
-If you don't want to `pip install protobuf` globally, you can
-symlink the python bin from a venv into `python` at the top of
-the project folder:
+If you don't want to `pip install protobuf stringcase` globally,
+you can do so in a venv, and then symlink the python bin from the
+venv into `python` at the top of the project folder:
 
 ```
 $ ln -sf /path/to/venv/bin/python python
