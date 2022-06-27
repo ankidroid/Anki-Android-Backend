@@ -1,6 +1,6 @@
 #![allow(clippy::missing_safety_doc)]
 
-use anki::backend_proto::{backend_error, BackendError, Int64};
+use anki::pb::{backend_error, BackendError, Int64};
 use jni::objects::{JClass, JObject};
 use jni::sys::{jarray, jbyteArray, jint, jlong};
 use jni::JNIEnv;
