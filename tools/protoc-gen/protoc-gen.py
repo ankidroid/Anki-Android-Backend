@@ -10,6 +10,9 @@ from google.protobuf.compiler import plugin_pb2 as plugin
 
 TYPE_ENUM = 14
 
+NO_MUTEX_METHODS = {"latestProgress", "syncMedia", "translateString", "awaitBackupCompletion",
+    "setWantsAbort", "abortSync", "abortMediaSync"}
+
 # Needs map<> and Fluent import rather than Backend
 ignore_methods_accepting = ["TranslateStringIn"]
 
@@ -206,7 +209,7 @@ class RPC:
         method=self.command_num
         deser=self.messages[input_type_name].as_builder()
 
-        if name in ("latestProgress", "syncMedia", "translateString", "awaitBackupCompletion"):
+        if name in NO_MUTEX_METHODS:
             raw_method = "runMethodRawNoLock"
         else:
             raw_method = "runMethodRaw"
