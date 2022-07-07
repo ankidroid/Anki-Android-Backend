@@ -45,7 +45,20 @@ android {
     sourceSets {
         main {
             kotlin.srcDirs += "build/generated/source/fluent"
+            resources {
+                srcDirs "src/main/resources", "build/generated/anki_artifacts"
+            }
         }
+    }
+}
+
+task buildAnkiWebAssets(type: Exec) {
+    workingDir "$rootDir"
+    String toolPath = System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows') ? 'tools\\web\\build-web-assets.ps1' : 'tools/web/build-web-assets.sh'
+    if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
+        commandLine 'cmd', '/c', 'Powershell  -File', toolPath
+    } else {
+        commandLine 'sh', '-c', toolPath
     }
 }
 
@@ -100,11 +113,18 @@ preBuild.dependsOn "generateTranslations"
 
 Boolean wantAllPlatforms = System.getenv("CURRENT_ONLY") != "true"
 
-if (wantAllPlatforms) {
-    preBuild.dependsOn "cargoBuild"
-} else {
-    preBuild.dependsOn "cargoBuildX86_64"
+task cargoBuildTask {
+    if (wantAllPlatforms) {
+        preBuild.dependsOn "cargoBuild"
+    } else {
+        preBuild.dependsOn "cargoBuildX86_64"
+    }
+
+    mustRunAfter "buildAnkiWebAssets"
 }
+
+preBuild.dependsOn "buildAnkiWebAssets"
+preBuild.dependsOn "cargoBuildTask"
 
 signing {
     def hasPrivate = project.hasProperty('SIGNING_PRIVATE_KEY')
