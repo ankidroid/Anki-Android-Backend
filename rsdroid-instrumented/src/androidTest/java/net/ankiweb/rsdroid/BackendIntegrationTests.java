@@ -31,6 +31,7 @@ import org.junit.runner.RunWith;
 
 import java.util.concurrent.TimeUnit;
 
+import anki.ankidroid.SchedTimingTodayLegacyRequest;
 import anki.scheduler.SchedTimingTodayResponse;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -64,7 +65,7 @@ public class BackendIntegrationTests extends InstrumentedTest {
     @Test
     public void schedTimingTodayCall() {
         Backend backend = getBackend("initial_version_2_12_1.anki2");
-        SchedTimingTodayResponse ret = backend.schedTimingTodayLegacy(1655258084, 0, 1655258084, 0, 0);
+        SchedTimingTodayResponse ret = backend.schedTimingTodayLegacy(SchedTimingTodayLegacyRequest.getDefaultInstance());
         int elapsed = ret.getDaysElapsed();
         long nextDayAt = ret.getNextDayAt();
     }
