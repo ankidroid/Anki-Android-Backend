@@ -50,6 +50,33 @@ jobs:
         run: |
           pip3 install --upgrade protobuf stringcase
 
+      - name: Setup bazel
+        run: |
+          sudo apt install bash grep findutils curl gcc g++ git python-is-python3 -y
+          curl -L https://github.com/bazelbuild/bazelisk/releases/download/v1.10.1/bazelisk-linux-amd64 -o ./bazel
+          chmod +x bazel && sudo mv bazel /usr/local/bin/
+
+      - name: Bazel cache
+        id: bazel-cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cache/bazel
+          key: ${{ runner.os }}-v1-bazel-cache-${{ hashFiles('rslib-bridge/anki/defs.bzl') }}
+          restore-keys: |
+            ${{ runner.os }}-v1-bazel-cache
+
+      - name: Node module cache
+        id: node-module-cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            rslib-bridge/anki/node_modules
+          key: ${{ runner.os }}-v1-node-module-cache-${{ hashFiles('rslib-bridge/anki/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-v1-node-module-cache-
+            ${{ runner.os }}-v1-node-module-cache
+
       - name: Build
         run: ./gradlew clean assembleRelease -DtestBuildType=release -Dorg.gradle.daemon=false -Dorg.gradle.console=plain
 

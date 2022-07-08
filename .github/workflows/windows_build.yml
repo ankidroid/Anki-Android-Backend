@@ -92,6 +92,34 @@ jobs:
             ${{ runner.os }}-rust-v1-assembleRelease
             ${{ runner.os }}-rust-v1
 
+      - name: Setup bazel
+        run: |
+          mkdir \bazel
+          cd \bazel
+          curl https://github.com/bazelbuild/bazelisk/releases/download/v1.10.1/bazelisk-windows-amd64.exe -o bazel.exe
+          $env:PATH = "c:\bazel;c:\msys64\usr\bin;$env:PATH"
+
+      - name: Bazel cache
+        id: bazel-cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            C:\Users\runneradmin\_bazel_runneradmin
+          key: ${{ runner.os }}-v1-bazel-cache-${{ hashFiles('rslib-bridge/anki/defs.bzl') }}
+          restore-keys: |
+            ${{ runner.os }}-v1-bazel-cache
+
+      - name: Node module cache
+        id: node-module-cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            rslib-bridge/anki/node_modules
+          key: ${{ runner.os }}-v1-node-module-cache-${{ hashFiles('rslib-bridge/anki/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-v1-node-module-cache-
+            ${{ runner.os }}-v1-node-module-cache
+
       # -Dorg.gradle.daemon=false has been removed
       # -Dorg.gradle.console=plain has been removed
       #      env:
@@ -105,5 +133,5 @@ jobs:
           $Env:ANDROID_NDK_HOME =  "C:\ProgramFiles\Android\android-sdk\ndk-bundle"
           $Env:ANDROID_NDK_PATH =  "C:\ProgramFiles\Android\android-sdk\ndk-bundle"
           $Env:ANDROID_SDK_ROOT =  "C:\ProgramFiles\Android\android-sdk"
-          $env:ANDROID_HOME
+          $env:ANDROID_HOME      
           ./gradlew clean assembleRelease -DtestBuildType=release # assembleAndroidTest

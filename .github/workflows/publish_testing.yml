@@ -52,6 +52,33 @@ jobs:
           brew install x86_64-unknown-linux-gnu
           x86_64-unknown-linux-gnu-gcc -v
 
+      - name: Setup bazel
+        run: |
+          curl -L https://github.com/bazelbuild/bazelisk/releases/download/v1.11.0/bazelisk-darwin -o bazel
+          chmod +x bazel
+          sudo mv bazel /usr/local/bin
+
+      - name: Bazel cache
+        id: bazel-cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            /private/var/tmp/_bazel_runner
+          key: ${{ runner.os }}-v1-bazel-cache-${{ hashFiles('rslib-bridge/anki/defs.bzl') }}
+          restore-keys: |
+            ${{ runner.os }}-v1-bazel-cache
+
+      - name: Node module cache
+        id: node-module-cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            rslib-bridge/anki/node_modules
+          key: ${{ runner.os }}-v1-node-module-cache-${{ hashFiles('rslib-bridge/anki/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-v1-node-module-cache-
+            ${{ runner.os }}-v1-node-module-cache
+
       - name: Build JAR
         run: |
           export ANKIDROID_LINUX_CC=x86_64-unknown-linux-gnu-gcc
