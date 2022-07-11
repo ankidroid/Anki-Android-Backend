@@ -26,4 +26,7 @@ cp /tmp/.bazel/bin/ts/reviewer/reviewer_extras_bundle.js $BUILD_DIR/web
 bazel build qt/aqt/data/web/pages --symlink_prefix=/tmp/.bazel/
 cp -r /tmp/.bazel/bin/qt/aqt/data/web/pages/* $BUILD_DIR/web
 
+cp $ANKI_SRC/cargo/licenses.json $BUILD_DIR/web/licenses-cargo.json
+cp $ANKI_SRC/ts/licenses.json $BUILD_DIR/web/licenses-ts.json
+
 chmod -R a+w $BUILD_DIR/web

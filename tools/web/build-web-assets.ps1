@@ -19,3 +19,6 @@ Copy-Item -Path $TEMP_DIR/.bazel/bin/ts/reviewer/reviewer_extras_bundle.js -Dest
 
 bazel --output_user_root=$ROOT_DIR/_bzl build qt/aqt/data/web/pages --symlink_prefix=$TEMP_DIR/.bazel/ --verbose_failures
 Get-Childitem $TEMP_DIR/.bazel/bin/qt/aqt/data/web/pages -Recurse -Include *.html,*.js,*.css | Copy-Item -Destination $BUILD_DIR/web -PassThru
+
+Copy-Item -Path $ANKI_SRC/cargo/licenses.json -Destination $BUILD_DIR/web/licenses-cargo.json -PassThru
+Copy-Item -Path $ANKI_SRC/ts/licenses.json -Destination $BUILD_DIR/web/licenses-ts.json -PassThru
