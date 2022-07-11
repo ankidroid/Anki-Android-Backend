@@ -10,10 +10,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  bash: "C:/msys64/usr/bin/bash.exe"
-  BAZEL_SH: "C:/msys64/usr/bin/bash.exe"
-
 jobs:
   build:
     timeout-minutes: 80
