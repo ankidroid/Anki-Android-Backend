@@ -66,13 +66,6 @@ jobs:
             ${{ runner.os }}-rust-v1-assembleRelease
             ${{ runner.os }}-rust-v1
 
-      - name: Setup bazel
-        run: |
-          mkdir \bazel
-          cd \bazel
-          curl https://github.com/bazelbuild/bazelisk/releases/download/v1.10.1/bazelisk-windows-amd64.exe -o bazel.exe
-          $env:PATH = "c:\bazel;c:\msys64\usr\bin;$env:PATH"
-
       - name: Bazel cache
         id: bazel-cache
         uses: actions/cache@v2

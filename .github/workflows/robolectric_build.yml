@@ -85,12 +85,6 @@ jobs:
             ${{ runner.os }}-rust-v1-rsdroid-testing:build
             ${{ runner.os }}-rust-v1
 
-      - name: Setup bazel
-        run: |
-          curl -L https://github.com/bazelbuild/bazelisk/releases/download/v1.11.0/bazelisk-darwin -o bazel
-          chmod +x bazel
-          sudo mv bazel /usr/local/bin
-
       - name: Bazel cache
         id: bazel-cache
         uses: actions/cache@v2
@@ -199,28 +193,6 @@ jobs:
           Set-Alias -Name "python3" -Value "python"
           pip3 install --upgrade protobuf stringcase
           python3 .github/scripts/protoc_gen_deps.py
-
-      - name: Setup bazel
-        if: matrix.os == 'macos-latest'
-        run: |
-          curl -L https://github.com/bazelbuild/bazelisk/releases/download/v1.11.0/bazelisk-darwin -o bazel
-          chmod +x bazel
-          sudo mv bazel /usr/local/bin
-
-      - name: Setup bazel
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          curl -L https://github.com/bazelbuild/bazelisk/releases/download/v1.10.1/bazelisk-linux-amd64 -o ./bazel
-          chmod +x bazel
-          sudo mv bazel /usr/local/bin
-
-      - name: Setup bazel
-        if: matrix.os == 'windows-latest'
-        run: |          
-          mkdir \bazel
-          cd \bazel
-          curl https://github.com/bazelbuild/bazelisk/releases/download/v1.10.1/bazelisk-windows-amd64.exe -o bazel.exe
-          $env:PATH = "c:\bazel;c:\msys64\usr\bin;$env:PATH"
 
       - name: Run Tests
         if: matrix.os != 'windows-latest'
