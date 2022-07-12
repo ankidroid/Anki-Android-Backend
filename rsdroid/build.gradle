@@ -4,6 +4,8 @@ apply plugin: "kotlin-android"
 apply plugin: 'signing'
 apply plugin: 'com.vanniktech.maven.publish'
 
+apply from: "$rootDir/build-web-assets.gradle"
+
 def getAnkiCommitHash = { ->
     def hashStdOut = new ByteArrayOutputStream()
     exec {
@@ -49,16 +51,6 @@ android {
                 srcDirs "src/main/resources", "build/generated/anki_artifacts"
             }
         }
-    }
-}
-
-task buildAnkiWebAssets(type: Exec) {
-    workingDir "$rootDir"
-    String toolPath = System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows') ? 'tools/web/build-web-assets.ps1' : 'tools/web/build-web-assets.sh'
-    if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
-        commandLine 'PowerShell', '-File', toolPath
-    } else {
-        commandLine 'sh', '-c', toolPath
     }
 }
 

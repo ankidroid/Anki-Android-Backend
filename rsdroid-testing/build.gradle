@@ -19,6 +19,8 @@ apply plugin: 'kotlin'
 apply plugin: 'signing'
 apply plugin: 'com.vanniktech.maven.publish'
 
+apply from: "$rootDir/build-web-assets.gradle"
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     // obtaining the OS
@@ -115,16 +117,6 @@ def toCommandLine(Platform targetPlatform) {
         case Platform.WINDOWS: return toWindowsCommandLine("${mainArg} --target x86_64-pc-windows-gnu")
     }
     throw new IllegalStateException(targetPlatform)
-}
-
-task buildAnkiWebAssets(type: Exec) {
-    workingDir "$rootDir"
-    String toolPath = System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows') ? 'tools\\web\\build-web-assets.ps1' : 'tools/web/build-web-assets.sh'
-    if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
-        commandLine 'cmd', '/c', 'Powershell  -File', toolPath
-    } else {
-        commandLine 'sh', '-c', toolPath
-    }
 }
 
 task preBuildWindows(type: Exec) {
