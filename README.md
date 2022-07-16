@@ -46,7 +46,7 @@ This is defined as an application to allow instrumented tests to be run against 
 - Android Library which contains the rust based `.so` under (x86, x86-64, arm, arm64)
   - Implements `android.database.sqlite`, redirecting SQL to the rust library
   - Exposes RPC calls to Rust via a clean Java interface (`net.ankiweb.rsdroid.Backend`)
-- Testing library to allow the above to be usable under Robolectric
+- Test library to allow the above to be usable under Robolectric
 
 ## Additional Information
 
