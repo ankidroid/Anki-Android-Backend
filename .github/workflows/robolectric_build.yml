@@ -85,26 +85,15 @@ jobs:
             ${{ runner.os }}-rust-v1-rsdroid-testing:build
             ${{ runner.os }}-rust-v1
 
-      - name: Bazel cache
-        id: bazel-cache
+      - name: Node and Bazel cache
         uses: actions/cache@v2
         with:
           path: |
             /private/var/tmp/_bazel_runner
-          key: ${{ runner.os }}-v1-bazel-cache-${{ hashFiles('rslib-bridge/anki/defs.bzl') }}
-          restore-keys: |
-            ${{ runner.os }}-v1-bazel-cache
-
-      - name: Node module cache
-        id: node-module-cache
-        uses: actions/cache@v2
-        with:
-          path: |
             rslib-bridge/anki/node_modules
-          key: ${{ runner.os }}-v1-node-module-cache-${{ hashFiles('rslib-bridge/anki/package.json') }}
+          key: ${{ runner.os }}-v1-node-bazel-cache-${{ hashFiles('rslib-bridge/anki/package.json') }}-${{ hashFiles('rslib-bridge/anki/defs.bzl') }}
           restore-keys: |
-            ${{ runner.os }}-v1-node-module-cache-
-            ${{ runner.os }}-v1-node-module-cache
+            ${{ runner.os }}-v1-node-bazel-cache
 
       - name: Build JAR
         run: |
