@@ -117,7 +117,8 @@ jobs:
           $Env:ANDROID_NDK_HOME =  "C:\ProgramFiles\Android\android-sdk\ndk-bundle"
           $Env:ANDROID_NDK_PATH =  "C:\ProgramFiles\Android\android-sdk\ndk-bundle"
           $Env:ANDROID_SDK_ROOT =  "C:\ProgramFiles\Android\android-sdk"
-          $env:ANDROID_HOME      
+          $env:ANDROID_HOME   
+          # wsl does not support bazel yet https://github.com/bazelbuild/bazel/issues/10941   
           echo "Removing Bash from WSL"
           rm.exe "C:/WINDOWS/system32/bash.EXE"
           Set-Alias -Name bash -Value "C:/msys64/usr/bin/bash.exe"

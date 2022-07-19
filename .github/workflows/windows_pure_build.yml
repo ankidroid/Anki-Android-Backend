@@ -80,6 +80,7 @@ jobs:
 
       - name: Build
         run: | 
+          # wsl does not support bazel yet https://github.com/bazelbuild/bazel/issues/10941
           echo "Removing Bash from WSL"
           rm.exe "C:/WINDOWS/system32/bash.EXE"
           Set-Alias -Name bash -Value "C:/msys64/usr/bin/bash.exe"
