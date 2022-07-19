@@ -1,6 +1,3 @@
-Set-Alias -Name bash -Value "C:/msys64/usr/bin/bash.exe"
-$env:BAZEL_SH = "C:/msys64/usr/bin/bash.exe" 
-
 $SRC_DIR = (Get-Item .).FullName
 $ROOT_DIR = (Get-Item D:/a/).FullName
 $ANKI_SRC = (Get-Item $SRC_DIR/rslib-bridge/anki).FullName
