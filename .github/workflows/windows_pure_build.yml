@@ -66,6 +66,8 @@ jobs:
             ${{ runner.os }}-rust-v1-assembleRelease
             ${{ runner.os }}-rust-v1
 
+      # Caching node modules and bazel, the bazel cache path on linux, mac and windows are according to following docs
+      # https://docs.bazel.build/versions/main/output_directories.html
       - name: Node and Bazel cache
         uses: actions/cache@v2
         with:
