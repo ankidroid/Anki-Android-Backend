@@ -1,0 +1,9 @@
+task buildAnkiWebAssets(type: Exec) {
+    workingDir "$rootDir"
+    String toolPath = System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows') ? 'tools/web/build-web-assets.ps1' : 'tools/web/build-web-assets.sh'
+    if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
+        commandLine 'PowerShell', '-File', toolPath
+    } else {
+        commandLine 'sh', '-c', toolPath
+    }
+}

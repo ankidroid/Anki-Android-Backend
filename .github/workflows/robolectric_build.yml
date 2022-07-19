@@ -85,6 +85,18 @@ jobs:
             ${{ runner.os }}-rust-v1-rsdroid-testing:build
             ${{ runner.os }}-rust-v1
 
+      # Caching node modules and bazel, the bazel cache path on linux, mac and windows are according to following docs
+      # https://docs.bazel.build/versions/main/output_directories.html
+      - name: Node and Bazel cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            /private/var/tmp/_bazel_runner
+            rslib-bridge/anki/node_modules
+          key: ${{ runner.os }}-v1-node-bazel-cache-${{ hashFiles('rslib-bridge/anki/package.json') }}-${{ hashFiles('rslib-bridge/anki/defs.bzl') }}
+          restore-keys: |
+            ${{ runner.os }}-v1-node-bazel-cache
+
       - name: Build JAR
         run: |
           export ANKIDROID_LINUX_CC=x86_64-unknown-linux-gnu-gcc
@@ -179,4 +191,6 @@ jobs:
 
       - name: Run Tests (win)
         if: matrix.os == 'windows-latest'
-        run: ./gradlew rsdroid:test -x jar -x cargoBuildArm -x cargoBuildX86 -x cargoBuildArm64 -x cargoBuildX86_64
+        run: | 
+          ./tools/web/set-bash-win.ps1
+          ./gradlew rsdroid:test -x jar -x cargoBuildArm -x cargoBuildX86 -x cargoBuildArm64 -x cargoBuildX86_64

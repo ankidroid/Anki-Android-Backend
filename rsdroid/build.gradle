@@ -4,6 +4,8 @@ apply plugin: "kotlin-android"
 apply plugin: 'signing'
 apply plugin: 'com.vanniktech.maven.publish'
 
+apply from: "$rootDir/build-web-assets.gradle"
+
 def getAnkiCommitHash = { ->
     def hashStdOut = new ByteArrayOutputStream()
     exec {
@@ -45,6 +47,9 @@ android {
     sourceSets {
         main {
             kotlin.srcDirs += "build/generated/source/fluent"
+            resources {
+                srcDirs "src/main/resources", "build/generated/anki_artifacts"
+            }
         }
     }
 }
@@ -100,11 +105,18 @@ preBuild.dependsOn "generateTranslations"
 
 Boolean wantAllPlatforms = System.getenv("CURRENT_ONLY") != "true"
 
-if (wantAllPlatforms) {
-    preBuild.dependsOn "cargoBuild"
-} else {
-    preBuild.dependsOn "cargoBuildX86_64"
+task cargoBuildTask {
+    if (wantAllPlatforms) {
+        preBuild.dependsOn "cargoBuild"
+    } else {
+        preBuild.dependsOn "cargoBuildX86_64"
+    }
+
+    mustRunAfter "buildAnkiWebAssets"
 }
+
+preBuild.dependsOn "buildAnkiWebAssets"
+preBuild.dependsOn "cargoBuildTask"
 
 signing {
     def hasPrivate = project.hasProperty('SIGNING_PRIVATE_KEY')

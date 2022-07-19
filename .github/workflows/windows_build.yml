@@ -92,6 +92,18 @@ jobs:
             ${{ runner.os }}-rust-v1-assembleRelease
             ${{ runner.os }}-rust-v1
 
+      # Caching node modules and bazel, the bazel cache path on linux, mac and windows are according to following docs
+      # https://docs.bazel.build/versions/main/output_directories.html
+      - name: Node and Bazel cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            C:/Users/runneradmin/_bazel_runneradmin
+            rslib-bridge/anki/node_modules
+          key: ${{ runner.os }}-v1-node-bazel-cache-${{ hashFiles('rslib-bridge/anki/package.json') }}-${{ hashFiles('rslib-bridge/anki/defs.bzl') }}
+          restore-keys: |
+            ${{ runner.os }}-v1-node-bazel-cache
+
       # -Dorg.gradle.daemon=false has been removed
       # -Dorg.gradle.console=plain has been removed
       #      env:
@@ -105,5 +117,6 @@ jobs:
           $Env:ANDROID_NDK_HOME =  "C:\ProgramFiles\Android\android-sdk\ndk-bundle"
           $Env:ANDROID_NDK_PATH =  "C:\ProgramFiles\Android\android-sdk\ndk-bundle"
           $Env:ANDROID_SDK_ROOT =  "C:\ProgramFiles\Android\android-sdk"
-          $env:ANDROID_HOME
+          $env:ANDROID_HOME   
+          ./tools/web/set-bash-win.ps1
           ./gradlew clean assembleRelease -DtestBuildType=release # assembleAndroidTest
