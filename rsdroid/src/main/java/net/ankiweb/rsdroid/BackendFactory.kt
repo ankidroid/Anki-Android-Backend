@@ -52,23 +52,6 @@ object BackendFactory {
         )
     }
 
-    @JvmStatic
-    fun setDefaultLanguagesFromLocales(locales: Iterable<Locale>) {
-        defaultLanguages = locales.map { localeToBackendCode(it) }
-    }
-
-    private fun localeToBackendCode(locale: Locale): String {
-        // TODO: this needs checking that all language codes match the ones
-        // shown here: https://i18n.ankiweb.net/teams/
-        return when (locale.language) {
-            Locale("heb").language -> "he"
-            Locale("yue").language -> "zh-TW"
-            Locale("ind").language -> "id"
-            Locale("tgl").language -> "tl"
-            else -> locale.language
-        }
-    }
-
     /** Allows overriding the returned backend for unit tests */
     fun setOverride(creator: CustomBackendCreator?) {
         backendForTesting = creator
