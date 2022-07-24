@@ -1,6 +1,8 @@
 #!/bin/bash
 # build web assets with anki submodule in rslib-bridge
 
+set -e
+
 # check if bazel exist or not
 if ! bazel --version > /dev/null 2>&1; then
   echo "bazel: command not found. Please install Bazelisk. Your distro may have it,"
@@ -29,4 +31,4 @@ cp -r /tmp/.bazel/bin/qt/aqt/data/web/pages/* $BUILD_DIR/web
 cp $ANKI_SRC/cargo/licenses.json $BUILD_DIR/web/licenses-cargo.json
 cp $ANKI_SRC/ts/licenses.json $BUILD_DIR/web/licenses-ts.json
 
-chmod -R a+w $BUILD_DIR/web
+chmod -R a+w $BUILD_DIR
