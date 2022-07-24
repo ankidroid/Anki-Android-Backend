@@ -112,7 +112,7 @@ class Message:
             name = "`val`"
 
         return "{}: {}{}".format(
-           name, to_java_type(field.type, field), annotation, 
+           name, to_java_type(field.type, field), annotation,
         )
 
     def as_setter_name(self, field):
@@ -249,9 +249,11 @@ fun {name}Raw(input: ByteArray): ByteArray {{
             return_segment = f"""
 {name}Raw(input.toByteArray());
             """
+            check = ""
             out_with_colon = ""
         else:
             out_with_colon = f": {out}"
+            check = "@CheckResult"
             return_segment = f"""\
 try {{
     return {output_type_name}.parseFrom({name}Raw(input.toByteArray())){single_attribute};
@@ -260,6 +262,7 @@ try {{
 }}"""
 
         buf += f"""
+{check}
 @Throws(BackendException::class)
 open fun {name}{inv}{out_with_colon} {{
     {deser}
@@ -316,6 +319,8 @@ def generate_code(request, response):
 @file:Suppress("NAME_SHADOWING")
 
 package anki.backend;
+
+import androidx.annotation.CheckResult;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.GeneratedMessageV3;
