@@ -73,6 +73,25 @@ rustup target add i686-linux-android        # x86
 rustup target add aarch64-linux-android     # arm64
 rustup target add x86_64-linux-android      # x86_64
 
+if [ "$(uname)" == "Darwin" ]; then
+  # We do not want to run under Rosetta 2
+  arch_name="$(uname -m)"
+  if [ "${arch_name}" = "x86_64" ]; then
+    if [ "$(sysctl -in sysctl.proc_translated)" = "1" ]; then
+      echo "Running on Rosetta 2"
+      echo "This is not supported. Run \`env /usr/bin/arch -arm64 /bin/bash --login\` then try again"
+      exit 1
+    else
+      echo "Running on native Intel"
+    fi
+  elif [ "${arch_name}" = "arm64" ]; then
+    echo "Running on ARM, installing Apple Silicon M1 target for robolectric dylib generation"
+    rustup target add aarch64-apple-darwin  # apple silicon for M1 robolectric test dylib generation
+  else
+    echo "Unknown architecture: ${arch_name}"
+  fi
+fi
+
 cecho $lgray "Installing cross"
 cargo install cross --git https://github.com/rust-embedded/cross/ --tag v0.2.1 # current requires rust-current
 

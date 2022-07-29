@@ -79,6 +79,12 @@ rustup target add aarch64-linux-android
 rustup target add x86_64-linux-android
 ```
 
+Optionally add the Apple Silicon target if you have an Apple Silicon M1 CPU machine:
+
+```bash
+rustup target add aarch64-apple-darwin
+```
+
 It appears that you need to make a link to 'cc' on linux for the Rust build to work:
 
 ```bash
