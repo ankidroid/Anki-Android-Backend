@@ -68,3 +68,6 @@ AnkiDroid/ACRA-INSTALLATION
 
 # optional symlink to venv
 python
+
+# rust build files
+target

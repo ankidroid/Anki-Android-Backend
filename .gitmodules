@@ -1,6 +1,3 @@
 [submodule "anki"]
 	path = anki
 	url = https://github.com/ankidroid/anki
-[submodule "ftl/core"]
-	path = ftl/core
-	url = https://github.com/ankitects/anki-core-i18n.git

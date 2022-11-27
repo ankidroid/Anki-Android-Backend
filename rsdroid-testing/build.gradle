@@ -70,7 +70,7 @@ def getAssetsDir() {
 }
 
 def getTargetDir() {
-    return getInputDir() + "/target"
+    return getInputDir() + "/../target"
 }
 
 def toWindowsCommandLine(String command) {

@@ -30,7 +30,7 @@ open class BackendInvalidInputException(error: BackendError?) : BackendException
     class BackendCollectionNotOpenException(error: BackendError?) : BackendInvalidInputException(error)
     companion object {
         fun fromInvalidInputError(error: BackendError): BackendInvalidInputException {
-            when (error.localized) {
+            when (error.message) {
                 "CollectionAlreadyOpen" -> return BackendCollectionAlreadyOpenException(error)
                 "CollectionNotOpen" -> return BackendCollectionNotOpenException(error)
             }

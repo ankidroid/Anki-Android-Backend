@@ -1,0 +1,31 @@
+[workspace.package]
+version = "0.0.0"
+authors = ["Ankitects Pty Ltd and contributors"]
+license = "AGPL-3.0-or-later"
+rust-version = "1.64"
+edition = "2021"
+
+[workspace]
+members = [
+  "rslib-bridge",
+  "anki/rslib",
+]
+exclude = []
+resolver = "2"
+
+[patch.crates-io]
+# If updating rev, hakari.toml needs updating too.
+reqwest = { git = "https://github.com/ankitects/reqwest.git", rev = "7591444614de02b658ddab125efba7b2bb4e2335" }
+
+# Apply mild optimizations to our dependencies in dev mode, which among other things
+# improves sha2 performance by about 21x. Opt 1 chosen due to
+# https://doc.rust-lang.org/cargo/reference/profiles.html#overrides-and-generics. This
+# applies to the dependencies of unit tests as well.
+[profile.dev.package."*"]
+opt-level = 1
+debug = 0
+
+# Debug info off by default, which speeds up incremental builds and produces a considerably
+# smaller library.
+[profile.dev.package.anki]
+debug = 0

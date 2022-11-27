@@ -1,4 +1,3 @@
 [env]
-RSLIB_FTL_ROOT = { value = "ftl/core/l10n.toml", relative = true }
-BUILDINFO = { value = "rsdroid/build/generated/anki_artifacts/buildinfo.txt", relative = true }
-BAZEL = "1"
+STRINGS_JSON = { value = "anki/out/strings.json", relative = true }
+PROTOC = { value = "anki/out/extracted/protoc/bin/protoc", relative = true }

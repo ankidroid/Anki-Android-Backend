@@ -84,7 +84,6 @@ public class ExceptionTest {
             { BackendForTesting.ErrorType.FatalError, BackendException.BackendFatalError.class },
             { BackendForTesting.ErrorType.Interrupted, BackendInterruptedException.class},
             { BackendForTesting.ErrorType.InvalidInput, BackendInvalidInputException.class},
-            { BackendForTesting.ErrorType.IoError, BackendIoException.class},
             { BackendForTesting.ErrorType.JSONError, BackendJsonException.class },
             { BackendForTesting.ErrorType.ProtoError, BackendProtoException.class },
             { BackendForTesting.ErrorType.TemplateError, BackendTemplateException.class},

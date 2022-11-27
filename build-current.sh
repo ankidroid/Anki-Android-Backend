@@ -11,4 +11,4 @@ export CURRENT_ONLY=true
 ./gradlew assembleRelease
 
 # build library for Robolectric tests
-CARGO_TARGET_DIR=target NO_CROSS=true ./gradlew rsdroid-testing:build
+CARGO_TARGET_DIR=$(pwd)/target NO_CROSS=true ./gradlew rsdroid-testing:build

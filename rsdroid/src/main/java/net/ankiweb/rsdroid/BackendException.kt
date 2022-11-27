@@ -28,7 +28,7 @@ import java.util.regex.Pattern
 open class BackendException : RuntimeException {
     private val error: BackendError?
 
-    constructor(error: BackendError) : super(error.localized) {
+    constructor(error: BackendError) : super(error.message) {
         this.error = error
     }
 
@@ -74,7 +74,7 @@ open class BackendException : RuntimeException {
         class BackendDbMissingEntityException(error: BackendError) : BackendException(error)
         companion object {
             fun fromDbError(error: BackendError): BackendException {
-                val localised = error.localized ?: return BackendDbException(error)
+                val localised = error.message ?: return BackendDbException(error)
                 if (localised.contains("kind: FileTooNew")) {
                     return BackendDbFileTooNewException(error)
                 }
