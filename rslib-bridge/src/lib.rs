@@ -46,7 +46,7 @@ pub unsafe extern "C" fn Java_net_ankiweb_rsdroid_NativeMethods_closeBackend(
     args: jlong,
 ) {
     let raw = args as *mut Backend;
-    Box::from_raw(raw);
+    drop(Box::from_raw(raw));
 }
 
 #[no_mangle]
