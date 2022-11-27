@@ -77,8 +77,8 @@ jobs:
         with:
           path: |
             ~/.cache/bazel
-            rslib-bridge/anki/node_modules
-          key: ${{ runner.os }}-v1-node-bazel-cache-${{ hashFiles('rslib-bridge/anki/package.json') }}-${{ hashFiles('rslib-bridge/anki/defs.bzl') }}
+            anki/node_modules
+          key: ${{ runner.os }}-v1-node-bazel-cache-${{ hashFiles('anki/package.json') }}-${{ hashFiles('anki/defs.bzl') }}
           restore-keys: |
             ${{ runner.os }}-v1-node-bazel-cache
 

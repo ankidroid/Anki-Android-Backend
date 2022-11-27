@@ -10,5 +10,5 @@ if ! bazel --version > /dev/null 2>&1; then
   exit 1
 fi
 
-(cd rslib-bridge/anki && bazel build -c opt buildinfo.txt)
-cp rslib-bridge/anki/.bazel/bin/buildinfo.txt rslib-bridge
+(cd anki && bazel build -c opt buildinfo.txt)
+cp anki/.bazel/bin/buildinfo.txt rslib-bridge

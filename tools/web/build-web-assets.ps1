@@ -1,6 +1,6 @@
 $SRC_DIR = (Get-Item .).FullName
 $ROOT_DIR = (Get-Item D:/a/).FullName
-$ANKI_SRC = (Get-Item $SRC_DIR/rslib-bridge/anki).FullName
+$ANKI_SRC = (Get-Item $SRC_DIR/anki).FullName
 $TEMP_DIR = (Get-Item $ENV:TEMP).FullName
 
 New-Item -P $SRC_DIR/rsdroid/build/generated/anki_artifacts/web -itemType Directory

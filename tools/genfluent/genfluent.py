@@ -13,7 +13,7 @@ import re
 
 def ensure_i18n_module_correct():
     reg = re.compile(r'(\s+)(\S+_(?:commit|zip_csum)) = "(.*)"')
-    for line in open("rslib-bridge/anki/repos.bzl").readlines():
+    for line in open("anki/repos.bzl").readlines():
         m = reg.match(line)
         if m:
             (indent, key, commit) = m.groups()
@@ -24,7 +24,7 @@ def ensure_i18n_module_correct():
 
 def get_strings():
     output_file = Path("output.json").absolute()
-    subprocess.run(["cargo", "run", output_file], check=True, cwd="rslib-bridge/anki/rslib/i18n")
+    subprocess.run(["cargo", "run", output_file], check=True, cwd="anki/rslib/i18n")
     data = json.load(open(output_file))
     output_file.unlink()
     return data

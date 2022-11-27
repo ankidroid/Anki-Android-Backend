@@ -9,7 +9,7 @@ apply from: "$rootDir/build-web-assets.gradle"
 def getAnkiCommitHash = { ->
     def hashStdOut = new ByteArrayOutputStream()
     exec {
-        commandLine "git", "-C", new File("${project.rootDir}", "rslib-bridge/anki"), "rev-parse", "HEAD"
+        commandLine "git", "-C", new File("${project.rootDir}", "anki"), "rev-parse", "HEAD"
         standardOutput = hashStdOut
     }
     def commit = hashStdOut.toString().trim()
@@ -61,6 +61,7 @@ cargo {
     module = "../rslib-bridge"
     libname = "rsdroid"
     targets = ["x86", "arm", "x86_64", "arm64"]
+    targetDirectory = "../target"
     profile = 'release'
     apiLevel = 21
     verbose = true

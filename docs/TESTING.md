@@ -11,7 +11,7 @@ so far.
 Make sure you can build AnkiDroid first.
 
 Follow the initial setup instructions in the computer version
-(rslib-bridge/anki/docs/{windows,mac,linux}.md) to install prerequisites
+(anki/docs/{windows,mac,linux}.md) to install prerequisites
 like Bazelisk and the build tools for your platform.
 
 Install NDK:

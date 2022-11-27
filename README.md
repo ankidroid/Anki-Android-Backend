@@ -41,7 +41,7 @@ This is defined as an application to allow instrumented tests to be run against 
 
 - Points to a fixed commit of `ankidroid/anki`
   - Modifications to the library so we do not need to update to database schema 15 for version 1
-- References `rslib-bridge/anki/proto/anki/*.proto` which define RPC service calls to the anki backend
+- References `anki/proto/anki/*.proto` which define RPC service calls to the anki backend
 - Python script to auto-generate the Java interface/backend to the RPC mechanism. Invoked via gradle.
 - Android Library which contains the rust based `.so` under (x86, x86-64, arm, arm64)
   - Implements `android.database.sqlite`, redirecting SQL to the rust library

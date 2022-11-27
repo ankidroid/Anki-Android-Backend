@@ -1,5 +1,5 @@
 [submodule "anki"]
-	path = rslib-bridge/anki
+	path = anki
 	url = https://github.com/ankidroid/anki
 [submodule "ftl/core"]
 	path = ftl/core

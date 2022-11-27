@@ -12,7 +12,7 @@ if ! bazel --version > /dev/null 2>&1; then
 fi
 
 SRC_DIR=$(pwd)
-ANKI_SRC=$SRC_DIR/rslib-bridge/anki
+ANKI_SRC=$SRC_DIR/anki
 BUILD_DIR=$SRC_DIR/rsdroid/build/generated/anki_artifacts
 mkdir -p $BUILD_DIR/web
 
