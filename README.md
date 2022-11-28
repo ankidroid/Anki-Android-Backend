@@ -1,6 +1,6 @@
 # AnkiDroid-Backend
 
-Adapter allowing AnkiDroid to leverage Anki Desktop's Rust-based business logic layer via access to `anki/rslib` over JNI.
+An interface for accessing Anki Desktop's Rust backend inside AnkiDroid.
 
 ## Why?
 
@@ -11,42 +11,19 @@ Adapter allowing AnkiDroid to leverage Anki Desktop's Rust-based business logic 
   - Saves massive amount of AnkiDroid developer time & effort
   - Allows Anki Desktop to iterate faster
   - We can quickly port changes upstream, which will benefit the ecosystem
-- Insulates Anki-Android users from the complexity of installing multiple toolchains
-  - The Rust/Python/cross-compilation toolchain is much more complex than downloading Android Studio
-  - A separate repository means we keep a low barrier to entry for new contributors
 
-## How to use it in a project
+- In a separate repo, so most AnkiDroid developers do not need to install Rust
+and build the backend.
+
+## How to use
 
 AnkiDroid uses a pre-built version of this library, and includes it in AnkiDroid/build.gradle.
-To build a local version of this library and tell AnkiDroid to use it, please see the instructions
-in docs/TESTING.md
+To build a local version of this library and tell AnkiDroid to use it, please see
+the [howto guide](./docs/HOWTO.md).
 
-## Folders
+## Architecture
 
-`/anki/` - git submodule containing the Anki Rust Codebase, used both for building into `.so` files, and to obtain the current `.proto` files for use in Java codegen
-
-`/tools/` Tools to generate efficient protobuf-based RPC calls using JNI
-
-`/rsdroid/` - Java library to be consumed by `Anki-Android`.
-
-`rsdroid-testing` - Builds a testing library which exposes a function to load `rsdroid` in a non-Android context for testing via Robolectric
-
-`rsdroid-instrumented` - Android Instrumented Test
-
-This is defined as an application to allow instrumented tests to be run against a library - there may be a better method
-
-`/rslib-bridge/` (Rust) Android-specific library to communicate with `anki/rslib`
-
-## Implementation
-
-- Points to a fixed commit of `ankidroid/anki`
-  - Modifications to the library so we do not need to update to database schema 15 for version 1
-- References `anki/proto/anki/*.proto` which define RPC service calls to the anki backend
-- Python script to auto-generate the Java interface/backend to the RPC mechanism. Invoked via gradle.
-- Android Library which contains the rust based `.so` under (x86, x86-64, arm, arm64)
-  - Implements `android.database.sqlite`, redirecting SQL to the rust library
-  - Exposes RPC calls to Rust via a clean Java interface (`net.ankiweb.rsdroid.Backend`)
-- Testing library to allow the above to be usable under Robolectric
+See [the overview](./docs/OVERVIEW.md).
 
 ## Additional Information
 
@@ -55,4 +32,4 @@ See `/docs` for more in-depth information.
 ## License
 
 [GPL-3.0 License](https://github.com/ankidroid/Anki-Android/blob/master/COPYING)  
-[AGPL-3.0 Licence](https://github.com/david-allison-1/anki/blob/master/LICENSE) (anki submodule)
+[AGPL-3.0 Licence](https://github.com/AnkiDroid/anki/blob/main/LICENSE) (anki submodule)

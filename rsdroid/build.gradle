@@ -62,7 +62,7 @@ cargo {
     libname = "rsdroid"
     targets = ["x86", "arm", "x86_64", "arm64"]
     targetDirectory = "../target"
-    profile = 'release'
+    profile = System.getenv("DEBUG") == "1" ? "debug" : 'release'
     apiLevel = 21
     verbose = true
 }
@@ -104,13 +104,18 @@ task generateTranslations(type: Exec) {
 
 preBuild.dependsOn "generateTranslations"
 
-Boolean wantAllPlatforms = System.getenv("CURRENT_ONLY") != "true"
+Boolean wantAllPlatforms = System.getenv("ALL_ARCHS") == "1"
+print("archs: ${System.getenv("ALL_ARCHS")}")
 
 task cargoBuildTask {
     if (wantAllPlatforms) {
         preBuild.dependsOn "cargoBuild"
     } else {
-        preBuild.dependsOn "cargoBuildX86_64"
+        def target = "X86_64"
+        if (System.getProperty("os.arch") == "aarch64") {
+            target = "Arm64"
+        }
+        preBuild.dependsOn "cargoBuild${target}"
     }
 
     mustRunAfter "buildAnkiWebAssets"

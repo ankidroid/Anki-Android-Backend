@@ -24,6 +24,3 @@ log = "0.4.17"
 slog = "2.7.0"
 gag = "1.0.0"
 slog-envlogger = "2.2.0"
-
-[features]
-no-android = []

@@ -85,12 +85,6 @@ Optionally add the Apple Silicon target if you have an Apple Silicon M1 CPU mach
 rustup target add aarch64-apple-darwin
 ```
 
-It appears that you need to make a link to 'cc' on linux for the Rust build to work:
-
-```bash
-sudo ln -s /usr/bin/cc /usr/local/bin/x86_64-unknown-linux-gnu-gcc
-```
-
 #### Cross-compile tools
 
 Install cross crate for cross compiling rust code

@@ -12,6 +12,18 @@ This repo is comprised of two main components:
   generated from the service definitions in `anki/proto/anki`. `rsdroid` also provides an adaptor to the Rust
   database functionality, so that the Rust backend can be used in place of the standard Android SQLite library.
 
+Other folders:
+
+`/anki/` - Git submodule containing the Anki Rust Codebase, used both for building into `.so` files, and to obtain the current `.proto` files for use in Java codegen
+
+`/tools/` Scripts to generate the backend interface and translations
+
+`rsdroid-testing` - Builds a testing library targetting desktop machines, for use with Robolectric
+
+`rsdroid-instrumented` - Android Instrumented Test
+
+This is defined as an application to allow instrumented tests to be run against a library - there may be a better method
+
 ## Protocol Buffers
 
 The Rust backend uses Protocol Buffers to define available methods,
