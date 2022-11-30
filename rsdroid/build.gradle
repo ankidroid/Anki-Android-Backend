@@ -64,7 +64,7 @@ cargo {
     targetDirectory = "../target"
     profile = System.getenv("DEBUG") == "1" ? "debug" : 'release'
     apiLevel = 21
-    verbose = true
+    verbose = false
 }
 
 apply from: "proto.gradle"
