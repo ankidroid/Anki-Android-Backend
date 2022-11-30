@@ -101,7 +101,7 @@ jobs:
           target: default
           arch: x86_64
           profile: Nexus 6
-          script: ./gradlew rsdroid:lint rsdroid-instrumented:connectedCheck
+          script: ./check-droid.sh
 
       - name: Build Robolectric/X86_64
         if: matrix.os != 'windows-latest'
