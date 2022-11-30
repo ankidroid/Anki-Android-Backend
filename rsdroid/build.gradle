@@ -105,7 +105,8 @@ task generateTranslations(type: Exec) {
 preBuild.dependsOn "generateTranslations"
 
 Boolean wantAllPlatforms = System.getenv("ALL_ARCHS") == "1"
-print("archs: ${System.getenv("ALL_ARCHS")}")
+println("Env: ALL_ARCHS=${System.getenv("ALL_ARCHS")}")
+println("Env: DEBUG=${System.getenv("DEBUG")}")
 
 task cargoBuildTask {
     if (wantAllPlatforms) {
