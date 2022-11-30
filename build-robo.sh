@@ -23,6 +23,11 @@ fi
 
 # Build the shared libraries
 if [ "$ALL_ARCHS" = "1" ]; then
+    if [[ "$OSTYPE" != "darwin"* ]]; then
+        echo "Must be on macOS to do a multi-arch build."
+        exit 1
+    fi
+
     # Mac
     for target in \
         x86_64-apple-darwin \
