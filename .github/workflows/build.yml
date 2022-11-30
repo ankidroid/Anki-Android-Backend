@@ -88,13 +88,9 @@ jobs:
         if: matrix.os == 'windows-latest'
         run: ./build-aar.bat
 
-      - name: Build Robolectric/X86_64
-        if: matrix.os != 'windows-latest'
-        run: ./build-robo.sh
-
-      - name: Build Robolectric/X86_64 (Win)
-        if: matrix.os == 'windows-latest'
-        run: ./build-robo.bat
+      - name: Check Rust (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: ./check-rust.sh
 
       - name: Run tests (Mac)
         uses: reactivecircus/android-emulator-runner@v2
@@ -106,3 +102,11 @@ jobs:
           arch: x86_64
           profile: Nexus 6
           script: ./gradlew rsdroid:lint rsdroid-instrumented:connectedCheck
+
+      - name: Build Robolectric/X86_64
+        if: matrix.os != 'windows-latest'
+        run: ./build-robo.sh
+
+      - name: Build Robolectric/X86_64 (Win)
+        if: matrix.os == 'windows-latest'
+        run: ./build-robo.bat

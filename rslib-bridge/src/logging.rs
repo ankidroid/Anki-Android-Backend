@@ -74,12 +74,7 @@ fn monitor_io_handle(handle: BufferRedirect) {
 }
 
 fn should_ignore_line(buf: &str) -> bool {
-    // quieten simulator noise
-    if buf.starts_with("s_glBindAttribLocation") {
-        true
-    } else {
-        false
-    }
+    buf.starts_with("s_glBindAttribLocation")
 }
 
 pub(crate) fn setup_logging() -> Logger {
