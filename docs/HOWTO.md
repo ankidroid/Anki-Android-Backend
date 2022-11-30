@@ -4,15 +4,39 @@
 
 Make sure you have Android Studio can build AnkiDroid first.
 
-Initialize the anki submodule:
+### Init submodule
 
-- git submodule update --init
+git submodule update --init
 
-Follow the initial setup instructions in the computer version
-(anki/docs/development.md) to install prerequisites
-like rustup, ninja and the build tools for your platform.
+### C toolchain
 
-Then install the NDK via Android Studio's Tools>SDK menu option:
+Install Xcode/Visual Studio if on macOS/Windows.
+
+### Rust
+
+Install rustup from https://rustup.rs/
+
+### Ninja
+
+Debian/Ubuntu:
+
+  sudo apt install ninja-build
+
+macOS:
+
+  brew upgrade
+  brew install ninja
+
+Windows if using choco:
+
+  choco install ninja
+
+You can alternatively download a binary from https://github.com/ninja-build/ninja/releases
+and put it on your path.
+
+### NDK
+
+In Android Studio, choose the Tools>SDK menu option.
 
 - In SDK tools, enable "show package details"
 - Choose the NDK version that matches the number used in .github/workflows, eg 22.0.7026061
