@@ -1,4 +1,4 @@
-# Overview
+# Architecture
 
 Anki-Android-Backend uses Rust, Java and a little Python. Since setting up a Rust environment is somewhat complex, having a separate library encourages drive-by contributions to the main app by keeping a low barrier to entry for Anki-Android.
 
