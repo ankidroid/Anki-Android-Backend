@@ -51,6 +51,16 @@ In Android Studio, choose the Tools>SDK menu option.
 - After downloading, you may need to restart Android Studio to get it to
 synchronize gradle.
 
+### Windows: msys2
+
+Install [msys2](https://www.msys2.org/) into the default folder location.
+
+After installation completes, run msys2, and run the following command:
+
+```
+$ pacman -S git rsync
+```
+
 ## Building
 
 Two main files need to be built:
