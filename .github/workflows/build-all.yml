@@ -1,6 +1,11 @@
 name: Build AAR and Robo (all platforms)
 on:
   workflow_dispatch:
+    inputs:
+      mavenPublish:
+        description: "Publish artifacts to Maven Central? non-empty to publish, empty to skip publish"
+        required: false
+        type: string
   push:
   schedule:
     - cron: "0 0 * * *"
@@ -104,7 +109,7 @@ jobs:
       # following steps only run on workflow dispatch
 
       - name: Publish AAR to Maven
-        if: github.event_name == 'workflow_dispatch'
+        if: "${{ github.event.inputs.mavenPublish != '' && github.event_name == 'workflow_dispatch'}}"       
         env:
           ORG_GRADLE_PROJECT_SIGNING_PRIVATE_KEY: ${{ secrets.SIGNING_PRIVATE_KEY }}
           ORG_GRADLE_PROJECT_SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
@@ -114,7 +119,7 @@ jobs:
           ./gradlew rsdroid:uploadArchives -DtestBuildType=release -Dorg.gradle.daemon=false -Dorg.gradle.console=plain
 
       - name: Publish JAR to Maven
-        if: github.event_name == 'workflow_dispatch'
+        if: "${{ github.event.inputs.mavenPublish != '' && github.event_name == 'workflow_dispatch'}}"       
         env:
           ORG_GRADLE_PROJECT_SIGNING_PRIVATE_KEY: ${{ secrets.SIGNING_PRIVATE_KEY }}
           ORG_GRADLE_PROJECT_SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
@@ -130,5 +135,5 @@ jobs:
           ./gradlew rsdroid-testing:uploadArchives -Dorg.gradle.project.macCC=$ANKIDROID_MACOS_CC -DtestBuildType=debug -Dorg.gradle.daemon=false -Dorg.gradle.console=plain
 
       - name: ℹ️Additional Release Instructions (requires human interaction)
-        if: github.event_name == 'workflow_dispatch'
+        if: "${{ github.event.inputs.mavenPublish != '' && github.event_name == 'workflow_dispatch'}}"       
         run: echo "Sign in to https://oss.sonatype.org/#stagingRepositories , close the repository, then release it"
