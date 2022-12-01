@@ -42,7 +42,7 @@ public class BackendIntegrationTests extends InstrumentedTest {
 
     /** Ensure that the database can't be locked */
     @Rule
-    public Timeout timeout = new Timeout(3, TimeUnit.SECONDS);
+    public Timeout timeout = new Timeout(10, TimeUnit.SECONDS);
 
     @Before
     public void test() {
