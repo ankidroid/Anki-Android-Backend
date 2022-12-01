@@ -29,22 +29,11 @@ ok_echo() {
 }
 
 cecho $lgray"##################################"
-cecho $lgray "# AnkiDroidBackend Docker Script #"
+cecho $lgray "# AnkiDroidBackend Doctor Script #"
 cecho $lgray "##################################\n"
 
-cecho $lgray "Getting all submodules recursively"
-git submodule update --init --recursive
-
-
-if [[ $(which docker) && $(docker --version) ]]; then
-  ok_echo "Docker is installed"
-else
-  error_echo "Docker is not installed. please install it first"
-fi
-
-
-cecho $lgray "Building docker images"
-./tools/build-docker-images.sh
+cecho $lgray "Getting anki submodules"
+git submodule update --init
 
 
 if [[ -n "$ANDROID_SDK_ROOT" ]]; then
@@ -61,17 +50,10 @@ else
   error_echo "NDK $ANDROID_NDK_VERSION directory found"
 fi
 
-
-cecho $lgray "Installing rust 1.58.1"
-rustup install 1.58.1
-rustup default 1.58.1
-
-
-cecho $lgray "Adding rust android targets"
-rustup target add armv7-linux-androideabi   # arm
-rustup target add i686-linux-android        # x86
-rustup target add aarch64-linux-android     # arm64
-rustup target add x86_64-linux-android      # x86_64
+which cargo || (
+  echo "Rustup should be installed"
+  exit 1
+))
 
 if [ "$(uname)" == "Darwin" ]; then
   # We do not want to run under Rosetta 2
@@ -90,29 +72,4 @@ if [ "$(uname)" == "Darwin" ]; then
   else
     echo "Unknown architecture: ${arch_name}"
   fi
-fi
-
-cecho $lgray "Installing cross"
-cargo install cross --git https://github.com/rust-embedded/cross/ --tag v0.2.1 # current requires rust-current
-
-
-cecho $lgray "Installing protobuf python libraries"
-
-if [[ $(protoc --version) ]]; then
-  ok_echo "Protobuf compiler is installed"
-else
-  error_echo "Protobuf compiler (protoc) is not found"
-fi
-
-if [[ $(pip3 install protobuf) ]]; then
-  ok_echo "Protobuf python library is installed"
-else
-    echo -e "Try installing with python 3.7"
-    error_echo "Failed installing Protobuf python libraries"
-fi
-
-if [[ $(pip3 install stringcase) ]]; then
-  ok_echo "Stringcase is installed"
-else
-  error_echo "Failed installing stringcase python library"
 fi
