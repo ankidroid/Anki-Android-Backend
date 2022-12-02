@@ -61,6 +61,12 @@ After installation completes, run msys2, and run the following command:
 $ pacman -S git rsync
 ```
 
+When following the build steps below, make sure msys is on the path:
+
+```
+set PATH=%PATH%;c:\msys64\usr\bin
+```
+
 ## Building
 
 Two main files need to be built:
@@ -90,6 +96,12 @@ with Android Studio. Eg on macOS:
 
 ```
 export JAVA_HOME="/Applications/Android Studio.app/Contents/jre/Contents/Home"
+```
+
+or Windows:
+
+```
+set JAVA_HOME=C:\Program Files\Android\Android Studio\jre
 ```
 
 Now build the .aar:
