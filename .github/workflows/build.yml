@@ -114,13 +114,13 @@ jobs:
       - name: Upload rsdroid AAR as artifact
         uses: actions/upload-artifact@v2
         with:
-          name: rsdroid-aar
+          name: rsdroid-aar-${{ matrix.os }}
           if-no-files-found: error
           path: rsdroid/build/outputs/aar
 
       - name: Upload rsdroid-robo JAR as artifact
         uses: actions/upload-artifact@v2
         with:
-          name: rsdroid-robo
+          name: rsdroid-robo-${{ matrix.os }}
           if-no-files-found: error
           path: rsdroid-testing/build/libs
