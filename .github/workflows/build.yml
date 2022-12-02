@@ -110,3 +110,17 @@ jobs:
       - name: Build Robolectric/X86_64 (Win)
         if: matrix.os == 'windows-latest'
         run: ./build-robo.bat
+
+      - name: Upload rsdroid AAR as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: rsdroid-aar
+          if-no-files-found: error
+          path: rsdroid/build/outputs/aar
+
+      - name: Upload rsdroid-robo JAR as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: rsdroid-robo
+          if-no-files-found: error
+          path: rsdroid-testing/build/libs
