@@ -106,16 +106,22 @@ set JAVA_HOME=C:\Program Files\Android\Android Studio\jre
 
 Now build the .aar:
 
+```
 ./build-aar.sh
+```
 
 If you have 'python3' on your system but not 'python', you can specify
 the name:
 
+```
 RUST_ANDROID_GRADLE_PYTHON_COMMAND=python3 ./build-aar.sh
+```
 
 Assuming success, then build the .jar file:
 
+```
 ./build-robo.sh
+```
 
 
 ## Modify AnkiDroid to use built library
