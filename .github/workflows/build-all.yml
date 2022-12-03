@@ -65,10 +65,10 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target
-          key: ${{ runner.os }}-rust-release-v2-${{ hashFiles('Cargo.lock', 'rslib-bridge/**', 'anki/rslib/**', 'anki/ftl/**', 'anki/proto/**') }}
+          key: ${{ runner.os }}-rust-release-v5-${{ hashFiles('Cargo.lock') }}
           restore-keys: |
-            ${{ runner.os }}-rust-release-v2
-            ${{ runner.os }}-rust
+            ${{ runner.os }}-rust-release-v5
+            ${{ runner.os }}-rust-release
 
       - name: Anki cache
         uses: actions/cache@v3
@@ -77,9 +77,10 @@ jobs:
             anki/out/node_modules
             anki/out/rust
             anki/out/extracted
-          key: ${{ runner.os }}-anki-v4-${{ hashFiles('Cargo.lock', 'anki/package.json', 'anki/build/**', 'anki/rslib/**', 'anki/ftl/**', 'anki/proto/**') }}
+          key: ${{ runner.os }}-anki-v5-${{ hashFiles('Cargo.lock', 'anki/yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-anki-v4
+            ${{ runner.os }}-anki-v5
+            ${{ runner.os }}-anki
 
       - name: Build Android/All
         run: ./build-aar.sh
