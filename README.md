@@ -1,58 +1,163 @@
 # AnkiDroid-Backend
 
-Adapter allowing AnkiDroid to leverage Anki Desktop's Rust-based business logic layer via access to `anki/rslib` over JNI.
+An interface for accessing Anki Desktop's Rust backend inside AnkiDroid. This
+allows AnkiDroid to re-use the computer version's business logic and webpages,
+instead of having to reimplement them.
 
-## Why?
+This is a separate repo that gets published to a library that AnkiDroid consumes,
+so that AnkiDroid development is possible without a Rust toolchain installed.
 
-- Removes the need to port Anki Desktop's business logic to Java
-  - 100% compatibility and no bugs
-  - Rust should provide a speed increase
-  - An upgrade for AnkiDroid should only require moving to a later commit in a submodule
-  - Saves massive amount of AnkiDroid developer time & effort
-  - Allows Anki Desktop to iterate faster
-  - We can quickly port changes upstream, which will benefit the ecosystem
-- Insulates Anki-Android users from the complexity of installing multiple toolchains
-  - The Rust/Python/cross-compilation toolchain is much more complex than downloading Android Studio
-  - A separate repository means we keep a low barrier to entry for new contributors
+## Prerequisites
 
-## How to use it in a project
+We assume you already have Android Studio, and are able to build the AnkiDroid
+project already.
 
-AnkiDroid uses a pre-built version of this library, and includes it in AnkiDroid/build.gradle.
-To build a local version of this library and tell AnkiDroid to use it, please see the instructions
-in docs/TESTING.md
+### Download Anki submodule
 
-## Folders
+git submodule update --init
 
-`/anki/` - git submodule containing the Anki Rust Codebase, used both for building into `.so` files, and to obtain the current `.proto` files for use in Java codegen
+### C toolchain
 
-`/tools/` Tools to generate efficient protobuf-based RPC calls using JNI
+Install Xcode/Visual Studio if on macOS/Windows.
 
-`/rsdroid/` - Java library to be consumed by `Anki-Android`.
+### Rust
 
-`rsdroid-testing` - Builds a testing library which exposes a function to load `rsdroid` in a non-Android context for testing via Robolectric
+Install rustup from https://rustup.rs/
 
-`rsdroid-instrumented` - Android Instrumented Test
+### Ninja
 
-This is defined as an application to allow instrumented tests to be run against a library - there may be a better method
+Debian/Ubuntu:
 
-`/rslib-bridge/` (Rust) Android-specific library to communicate with `anki/rslib`
+  sudo apt install ninja-build
 
-## Implementation
+macOS:
 
-- Points to a fixed commit of `ankidroid/anki`
-  - Modifications to the library so we do not need to update to database schema 15 for version 1
-- References `rslib-bridge/anki/proto/anki/*.proto` which define RPC service calls to the anki backend
-- Python script to auto-generate the Java interface/backend to the RPC mechanism. Invoked via gradle.
-- Android Library which contains the rust based `.so` under (x86, x86-64, arm, arm64)
-  - Implements `android.database.sqlite`, redirecting SQL to the rust library
-  - Exposes RPC calls to Rust via a clean Java interface (`net.ankiweb.rsdroid.Backend`)
-- Testing library to allow the above to be usable under Robolectric
+  brew upgrade
+  brew install ninja
 
-## Additional Information
+Windows if using choco:
 
-See `/docs` for more in-depth information.
+  choco install ninja
+
+You can alternatively download a binary from https://github.com/ninja-build/ninja/releases
+and put it on your path.
+
+### NDK
+
+In Android Studio, choose the Tools>SDK menu option.
+
+- In SDK tools, enable "show package details"
+- Choose the NDK version that matches the number used in .github/workflows, eg 22.0.7026061
+- After downloading, you may need to restart Android Studio to get it to
+synchronize gradle.
+
+### Windows: msys2
+
+Install [msys2](https://www.msys2.org/) into the default folder location.
+
+After installation completes, run msys2, and run the following command:
+
+```
+$ pacman -S git rsync
+```
+
+When following the build steps below, make sure msys is on the path:
+
+```
+set PATH=%PATH%;c:\msys64\usr\bin
+```
+
+## Building
+
+Two main files need to be built:
+
+- The main .aar file, which contains the backend Kotlin code, web assets, and
+Anki backend code compiled for Android.
+- A .jar that contains the backend code compiled for the host platform, for use
+with Robolectric unit tests.
+
+You should do the first build with the provided shell .sh/.bat file, as it will
+take care of downloading the target architecture library as well. You'll need
+to tell the script to use the Java libraries and NDK downloaded by Android Studio,
+eg on Linux:
+
+```
+export ANDROID_SDK_ROOT=$HOME/Android/Sdk
+```
+
+Or macOS:
+
+```
+export ANDROID_SDK_ROOT=$HOME/Library/Android/sdk
+```
+
+If you don't have Java installed, you may be able to use the version bundled
+with Android Studio. Eg on macOS:
+
+```
+export JAVA_HOME="/Applications/Android Studio.app/Contents/jre/Contents/Home"
+```
+
+or Windows:
+
+```
+set JAVA_HOME=C:\Program Files\Android\Android Studio\jre
+```
+
+Now build the .aar:
+
+```
+./build-aar.sh
+```
+
+If you have 'python3' on your system but not 'python', you can specify
+the name:
+
+```
+RUST_ANDROID_GRADLE_PYTHON_COMMAND=python3 ./build-aar.sh
+```
+
+Assuming success, then build the .jar file:
+
+```
+./build-robo.sh
+```
+
+
+## Modify AnkiDroid to use built library
+
+Now open the AnkiDroid project in AndroidStudio. To tell gradle to load the
+compiled .aar and .jar files from disk, edit local.properties
+in the AnkiDroid repo, and add the following line:
+
+```
+local_backend=true
+```
+
+If you also want to test out the new schema code paths that make greater use of the backend,
+add the following line (be warned, do not use this on a collection you care about yet):
+
+```
+legacy_schema=false
+```
+
+Also make sure ext.ankidroid_backend_version in AnkiDroid/build.gradle matches the version
+of the backend you're testing.
+
+After making the change, you should be able to build and run the project on an x86_64
+emulator/device (arm64 on M1 Macs), and run unit tests.
+
+## Release builds
+
+Only the current platform is built by default. In CI, the .aar and .jar files
+are built for multiple platforms, so one release library can be used on a variety
+of devices. See .github/workflows for how this is done.
+
+## Architecture
+
+See (ARCHITECTURE.md)[./docs/ARCHITECTURE.md]
 
 ## License
 
 [GPL-3.0 License](https://github.com/ankidroid/Anki-Android/blob/master/COPYING)  
-[AGPL-3.0 Licence](https://github.com/david-allison-1/anki/blob/master/LICENSE) (anki submodule)
+[AGPL-3.0 Licence](https://github.com/AnkiDroid/anki/blob/main/LICENSE) (anki submodule)

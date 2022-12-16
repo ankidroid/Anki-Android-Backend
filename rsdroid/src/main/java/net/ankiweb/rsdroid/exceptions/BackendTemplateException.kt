@@ -22,10 +22,10 @@ open class BackendTemplateException(error: BackendError?) : BackendException(err
     class BackendTemplateSaveException(error: BackendError?) : BackendTemplateException(error)
     companion object {
         fun fromTemplateError(error: BackendError): BackendTemplateException {
-            if (error.localized == null) {
+            if (error.message == null) {
                 return BackendTemplateException(error)
             }
-            return if (error.localized.contains("has a problem")) {
+            return if (error.message.contains("has a problem")) {
                 BackendTemplateSaveException(error)
             } else BackendTemplateException(error)
         }

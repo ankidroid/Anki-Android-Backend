@@ -1,0 +1,140 @@
+name: Build AAR and Robo (all platforms)
+on:
+  workflow_dispatch:
+    inputs:
+      mavenPublish:
+        description: "Publish artifacts to Maven Central? non-empty to publish, empty to skip publish"
+        required: false
+        type: string
+  push:
+  schedule:
+    - cron: "0 0 * * *"
+  pull_request:
+
+env:
+  ALL_ARCHS: 1
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}-release
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: macos-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Fetch submodules
+        run: git submodule update --init
+
+      - name: Setup Ninja
+        uses: ashutoshvarma/setup-ninja@master
+        with:
+          version: 1.10.0
+
+      # The action puts a relative path on the PATH 🙄
+      - name: Make path absolute
+        run: echo $(pwd)/ninja_bin >> $GITHUB_PATH
+
+      - name: Configure JDK 1.11
+        uses: actions/setup-java@v3
+        with:
+          distribution: "adopt"
+          java-version: "11" # minimum for Android API31
+
+      - name: Install Android Command Line Tools
+        uses: android-actions/setup-android@v2
+
+      - name: Install Windows cross compiler
+        run: brew install mingw-w64 && x86_64-w64-mingw32-gcc -v
+
+      - name: Install Linux cross compiler
+        run: |
+          brew tap SergioBenitez/osxct
+          brew install x86_64-unknown-linux-gnu
+          x86_64-unknown-linux-gnu-gcc -v
+
+      - name: Install NDK
+        run: .github/scripts/install_ndk.sh 22.0.7026061
+
+      - name: Rust Cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-rust-release-v5-${{ hashFiles('Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-rust-release-v5
+            ${{ runner.os }}-rust-release
+
+      - name: Anki cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            anki/out/node_modules
+            anki/out/rust
+            anki/out/extracted
+          key: ${{ runner.os }}-anki-v5-${{ hashFiles('Cargo.lock', 'anki/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-anki-v5
+            ${{ runner.os }}-anki
+
+      - name: Build Android/All
+        run: ./build-aar.sh
+
+      - name: Build Robolectric/All
+        run: ./build-robo.sh
+
+      - name: Check Compiled Libraries
+        run: >
+          cd rsdroid-testing/assets &&
+          ../../.github/scripts/check_robolectric_assets.sh
+
+      - name: Upload rsdroid AAR as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: rsdroid-aar
+          if-no-files-found: error
+          path: rsdroid/build/outputs/aar
+
+      - name: Upload rsdroid-robo JAR as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: rsdroid-robo
+          if-no-files-found: error
+          path: rsdroid-testing/build/libs
+
+      # following steps only run on workflow dispatch
+
+      - name: Publish AAR to Maven
+        if: "${{ github.event.inputs.mavenPublish != '' && github.event_name == 'workflow_dispatch'}}"       
+        env:
+          ORG_GRADLE_PROJECT_SIGNING_PRIVATE_KEY: ${{ secrets.SIGNING_PRIVATE_KEY }}
+          ORG_GRADLE_PROJECT_SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+          SONATYPE_NEXUS_USERNAME: david-allison-1
+          SONATYPE_NEXUS_PASSWORD: ${{ secrets.SONATYPE_NEXUS_PASSWORD }}
+        run: |
+          ./gradlew rsdroid:uploadArchives -DtestBuildType=release -Dorg.gradle.daemon=false -Dorg.gradle.console=plain
+
+      - name: Publish JAR to Maven
+        if: "${{ github.event.inputs.mavenPublish != '' && github.event_name == 'workflow_dispatch'}}"       
+        env:
+          ORG_GRADLE_PROJECT_SIGNING_PRIVATE_KEY: ${{ secrets.SIGNING_PRIVATE_KEY }}
+          ORG_GRADLE_PROJECT_SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+          SONATYPE_NEXUS_USERNAME: david-allison-1
+          SONATYPE_NEXUS_PASSWORD: ${{ secrets.SONATYPE_NEXUS_PASSWORD }}
+        run: |
+          export ANKIDROID_LINUX_CC=x86_64-unknown-linux-gnu-gcc
+          export ANKIDROID_MACOS_CC=cc
+          export RUST_DEBUG=1
+          export RUST_BACKTRACE=1
+          export RUST_LOG=trace
+          export NO_CROSS=true
+          ./gradlew rsdroid-testing:uploadArchives -Dorg.gradle.project.macCC=$ANKIDROID_MACOS_CC -DtestBuildType=debug -Dorg.gradle.daemon=false -Dorg.gradle.console=plain
+
+      - name: ℹ️Additional Release Instructions (requires human interaction)
+        if: "${{ github.event.inputs.mavenPublish != '' && github.event_name == 'workflow_dispatch'}}"       
+        run: echo "Sign in to https://oss.sonatype.org/#stagingRepositories , close the repository, then release it"

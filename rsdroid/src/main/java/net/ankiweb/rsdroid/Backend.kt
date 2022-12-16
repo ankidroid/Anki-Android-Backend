@@ -250,7 +250,7 @@ open class Backend(val context: Context, langs: Iterable<String> = listOf("en"),
     }
 
     private fun checkMainThreadOp(sql: String? = null) {
-        checkMainThread {
+        runIfOnMainThread {
             val stackTraceElements = Thread.currentThread().stackTrace
             val firstElem = stackTraceElements.filter {
                 val klass = it.className
@@ -274,9 +274,9 @@ open class Backend(val context: Context, langs: Iterable<String> = listOf("en"),
         checkMainThreadOp(query)
     }
 
-    private fun checkMainThread(func: () -> Unit) {
+    private fun runIfOnMainThread(func: () -> Unit) {
         try {
-            if (Looper.getMainLooper().isCurrentThread) {
+            if (Looper.getMainLooper().thread == Thread.currentThread()) {
                 func()
             }
         } catch (exc: NoSuchMethodError) {

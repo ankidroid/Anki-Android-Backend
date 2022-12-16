@@ -1,5 +1,0 @@
-# rustembedded/cross:x86_64-pc-windows-gnu
-FROM rustembedded/cross@sha256:5005553ddf4e82d4703ee7f458a24802a014f03884f87c6277e9c718765d3517
-
-# fix for error: linker `x86_64-unknown-linux-gnu-gcc` not found
-RUN ln -s /usr/bin/cc /usr/local/bin/x86_64-unknown-linux-gnu-gcc

@@ -30,7 +30,7 @@ pub unsafe extern "C" fn Java_net_ankiweb_rsdroid_NativeMethods_openBackend(
         })
         .map_err(|err| {
             BackendError {
-                localized: err,
+                message: err,
                 kind: backend_error::Kind::FatalError as i32,
                 ..Default::default()
             }
@@ -46,7 +46,7 @@ pub unsafe extern "C" fn Java_net_ankiweb_rsdroid_NativeMethods_closeBackend(
     args: jlong,
 ) {
     let raw = args as *mut Backend;
-    Box::from_raw(raw);
+    drop(Box::from_raw(raw));
 }
 
 #[no_mangle]
@@ -117,8 +117,8 @@ fn pack_result(result: Result<Vec<u8>, Vec<u8>>, env: &JNIEnv) -> jarray {
 }
 
 fn panic_to_anki_error(panic: Box<dyn Any + Send>) -> AnkiError {
-    AnkiError::FatalError(
-        match panic.downcast_ref::<&'static str>() {
+    AnkiError::FatalError {
+        info: match panic.downcast_ref::<&'static str>() {
             Some(msg) => *msg,
             None => match panic.downcast_ref::<String>() {
                 Some(msg) => msg.as_str(),
@@ -126,5 +126,5 @@ fn panic_to_anki_error(panic: Box<dyn Any + Send>) -> AnkiError {
             },
         }
         .to_string(),
-    )
+    }
 }

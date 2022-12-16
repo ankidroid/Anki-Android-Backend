@@ -38,33 +38,28 @@ object RustBackendLoader {
      * This call is cached and is a no-op if called multiple times.
      *
      * Note the @Synchronized label is misleading - see the docs for loadPath()
-     * 
+     *
      * @throws IllegalStateException OS is not Windows, Linux or macOS
      * @throws RuntimeException Failure when extracting library to load
      * @throws UnsatisfiedLinkError The library could not be loaded
      */
     @JvmStatic
     @Synchronized
-    fun ensureSetup(customPath: String?) {
+    fun ensureSetup() {
         if (hasSetUp) {
             return;
         }
-        if (customPath != null) {
-            print("loading rsdroid-testing with path $customPath")
-            loadRsdroid(customPath)
+        // This should help diagnose some issues,
+        print("loading rsdroid-testing for: " + System.getProperty("os.name"))
+        if (OS.isFamilyWindows()) {
+            load("rsdroid", ".dll")
+        } else if (OS.isFamilyMac()) {
+            load("librsdroid", ".dylib")
+        } else if (OS.isFamilyUnix()) {
+            load("librsdroid", ".so")
         } else {
-            // This should help diagnose some issues,
-            print("loading rsdroid-testing for: " + System.getProperty("os.name"))
-            if (OS.isFamilyWindows()) {
-                load("rsdroid", ".dll")
-            } else if (OS.isFamilyMac()) {
-                load("librsdroid", ".dylib")
-            } else if (OS.isFamilyUnix()) {
-                load("librsdroid", ".so")
-            } else {
-                val osName = System.getProperty("os.name")
-                throw IllegalStateException(String.format("Could not determine OS Type for: '%s'", osName))
-            }
+            val osName = System.getProperty("os.name")
+            throw IllegalStateException(String.format("Could not determine OS Type for: '%s'", osName))
         }
         hasSetUp = true
     }
@@ -73,16 +68,6 @@ object RustBackendLoader {
         if (PRINT_DEBUG) {
             println(message)
         }
-    }
-
-    /**
-     * Allows unit testing rsdroid under Robolectric <br></br>
-     * Loads (via [Runtime.load]) a librsdroid.so alternative compiled for the current operating system.<br></br><br></br>
-     *
-     * @param filePath A full path to the compiled .dll/.dylib/.so
-     */
-    private fun loadRsdroid(filePath: String) {
-        loadPath(filePath)
     }
 
     /**

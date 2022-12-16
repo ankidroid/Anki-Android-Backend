@@ -50,7 +50,6 @@ public class BackendForTesting extends Backend {
     public enum ErrorType {
         InvalidInput,
         TemplateError,
-        IoError,
         DbErrorFileTooNew,
         DbErrorFileTooOld,
         DbErrorMissingEntity,

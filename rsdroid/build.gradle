@@ -9,7 +9,7 @@ apply from: "$rootDir/build-web-assets.gradle"
 def getAnkiCommitHash = { ->
     def hashStdOut = new ByteArrayOutputStream()
     exec {
-        commandLine "git", "-C", new File("${project.rootDir}", "rslib-bridge/anki"), "rev-parse", "HEAD"
+        commandLine "git", "-C", new File("${project.rootDir}", "anki"), "rev-parse", "HEAD"
         standardOutput = hashStdOut
     }
     def commit = hashStdOut.toString().trim()
@@ -61,9 +61,10 @@ cargo {
     module = "../rslib-bridge"
     libname = "rsdroid"
     targets = ["x86", "arm", "x86_64", "arm64"]
-    profile = 'release'
+    targetDirectory = "../target"
+    profile = System.getenv("DEBUG") == "1" ? "debug" : 'release'
     apiLevel = 21
-    verbose = true
+    verbose = false
 }
 
 apply from: "proto.gradle"
@@ -103,13 +104,19 @@ task generateTranslations(type: Exec) {
 
 preBuild.dependsOn "generateTranslations"
 
-Boolean wantAllPlatforms = System.getenv("CURRENT_ONLY") != "true"
+Boolean wantAllPlatforms = System.getenv("ALL_ARCHS") == "1"
+println("Env: ALL_ARCHS=${System.getenv("ALL_ARCHS")}")
+println("Env: DEBUG=${System.getenv("DEBUG")}")
 
 task cargoBuildTask {
     if (wantAllPlatforms) {
         preBuild.dependsOn "cargoBuild"
     } else {
-        preBuild.dependsOn "cargoBuildX86_64"
+        def target = "X86_64"
+        if (System.getProperty("os.arch") == "aarch64") {
+            target = "Arm64"
+        }
+        preBuild.dependsOn "cargoBuild${target}"
     }
 
     mustRunAfter "buildAnkiWebAssets"

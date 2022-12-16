@@ -1,4 +1,4 @@
-# Overview
+# Architecture
 
 Anki-Android-Backend uses Rust, Java and a little Python. Since setting up a Rust environment is somewhat complex, having a separate library encourages drive-by contributions to the main app by keeping a low barrier to entry for Anki-Android.
 
@@ -7,16 +7,28 @@ This repo is comprised of two main components:
 - `rslib-bridge` is a small Rust project that gets compiled into a shared library, which Java code can import. Its API consists
   of only three different functions: `openBackend()`, `closeBackend()`, and `runMethodRaw()`. When one of these functions is called by
   Java code, `rslib-bridge` takes care of converting the Java objects to a native Rust representation, and then passes the call
-  on to Anki's Rust backend, which gets included in `rslib-bridge` via the `rslib-bridge/anki[/rslib]` submodule.
+  on to Anki's Rust backend, which gets included in `rslib-bridge` via the `anki[/rslib]` submodule.
 - `rsdroid` is a Kotlin library that provides a friendly interface to the backend code. The bulk of its code is automatically
-  generated from the service definitions in `rslib-bridge/anki/proto/anki`. `rsdroid` also provides an adaptor to the Rust
+  generated from the service definitions in `anki/proto/anki`. `rsdroid` also provides an adaptor to the Rust
   database functionality, so that the Rust backend can be used in place of the standard Android SQLite library.
+
+Other folders:
+
+`/anki/` - Git submodule containing the Anki Rust Codebase, used both for building into `.so` files, and to obtain the current `.proto` files for use in Java codegen
+
+`/tools/` Scripts to generate the backend interface and translations
+
+`rsdroid-testing` - Builds a testing library targetting desktop machines, for use with Robolectric
+
+`rsdroid-instrumented` - Android Instrumented Test
+
+This is defined as an application to allow instrumented tests to be run against a library - there may be a better method
 
 ## Protocol Buffers
 
 The Rust backend uses Protocol Buffers to define available methods,
 and the structure of data each method takes and receives. The files can
-be found in `rslib-bridge/anki/proto/anki`.
+be found in `anki/proto/anki`.
 
 For example:
 

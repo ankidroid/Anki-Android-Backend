@@ -1,4 +1,4 @@
 #!/bin/bash
 
-. tools/setup-python
-$PYTHON ./tools/genfluent/genfluent.py
+export PYTHONPATH=$(pwd)/anki/pylib/anki/_vendor
+anki/out/pyenv/bin/python ./tools/genfluent/genfluent.py
