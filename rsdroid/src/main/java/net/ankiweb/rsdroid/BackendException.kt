@@ -105,7 +105,7 @@ open class BackendException : RuntimeException {
                 BackendError.Kind.JSON_ERROR -> return BackendJsonException(error)
                 BackendError.Kind.SYNC_AUTH_ERROR -> return BackendSyncAuthFailedException(error)
                 BackendError.Kind.SYNC_OTHER_ERROR -> return BackendSyncException(error)
-                BackendError.Kind.FATAL_ERROR -> return BackendFatalError(error)
+                BackendError.Kind.ANKIDROID_PANIC_ERROR -> return BackendFatalError(error)
                 BackendError.Kind.EXISTS -> return BackendExistingException(error)
                 BackendError.Kind.FILTERED_DECK_ERROR -> return BackendDeckIsFilteredException(error)
                 BackendError.Kind.INTERRUPTED -> return BackendInterruptedException(error)
