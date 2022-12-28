@@ -81,7 +81,6 @@ public class ExceptionTest {
             { BackendForTesting.ErrorType.NetworkError, BackendNetworkException.class},
             { BackendForTesting.ErrorType.FilteredDeckError, BackendDeckIsFilteredException.class },
             { BackendForTesting.ErrorType.Existing, BackendExistingException.class },
-            { BackendForTesting.ErrorType.FatalError, BackendException.BackendFatalError.class },
             { BackendForTesting.ErrorType.Interrupted, BackendInterruptedException.class},
             { BackendForTesting.ErrorType.InvalidInput, BackendInvalidInputException.class},
             { BackendForTesting.ErrorType.JSONError, BackendJsonException.class },

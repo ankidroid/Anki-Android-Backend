@@ -3,46 +3,17 @@
 //! It also captures stdout/stderr output, and feeds it to logcat, to make it
 //! easier to debug issues with dbg!()/println!()
 
+use std::{
+    io::{BufRead, BufReader},
+    time::Duration,
+};
+
 use android_logger::{Config, FilterBuilder};
-use log::Level;
-use slog::*;
-use std::io::{BufRead, BufReader};
-use std::time::Duration;
-use std::{fmt, result};
-
+use anki::error::Result;
 use gag::BufferRedirect;
-
-pub struct AndroidSerializer;
-
-impl Serializer for AndroidSerializer {
-    fn emit_arguments(&mut self, key: Key, val: &fmt::Arguments<'_>) -> Result {
-        log::debug!("{}={}", key, val);
-        Ok(())
-    }
-}
-
-pub struct AndroidDrain;
-
-impl Drain for AndroidDrain {
-    type Ok = ();
-    type Err = ();
-
-    fn log(
-        &self,
-        record: &Record<'_>,
-        values: &OwnedKVList,
-    ) -> result::Result<Self::Ok, Self::Err> {
-        log::debug!("{}", record.msg());
-
-        record
-            .kv()
-            .serialize(record, &mut AndroidSerializer)
-            .unwrap();
-        values.serialize(record, &mut AndroidSerializer).unwrap();
-
-        Ok(())
-    }
-}
+use log::Level;
+use once_cell::sync::OnceCell;
+use tracing::{debug, info};
 
 fn redirect_io() -> Result<()> {
     monitor_io_handle(BufferRedirect::stdout()?);
@@ -64,10 +35,10 @@ fn monitor_io_handle(handle: BufferRedirect) {
                 }
                 Ok(_) => {
                     if !should_ignore_line(&buf) {
-                        log::debug!("{}", buf)
+                        debug!("STDOUT: {}", buf)
                     }
                 }
-                Err(err) => log::debug!("stdio err: {}", err),
+                Err(err) => debug!("STDERR: {}", err),
             }
         }
     });
@@ -77,18 +48,21 @@ fn should_ignore_line(buf: &str) -> bool {
     buf.starts_with("s_glBindAttribLocation")
 }
 
-pub(crate) fn setup_logging() -> Logger {
-    // failure is expected after the first backend invocation
-    let _ = redirect_io();
+pub(crate) fn setup_logging() {
+    static ONCE: OnceCell<()> = OnceCell::new();
+    ONCE.get_or_init(|| {
+        _ = redirect_io();
 
-    let filter = format!(
-        "{},rsdroid::logging=debug",
-        std::env::var("RUST_LOG").unwrap_or_else(|_| "error".into())
-    );
-    android_logger::init_once(
-        Config::default()
-            .with_min_level(Level::Debug)
-            .with_filter(FilterBuilder::new().parse(&filter).build()),
-    );
-    Logger::root(slog_envlogger::new(AndroidDrain {}).fuse(), slog_o!())
+        let filter = format!(
+            "{},rsdroid::logging=debug",
+            std::env::var("RUST_LOG").unwrap_or_else(|_| "error".into())
+        );
+        android_logger::init_once(
+            Config::default()
+                .with_min_level(Level::Debug)
+                .with_filter(FilterBuilder::new().parse(&filter).build()),
+        );
+
+        info!("rsdroid logging enabled");
+    });
 }

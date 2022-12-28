@@ -1,16 +1,25 @@
 #![allow(clippy::missing_safety_doc)]
 
-use anki::pb::{backend_error, BackendError, Int64};
-use jni::objects::{JClass, JObject};
-use jni::sys::{jarray, jbyteArray, jint, jlong};
-use jni::JNIEnv;
+use std::{
+    any::Any,
+    panic::{catch_unwind, AssertUnwindSafe},
+};
 
-use anki::backend::{init_backend, Backend};
-use anki::error::{AnkiError, Result};
-use anki::i18n::I18n;
+use anki::{
+    backend::{init_backend, Backend},
+    error::Result,
+    pb,
+    pb::{
+        backend::{backend_error, BackendError},
+        generic::Int64,
+    },
+};
+use jni::{
+    objects::{JClass, JObject},
+    sys::{jarray, jbyteArray, jint, jlong},
+    JNIEnv,
+};
 use prost::Message;
-use std::any::Any;
-use std::panic::{catch_unwind, AssertUnwindSafe};
 
 mod logging;
 
@@ -20,10 +29,10 @@ pub unsafe extern "C" fn Java_net_ankiweb_rsdroid_NativeMethods_openBackend(
     _: JClass,
     args: jbyteArray,
 ) -> jarray {
-    let logger = logging::setup_logging();
+    logging::setup_logging();
 
     let input = env.convert_byte_array(args).unwrap();
-    let result = init_backend(&input, Some(logger))
+    let result = init_backend(&input)
         .map(|backend| {
             let backend_ptr = Box::into_raw(Box::new(backend)) as i64;
             Int64 { val: backend_ptr }.encode_to_vec()
@@ -31,7 +40,7 @@ pub unsafe extern "C" fn Java_net_ankiweb_rsdroid_NativeMethods_openBackend(
         .map_err(|err| {
             BackendError {
                 message: err,
-                kind: backend_error::Kind::FatalError as i32,
+                kind: backend_error::Kind::InvalidInput as i32,
                 ..Default::default()
             }
             .encode_to_vec()
@@ -62,9 +71,7 @@ pub unsafe extern "C" fn Java_net_ankiweb_rsdroid_NativeMethods_runMethodRaw(
     let service: u32 = service as u32;
     let method: u32 = method as u32;
     let input = env.convert_byte_array(args).unwrap();
-    with_packed_result(&env, backend.i18n(), || {
-        backend.run_method(service, method, &input)
-    })
+    with_packed_result(&env, || backend.run_method(service, method, &input))
 }
 
 unsafe fn to_backend(ptr: jlong) -> &'static mut Backend {
@@ -81,13 +88,13 @@ macro_rules! null_on_error {
 }
 
 /// Run provided func and pack result into jarray. Catches panics.
-fn with_packed_result<F>(env: &JNIEnv, tr: &I18n, func: F) -> jarray
+fn with_packed_result<F>(env: &JNIEnv, func: F) -> jarray
 where
     F: FnOnce() -> Result<Vec<u8>, Vec<u8>>,
 {
     let result = match catch_unwind(AssertUnwindSafe(func)) {
         Ok(result) => result,
-        Err(panic) => Err(panic_to_anki_error(panic).into_protobuf(tr).encode_to_vec()),
+        Err(panic) => Err(panic_to_backend_error(panic).encode_to_vec()),
     };
     pack_result(result, env)
 }
@@ -116,15 +123,18 @@ fn pack_result(result: Result<Vec<u8>, Vec<u8>>, env: &JNIEnv) -> jarray {
     outer_array
 }
 
-fn panic_to_anki_error(panic: Box<dyn Any + Send>) -> AnkiError {
-    AnkiError::FatalError {
-        info: match panic.downcast_ref::<&'static str>() {
-            Some(msg) => *msg,
-            None => match panic.downcast_ref::<String>() {
-                Some(msg) => msg.as_str(),
-                None => "unknown panic",
-            },
-        }
-        .to_string(),
+fn panic_to_backend_error(panic: Box<dyn Any + Send>) -> BackendError {
+    let message = match panic.downcast_ref::<&'static str>() {
+        Some(msg) => *msg,
+        None => match panic.downcast_ref::<String>() {
+            Some(msg) => msg.as_str(),
+            None => "unknown panic",
+        },
+    }
+    .to_string();
+    BackendError {
+        kind: pb::backend::backend_error::Kind::AnkidroidPanicError as i32,
+        message,
+        ..Default::default()
     }
 }
