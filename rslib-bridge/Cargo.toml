@@ -10,8 +10,7 @@ crate_type = ["dylib"]
 [dependencies]
 jni = { version = "0.17.0", default-features = false }
 anki = { path = "../anki/rslib", features = ["rustls"] }
-# pinned until https://github.com/chronotope/chrono/issues/922 is resolved
-chrono = "=0.4.19"
+chrono = { git = "https://github.com/ankitects/chrono.git", rev = "fd971dde70cde002dba1f9face6a32891513672c" }
 
 prost = "0.11"
 serde = "1.0.114"
