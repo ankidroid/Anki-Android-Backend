@@ -13,10 +13,6 @@ members = [
 exclude = []
 resolver = "2"
 
-[patch.crates-io]
-# If updating rev, hakari.toml needs updating too.
-reqwest = { git = "https://github.com/ankitects/reqwest.git", rev = "7591444614de02b658ddab125efba7b2bb4e2335" }
-
 [profile.dev.package."*"]
 opt-level = 0
 debug = 0
