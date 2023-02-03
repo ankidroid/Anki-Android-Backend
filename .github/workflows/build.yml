@@ -77,10 +77,8 @@ jobs:
             anki/out/extracted
           key: ${{ runner.os }}-anki-v5-${{ hashFiles('Cargo.lock', 'anki/yarn.lock') }}
           restore-keys: |
-            Linux-anki-v5
-            Linux-anki
-            macOS-anki-v5
-            macOS-anki
+            ${{ runner.os }}-anki-v5
+            ${{ runner.os }}-anki
 
       - name: Build Android/X86_64
         if: matrix.os != 'windows-latest'
