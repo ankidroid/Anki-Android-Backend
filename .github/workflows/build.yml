@@ -68,16 +68,29 @@ jobs:
             ${{ runner.os }}-rust-debug-v5
             ${{ runner.os }}-rust-debug
 
-      - name: Anki cache
+      - name: Anki cache (Unix)
         uses: actions/cache@v3
+        if: matrix.os != 'windows-latest'
         with:
           path: |
             anki/out/node_modules
             anki/out/rust
             anki/out/extracted
-          key: ${{ runner.os }}-anki-v5-${{ hashFiles('Cargo.lock', 'anki/yarn.lock') }}
+          key: ${{ runner.os }}-anki-v6-${{ hashFiles('Cargo.lock', 'anki/yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-anki-v5
+            ${{ runner.os }}-anki-v6
+            ${{ runner.os }}-anki
+
+      - name: Anki cache (Windows)
+        uses: actions/cache@v3
+        if: matrix.os == 'windows-latest'
+        with:
+          path: |
+            anki/out/rust
+            anki/out/extracted
+          key: ${{ runner.os }}-anki-v6-${{ hashFiles('Cargo.lock', 'anki/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-anki-v6
             ${{ runner.os }}-anki
 
       - name: Build Android/X86_64
