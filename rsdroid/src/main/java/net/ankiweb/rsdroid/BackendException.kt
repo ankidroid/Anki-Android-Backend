@@ -123,6 +123,7 @@ open class BackendException : RuntimeException {
                 BackendError.Kind.DELETED -> return BackendException(error)
                 BackendError.Kind.CARD_TYPE_ERROR -> return BackendException(error)
                 BackendError.Kind.UNRECOGNIZED -> return BackendException(error)
+                BackendError.Kind.OS_ERROR -> return BackendException(error)
             }
         }
 
