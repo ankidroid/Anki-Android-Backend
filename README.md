@@ -22,7 +22,7 @@ Install Xcode/Visual Studio if on macOS/Windows.
 
 ### Rust
 
-Install rustup from https://rustup.rs/
+Install rustup from <https://rustup.rs/>
 
 ### Ninja
 
@@ -39,7 +39,7 @@ Windows if using choco:
 
   choco install ninja
 
-You can alternatively download a binary from https://github.com/ninja-build/ninja/releases
+You can alternatively download a binary from <https://github.com/ninja-build/ninja/releases>
 and put it on your path.
 
 ### NDK
@@ -58,7 +58,7 @@ Install [msys2](https://www.msys2.org/) into the default folder location.
 After installation completes, run msys2, and run the following command:
 
 ```
-$ pacman -S git rsync
+pacman -S git rsync
 ```
 
 When following the build steps below, make sure msys is on the path:
@@ -123,7 +123,6 @@ Assuming success, then build the .jar file:
 ./build-robo.sh
 ```
 
-
 ## Modify AnkiDroid to use built library
 
 Now open the AnkiDroid project in AndroidStudio. To tell gradle to load the
@@ -155,7 +154,7 @@ of devices. See .github/workflows for how this is done.
 
 ## Architecture
 
-See (ARCHITECTURE.md)[./docs/ARCHITECTURE.md]
+See [ARCHITECTURE.md](./docs/ARCHITECTURE.md)
 
 ## License
 
