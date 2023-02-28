@@ -152,6 +152,14 @@ Only the current platform is built by default. In CI, the .aar and .jar files
 are built for multiple platforms, so one release library can be used on a variety
 of devices. See .github/workflows for how this is done.
 
+### Creating and Publishing a release
+
+1. Most likely you will want to align the `anki` submodule SHA with a new tagged release from upstream `ankitects/anki` repository
+1. Edit the file `gradle.properties` - increment the Anki-Android-Backend version (first part of version string) if there are code changes in this repository, and align the second part of the version string (the anki upstream part) with the tag name of the upstream tag used for the anki submodule SHA here
+1. Run the Github workflow `Build AAR and Robo (all platforms)` manually with a string argument (I typically use `shipit`, but any string will work) - this will trigger a full release build ready for upload to maven
+1. Check the workflow logs for the link to Maven Central where **if you have a Maven Central user with permissions (like David A and Mike H - ask if you want permission)** you may "close" the repository" then after a short wait "release" the repository
+1. Head over to the main `Anki-Android` repository and update the `AnkiDroid/build.gradle` file there to adopt the new backend version once it shows up in [https://repo1.maven.org/maven2/io/github/david-allison-1/anki-android-backend/]
+
 ## Architecture
 
 See [ARCHITECTURE.md](./docs/ARCHITECTURE.md)
