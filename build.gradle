@@ -11,7 +11,7 @@ buildscript {
         androidxTestJunitVersion = "1.1.3"
         sqliteVersion = "2.2.0"
         kotlin_version = '1.8.10'
-        version_dokka = "1.7.20"
+        version_dokka = "1.8.10"
     }
 
     repositories {
