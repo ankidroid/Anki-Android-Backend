@@ -155,6 +155,8 @@ of devices. See .github/workflows for how this is done.
 ### Creating and Publishing a release
 
 1. Most likely you will want to align the `anki` submodule SHA with a new tagged release from upstream `ankitects/anki` repository
+   1. change into the anki submodule directory and `git fetch origin` to get the upstream ankitects/anki repo git information local
+   1. update to the SHA of the commit for the latest tag: ` git checkout 0c1eaf4ce66c1b90867af9a79b95d9e507262cf8 --recurse-submodules` (as an example)
 1. Edit the file `gradle.properties` - increment the Anki-Android-Backend version (first part of version string) if there are code changes in this repository, and align the second part of the version string (the anki upstream part) with the tag name of the upstream tag used for the anki submodule SHA here
 1. Run the Github workflow `Build AAR and Robo (all platforms)` manually with a string argument (I typically use `shipit`, but any string will work) - this will trigger a full release build ready for upload to maven
 1. Check the workflow logs for the link to Maven Central where **if you have a Maven Central user with permissions (like David A and Mike H - ask if you want permission)** you may "close" the repository" then after a short wait "release" the repository
