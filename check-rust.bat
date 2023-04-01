@@ -1,3 +1,4 @@
-rustup component add rustfmt clippy
+rustup component add clippy
 cargo clippy
-cargo fmt -- --check
+cd anki\cargo\format
+cargo fmt --check --all --manifest-path ..\..\..\Cargo.toml

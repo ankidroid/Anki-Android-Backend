@@ -1,2 +1,3 @@
 [toolchain]
-channel = "1.65"
+# older versions may fail to compile; newer versions may fail the clippy tests
+channel = "1.66.1"
