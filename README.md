@@ -12,6 +12,11 @@ so that AnkiDroid development is possible without a Rust toolchain installed.
 We assume you already have Android Studio, and are able to build the AnkiDroid
 project already.
 
+The repos `Anki-Android` and `Anki-Android-Backend` should be cloned inside the
+same folder. Furthermore, `Anki-Android-Backend` should not be renamed, as this
+name is hard-coded in AnkiDroid gradle files. Unless stated otherwise, all
+commands below are supposed to be executed in the current repo.
+
 ### Download Anki submodule
 
 git submodule update --init
@@ -26,16 +31,16 @@ Install rustup from <https://rustup.rs/>
 
 ### Ninja
 
-Debian/Ubuntu:
+#### Debian/Ubuntu:
 
   sudo apt install ninja-build
 
-macOS:
+#### macOS:
 
   brew upgrade
   brew install ninja
 
-Windows if using choco:
+#### Windows if using choco:
 
   choco install ninja
 
@@ -47,7 +52,7 @@ and put it on your path.
 In Android Studio, choose the Tools>SDK menu option.
 
 - In SDK tools, enable "show package details"
-- Choose the NDK version that matches the number used in .github/workflows, eg 22.0.7026061
+- Choose the NDK version that matches the number used in [.github/workflows/build.yml], eg 22.0.7026061
 - After downloading, you may need to restart Android Studio to get it to
 synchronize gradle.
 
@@ -126,7 +131,7 @@ Assuming success, then build the .jar file:
 ## Modify AnkiDroid to use built library
 
 Now open the AnkiDroid project in AndroidStudio. To tell gradle to load the
-compiled .aar and .jar files from disk, edit local.properties
+compiled .aar and .jar files from disk, edit `local.properties`
 in the AnkiDroid repo, and add the following line:
 
 ```
@@ -140,8 +145,10 @@ add the following line (be warned, do not use this on a collection you care abou
 legacy_schema=false
 ```
 
-Also make sure ext.ankidroid_backend_version in AnkiDroid/build.gradle matches the version
-of the backend you're testing.
+Check `Anki-AndroidBackend/gradle.properties`'s `VERSION_NAME` and
+`Anki-Android/build.gradle`'s `ext.ankidroid_backend_version`. Both variables
+should have the same value. If it is not the case, you must edit Anki-Android's
+one.
 
 After making the change, you should be able to build and run the project on an x86_64
 emulator/device (arm64 on M1 Macs), and run unit tests.
@@ -150,17 +157,46 @@ emulator/device (arm64 on M1 Macs), and run unit tests.
 
 Only the current platform is built by default. In CI, the .aar and .jar files
 are built for multiple platforms, so one release library can be used on a variety
-of devices. See .github/workflows for how this is done.
+of devices. See [.github/workflows] for how this is done.
+
+### Testing with a specific version of anki
+
+In this section, we'll consider that you want to test AnkiDroid with the version
+of Anki at commit `$COMMIT_IDENTIFIER` from the repository `some_repo`.
+
+Most of the time `$SOME_REPO` will simply be `origin`, that is, ankitects
+official repository, and `COMMIT_IDENTIFIER` could be replaced by the tag of the
+latest stable release. You can find the latest tag by running `git tag|sort
+-V|tail -n1` in the `anki` directory.
+
+1. run `cd anki` to change into the anki submodule directory,
+1. run `git fetch $SOME_REPO` to ensure you obtain the latest change from this repo.
+1. run `git checkout $COMMIT_IDENTIFIER --recurse-submodules` to obtain the version of the code at this particular commit.
 
 ### Creating and Publishing a release
 
-1. Most likely you will want to align the `anki` submodule SHA with a new tagged release from upstream `ankitects/anki` repository
-   1. change into the anki submodule directory and `git fetch origin` to get the upstream ankitects/anki repo git information local
-   1. update to the SHA of the commit for the latest tag: ` git checkout 0c1eaf4ce66c1b90867af9a79b95d9e507262cf8 --recurse-submodules` (as an example)
-1. Edit the file `gradle.properties` - increment the Anki-Android-Backend version (first part of version string) if there are code changes in this repository, and align the second part of the version string (the anki upstream part) with the tag name of the upstream tag used for the anki submodule SHA here
-1. Run the Github workflow `Build AAR and Robo (all platforms)` manually with a string argument (I typically use `shipit`, but any string will work) - this will trigger a full release build ready for upload to maven
-1. Check the workflow logs for the link to Maven Central where **if you have a Maven Central user with permissions (like David A and Mike H - ask if you want permission)** you may "close" the repository" then after a short wait "release" the repository
-1. Head over to the main `Anki-Android` repository and update the `AnkiDroid/build.gradle` file there to adopt the new backend version once it shows up in [https://repo1.maven.org/maven2/io/github/david-allison-1/anki-android-backend/]
+Let's now consider that you want to release a new version of the back-end.
+
+1. Find the latest stable version of Anki. You can find the latest tag by
+running `git tag|sort -V|tail -n1` in the `anki` directory. Let's call it
+version $ANKI_VERSION.
+1. Ensure you are testing and building the back-end against this version (see
+preceding section to learn how to do it).
+1. In `Anki-Android-Backend/gradle.properties` you will need to update
+`VERSION_NAME`. Its value is of the form
+`$BACKEND_VERSION-$ANKI_VERSION`. `$ANKI_VERSION` should be as defined
+above. `$BACKEND_VERSION` should be incremented compared to the last release.
+1. Run the Github workflow `Build AAR and Robo (all platforms)` manually with a
+string argument (I typically use `shipit`, but any string will work) - this will
+trigger a full release build ready for upload to maven.
+1. Check the workflow logs for the link to Maven Central where **if you have a
+Maven Central user with permissions (like David A and Mike H - ask if you want
+permission)** you may "close" the repository" then after a short wait "release"
+the repository.
+1. Head over to the main `Anki-Android` repository and update the
+`AnkiDroid/build.gradle` file there to adopt the new backend version once it
+shows up in
+https://repo1.maven.org/maven2/io/github/david-allison-1/anki-android-backend/
 
 ## Architecture
 
