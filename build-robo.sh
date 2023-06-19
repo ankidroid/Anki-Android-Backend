@@ -13,6 +13,8 @@
 
 set -e
 
+export CARGO_TARGET_DIR=target
+
 if [ "$DEBUG" = "1" ]; then
     release=""
     dir="debug"

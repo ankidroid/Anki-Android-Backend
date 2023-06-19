@@ -17,6 +17,7 @@
 
 set -e
 
+export CARGO_TARGET_DIR=target
 if [ "$ALL_ARCHS" = "1" ]; then
     rustup target add armv7-linux-androideabi   # arm
     rustup target add i686-linux-android        # x86
