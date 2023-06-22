@@ -23,6 +23,7 @@ tracing = { version = "0.1.37", features = ["max_level_trace", "release_max_leve
 anki_io = { version = "0.0.0", path = "../anki/rslib/io" }
 anki_process = { version = "0.0.0", path = "../anki/rslib/process" }
 anki_proto_gen = { version = "0.0.0", path = "../anki/rslib/proto_gen" }
+anki_i18n = { version = "0.0.0", path = "../anki/rslib/i18n" }
 
 anyhow = "1.0.71"
 glob = "0.3.1"

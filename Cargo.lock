@@ -566,6 +566,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "build_rust"
+version = "0.1.0"
+dependencies = [
+ "anki_io",
+ "anki_process",
+ "anyhow",
+ "camino",
+ "glob",
+ "which",
+]
+
+[[package]]
 name = "bumpalo"
 version = "3.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -603,6 +615,12 @@ dependencies = [
  "libc",
  "pkg-config",
 ]
+
+[[package]]
+name = "camino"
+version = "1.1.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c530edf18f37068ac2d977409ed5cd50d53d73bc653c7647b48eb78976ac9ae2"
 
 [[package]]
 name = "cast"
@@ -2750,6 +2768,7 @@ version = "0.1.0"
 dependencies = [
  "android_logger",
  "anki",
+ "anki_i18n",
  "anki_io",
  "anki_process",
  "anki_proto",

@@ -88,12 +88,14 @@ eg on Linux:
 
 ```
 export ANDROID_SDK_ROOT=$HOME/Android/Sdk
+export ANDROID_NDK_HOME=$HOME/Android/Sdk/ndk/25.2.9519653
 ```
 
 Or macOS:
 
 ```
 export ANDROID_SDK_ROOT=$HOME/Library/Android/sdk
+export ANDROID_NDK_HOME=$HOME/Library/Android/sdk/ndk/25.2.9519653
 ```
 
 If you don't have Java installed, you may be able to use the version bundled
@@ -109,24 +111,10 @@ or Windows:
 set JAVA_HOME=C:\Program Files\Android\Android Studio\jre
 ```
 
-Now build the .aar:
+Now build with `./build.sh` or `build.bat`.
 
-```
-./build-aar.sh
-```
-
-If you have 'python3' on your system but not 'python', you can specify
-the name:
-
-```
-RUST_ANDROID_GRADLE_PYTHON_COMMAND=python3 ./build-aar.sh
-```
-
-Assuming success, then build the .jar file:
-
-```
-./build-robo.sh
-```
+After you've confirmed building works, you may want to build again with the env
+var RELEASE=1 defined, to build a faster version.
 
 ## Modify AnkiDroid to use built library
 

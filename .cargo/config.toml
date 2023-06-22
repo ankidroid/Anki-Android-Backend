@@ -3,7 +3,7 @@
 target-dir = "target"
 
 [env]
-STRINGS_JSON = { value = "anki/out/strings.json", relative = true }
-DESCRIPTORS_BIN = { value = "anki/out/descriptors.bin", relative = true }
+DESCRIPTORS_BIN = { value = "anki/out/rslib/proto/descriptors.bin", relative = true }
+STRINGS_JSON_ANKIDROID = { value = "anki/out/strings.json", relative = true }
 PROTOC = { value = "anki/out/extracted/protoc/bin/protoc", relative = true }
 GENERATED_BACKEND_DIR = { value = "rsdroid/build/generated/source/backend", relative = true }

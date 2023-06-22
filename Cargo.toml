@@ -9,6 +9,7 @@ edition = "2021"
 members = [
   "rslib-bridge",
   "anki/rslib",
+  "build_rust"
 ]
 exclude = []
 resolver = "2"

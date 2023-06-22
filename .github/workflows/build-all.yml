@@ -1,4 +1,4 @@
-name: Build AAR and Robo (all platforms)
+name: Build release (from macOS)
 on:
   workflow_dispatch:
     inputs:
@@ -44,9 +44,6 @@ jobs:
           distribution: "adopt"
           java-version: "11" # minimum for Android API31
 
-      - name: Install Android Command Line Tools
-        uses: android-actions/setup-android@v2
-
       - name: Install Windows cross compiler
         run: brew install mingw-w64 && x86_64-w64-mingw32-gcc -v
 
@@ -56,8 +53,6 @@ jobs:
           brew install x86_64-unknown-linux-gnu
           x86_64-unknown-linux-gnu-gcc -v
 
-      - name: Install NDK
-        run: .github/scripts/install_ndk.sh 25.2.9519653
 
       - name: Rust Cache
         uses: actions/cache@v3
@@ -66,28 +61,15 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target
+            anki/out/rust
+            anki/out/extracted
           key: ${{ runner.os }}-rust-release-v5-${{ hashFiles('Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-rust-release-v5
             ${{ runner.os }}-rust-release
 
-      - name: Anki cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            anki/out/node_modules
-            anki/out/rust
-            anki/out/extracted
-          key: ${{ runner.os }}-anki-v5-${{ hashFiles('Cargo.lock', 'anki/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-anki-v5
-            ${{ runner.os }}-anki
-
-      - name: Build Android/All
-        run: ./build-aar.sh
-
-      - name: Build Robolectric/All
-        run: ./build-robo.sh
+      - name: Build all
+        run: ./build.sh
 
       - name: Check Compiled Libraries
         run: >
