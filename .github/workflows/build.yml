@@ -68,7 +68,7 @@ jobs:
         if: matrix.os == 'macos-latest'
         timeout-minutes: 30
         with:
-          api-level: 21
+          api-level: 23
           target: default
           arch: x86_64
           profile: Nexus 6
