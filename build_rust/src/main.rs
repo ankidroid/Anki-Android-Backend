@@ -3,6 +3,7 @@ use anki_process::CommandExt;
 use anyhow::Result;
 use camino::Utf8Path;
 use std::env;
+use std::env::consts::OS;
 use std::path::Path;
 use std::process::Command;
 
@@ -225,6 +226,9 @@ fn build_rsdroid(is_release: bool, target_arch: &str, target_dir: &Utf8Path) -> 
     }
     if !target_arch.is_empty() {
         command.args(["--target", target_arch]);
+    }
+    if OS == "macos" && target_arch == "x86_64-unknown-linux-gnu" {
+        command.env("CC", "x86_64-unknown-linux-gnu-gcc");
     }
     command.ensure_success()?;
     Ok(())
