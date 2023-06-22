@@ -52,7 +52,7 @@ and put it on your path.
 In Android Studio, choose the Tools>SDK Manager menu option.
 
 - In SDK tools, enable "show package details"
-- Choose the NDK version that matches the number used in [.github/workflows/build.yml](.github/workflows/build.yml), eg 22.0.7026061
+- Choose the NDK version that matches the number used in [.github/workflows/build.yml](.github/workflows/build.yml), eg 25.2.9519653
 - After downloading, you may need to restart Android Studio to get it to
 synchronize gradle.
 

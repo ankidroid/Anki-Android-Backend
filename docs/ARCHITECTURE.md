@@ -61,7 +61,8 @@ id and the input bytes into the backend's `runMethodRaw()`, and the backend
 returns another ByteArray which can be decoded into the output message.
 
 Doing this manually for each method would be a pain, so we use code generation
-instead. `tools/protoc-gen/protoc-gen.py` reads the Protobuf files, and
+instead. `rslib-bridge/proto.rs` reads the Protobuf files (actually, a binary
+representation of them exported by the backend), and
 automatically generates methods for us into a GeneratedBackend.kt file. Eg:
 
 ```

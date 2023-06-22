@@ -11,7 +11,7 @@ use std::{
 use android_logger::{Config, FilterBuilder};
 use anki::error::Result;
 use gag::BufferRedirect;
-use log::Level;
+use log::LevelFilter;
 use once_cell::sync::OnceCell;
 use tracing::{debug, info};
 
@@ -59,7 +59,7 @@ pub(crate) fn setup_logging() {
         );
         android_logger::init_once(
             Config::default()
-                .with_min_level(Level::Debug)
+                .with_max_level(LevelFilter::Debug)
                 .with_filter(FilterBuilder::new().parse(&filter).build()),
         );
 

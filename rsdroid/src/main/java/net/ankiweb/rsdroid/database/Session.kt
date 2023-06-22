@@ -33,7 +33,7 @@
  */
 package net.ankiweb.rsdroid.database
 
-import anki.ankidroid.DBResponse
+import anki.ankidroid.DbResponse
 import org.json.JSONArray
 import java.util.*
 
@@ -71,11 +71,11 @@ class Session(private val backend: SQLHandler) : SQLHandler {
         return backend.getPath()
     }
 
-    override fun getNextSlice(startIndex: Long, sequenceNumber: Int): DBResponse {
+    override fun getNextSlice(startIndex: Long, sequenceNumber: Int): DbResponse {
         return backend.getNextSlice(startIndex, sequenceNumber)
     }
 
-    override fun fullQueryProto(query: String, bindArgs: Array<Any?>?): DBResponse {
+    override fun fullQueryProto(query: String, bindArgs: Array<Any?>?): DbResponse {
         return backend.fullQueryProto(query, bindArgs)
     }
 

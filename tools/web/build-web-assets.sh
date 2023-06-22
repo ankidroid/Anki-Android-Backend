@@ -11,7 +11,7 @@ mkdir -p $BUILD_DIR/web
 # build reviewer_extras_bundle and pages files
 cd $ANKI_SRC
 
-./ninja extract:protoc ts:reviewer:reviewer_extras_bundle.js qt/aqt:data/web/pages
+./ninja extract:protoc ts:reviewer:reviewer_extras_bundle.js qt:aqt:data:web:pages
 cp out/qt/_aqt/data/web/pages/* out/ts/reviewer/reviewer_extras_bundle.js $BUILD_DIR/web/
 
 cp $ANKI_SRC/cargo/licenses.json $BUILD_DIR/web/licenses-cargo.json
