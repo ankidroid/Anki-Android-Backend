@@ -47,24 +47,12 @@ android {
         main {
             kotlin.srcDirs += "build/generated/source/backend"
             java.srcDirs += "build/generated/source/backend"
+            jniLibs.srcDirs 'build/generated/jniLibs'
             resources {
                 srcDirs "src/main/resources", "build/generated/anki_artifacts"
             }
         }
     }
-}
-
-// Consider upgrade to DSL: https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
-apply plugin: "org.mozilla.rust-android-gradle.rust-android"
-
-cargo {
-    module = "../rslib-bridge"
-    libname = "rsdroid"
-    targets = ["x86", "arm", "x86_64", "arm64"]
-    targetDirectory = "../target"
-    profile = System.getenv("DEBUG") == "1" ? "debug" : 'release'
-    apiLevel = 21
-    verbose = false
 }
 
 dependencies {
@@ -91,26 +79,29 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
     }
 }
 
-Boolean wantAllPlatforms = System.getenv("ALL_ARCHS") == "1"
-println("Env: ALL_ARCHS=${System.getenv("ALL_ARCHS")}")
-println("Env: DEBUG=${System.getenv("DEBUG")}")
+preBuild.dependsOn "buildRust"
 
-task cargoBuildTask {
-    if (wantAllPlatforms) {
-        preBuild.dependsOn "cargoBuild"
-    } else {
-        def target = "X86_64"
-        if (System.getProperty("os.arch") == "aarch64") {
-            target = "Arm64"
-        }
-        preBuild.dependsOn "cargoBuild${target}"
-    }
-
-    mustRunAfter "buildAnkiWebAssets"
+def getSdkDir() {
+    Properties properties = new Properties()
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+    return properties.getProperty('sdk.dir')
 }
 
-preBuild.dependsOn "buildAnkiWebAssets"
-preBuild.dependsOn "cargoBuildTask"
+task buildRust(type: Exec) {
+    // ensure script doesn't try to start gradle again
+    environment 'RUNNING_FROM_GRADLE', '1'
+    if (!System.getenv('ANDROID_NDK_HOME')) {
+        String ndkPath = "${getSdkDir()}/ndk/25.2.9519653"
+        environment 'ANDROID_NDK_HOME', ndkPath
+    }
+    workingDir "$rootDir"
+    String toolPath = System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows') ? 'build-aar.bat' : './build-aar.sh'
+    if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
+        commandLine toolPath
+    } else {
+        commandLine 'sh', '-c', toolPath
+    }
+}
 
 signing {
     def hasPrivate = project.hasProperty('SIGNING_PRIVATE_KEY')
