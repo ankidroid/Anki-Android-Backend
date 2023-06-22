@@ -1,6 +1,7 @@
 // Copyright: Ankitects Pty Ltd and contributors
 // License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
 
+pub mod fluent;
 pub mod proto;
 
 use std::{env, path::PathBuf};
@@ -14,6 +15,7 @@ fn main() -> Result<()> {
     let pool = DescriptorPool::decode(std::fs::read(descriptors_path)?.as_ref())?;
     let (_, services) = anki_proto_gen::get_services(&pool);
     proto::write_kotlin_interface(&services)?;
+    fluent::write_translations();
 
     Ok(())
 }

@@ -15,7 +15,7 @@ use inflections::Inflect;
 use prost_reflect::{FieldDescriptor, Kind, MessageDescriptor};
 
 fn out_dir() -> PathBuf {
-    PathBuf::from(std::env::var("GENERATED_PROTO_DIR").unwrap())
+    PathBuf::from(std::env::var("GENERATED_BACKEND_DIR").unwrap())
 }
 
 pub(crate) fn write_kotlin_interface(services: &[BackendService]) -> Result<()> {

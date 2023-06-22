@@ -45,7 +45,6 @@ android {
 
     sourceSets {
         main {
-            kotlin.srcDirs += "build/generated/source/fluent"
             kotlin.srcDirs += "build/generated/source/backend"
             java.srcDirs += "build/generated/source/backend"
             resources {
@@ -91,18 +90,6 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
         freeCompilerArgs = ["-opt-in=kotlin.RequiresOptIn"]
     }
 }
-
-task generateTranslations(type: Exec) {
-    workingDir "$rootDir"
-    String genPath = System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows') ? 'tools\\genfluent\\genfluent.bat' : 'tools/genfluent/genfluent.sh'
-    if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
-        commandLine 'cmd', '/c', genPath
-    } else {
-        commandLine 'sh', '-c', genPath
-    }
-}
-
-preBuild.dependsOn "generateTranslations"
 
 Boolean wantAllPlatforms = System.getenv("ALL_ARCHS") == "1"
 println("Env: ALL_ARCHS=${System.getenv("ALL_ARCHS")}")
