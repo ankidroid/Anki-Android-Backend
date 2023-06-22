@@ -31,4 +31,10 @@ else
     fi
 fi
 
+# Rust 1.70 necessitated an NDK upgrade, and one of the two
+# caused crashes until these flags are set.
+# https://github.com/termux/termux-packages/issues/14576
+# https://github.com/mozilla/rust-android-gradle/issues/105
+# This is also in check-droid.sh
+export RUSTFLAGS=" -C link-arg=$(clang -print-libgcc-file-name)"
 ./gradlew assembleRelease

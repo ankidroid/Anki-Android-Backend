@@ -16,7 +16,7 @@
 package net.ankiweb.rsdroid.database
 
 import androidx.annotation.CheckResult
-import anki.ankidroid.DBResponse
+import anki.ankidroid.DbResponse
 import org.json.JSONArray
 
 interface SQLHandler {
@@ -40,8 +40,8 @@ interface SQLHandler {
     fun getPath(): String?
 
     /* Protobuf-related (#6) */
-    fun getNextSlice(startIndex: Long, sequenceNumber: Int): DBResponse
-    fun fullQueryProto(query: String, bindArgs: Array<Any?>?): DBResponse
+    fun getNextSlice(startIndex: Long, sequenceNumber: Int): DbResponse
+    fun fullQueryProto(query: String, bindArgs: Array<Any?>?): DbResponse
     fun cancelCurrentProtoQuery(sequenceNumber: Int)
     fun cancelAllProtoQueries()
 

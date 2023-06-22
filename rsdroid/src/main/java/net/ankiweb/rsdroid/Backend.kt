@@ -19,7 +19,7 @@ import android.content.Context
 import android.os.Looper
 import androidx.annotation.CheckResult
 import androidx.annotation.VisibleForTesting
-import anki.ankidroid.DBResponse
+import anki.ankidroid.DbResponse
 import anki.backend.BackendError
 import anki.backend.BackendInit
 import anki.backend.GeneratedBackend
@@ -218,12 +218,12 @@ open class Backend(val context: Context, langs: Iterable<String> = listOf("en"),
     }
 
     /* Begin Protobuf-based database streaming methods (#6) */
-    override fun fullQueryProto(query: String, bindArgs: Array<Any?>?): DBResponse {
+    override fun fullQueryProto(query: String, bindArgs: Array<Any?>?): DbResponse {
         checkMainThreadSQL(query)
         return runDbCommandProto(dbRequestJson(query, bindArgs))
     }
 
-    override fun getNextSlice(startIndex: Long, sequenceNumber: Int): DBResponse {
+    override fun getNextSlice(startIndex: Long, sequenceNumber: Int): DbResponse {
         return getNextResultPage(sequenceNumber, startIndex)
     }
 

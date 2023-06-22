@@ -47,13 +47,13 @@ jobs:
 
       - name: Install NDK
         if: matrix.os != 'windows-latest'
-        run: .github/scripts/install_ndk.sh 22.0.7026061
+        run: .github/scripts/install_ndk.sh 25.2.9519653
 
       - name: Install NDK (Windows)
         if: matrix.os == 'windows-latest'
         run: |
           Write-Host "NDK Install Started"
-          (. sdkmanager.bat --install "ndk;22.0.7026061" --sdk_root="$Env:ANDROID_SDK_ROOT") | out-null
+          (. sdkmanager.bat --install "ndk;25.2.9519653" --sdk_root="$Env:ANDROID_SDK_ROOT") | out-null
           Write-Host "NDK Install Completed"
 
       - name: Rust Cache

@@ -1,5 +1,4 @@
 apply plugin: 'com.android.library' // required for aar generation to link to from AnkiDroid
-apply plugin: 'com.google.protobuf'
 apply plugin: "kotlin-android"
 apply plugin: 'signing'
 apply plugin: 'com.vanniktech.maven.publish'
@@ -19,7 +18,7 @@ def getAnkiCommitHash = { ->
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
-    ndkVersion "22.0.7026061" // Used by GitHub actions - avoids an install step on some machines
+    ndkVersion "25.2.9519653" // Used by GitHub actions - avoids an install step on some machines
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -47,6 +46,8 @@ android {
     sourceSets {
         main {
             kotlin.srcDirs += "build/generated/source/fluent"
+            kotlin.srcDirs += "build/generated/source/backend"
+            java.srcDirs += "build/generated/source/backend"
             resources {
                 srcDirs "src/main/resources", "build/generated/anki_artifacts"
             }
@@ -67,13 +68,12 @@ cargo {
     verbose = false
 }
 
-apply from: "proto.gradle"
-
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar", '*.so'])
     implementation "androidx.appcompat:appcompat:${rootProject.ext.appcompatVersion}"
     // Protobuf is part of the ABI, so include it as a compile/api dependency.
-    api "com.google.protobuf:protobuf-kotlin:${rootProject.ext.protobufVersion}"
+    api "com.google.protobuf:protobuf-kotlin-lite:${rootProject.ext.protobufVersion}"
+
     implementation "androidx.sqlite:sqlite:${rootProject.ext.sqliteVersion}"
     implementation 'com.jakewharton.timber:timber:5.0.1'
     implementation 'androidx.sqlite:sqlite-framework:2.2.0'

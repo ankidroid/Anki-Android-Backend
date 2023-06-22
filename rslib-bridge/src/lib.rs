@@ -8,11 +8,10 @@ use std::{
 use anki::{
     backend::{init_backend, Backend},
     error::Result,
-    pb,
-    pb::{
-        backend::{backend_error, BackendError},
-        generic::Int64,
-    },
+};
+use anki_proto::{
+    backend::{backend_error, BackendError},
+    generic::Int64,
 };
 use jni::{
     objects::{JClass, JObject},
@@ -71,7 +70,7 @@ pub unsafe extern "C" fn Java_net_ankiweb_rsdroid_NativeMethods_runMethodRaw(
     let service: u32 = service as u32;
     let method: u32 = method as u32;
     let input = env.convert_byte_array(args).unwrap();
-    with_packed_result(&env, || backend.run_method(service, method, &input))
+    with_packed_result(&env, || backend.run_service_method(service, method, &input))
 }
 
 unsafe fn to_backend(ptr: jlong) -> &'static mut Backend {
@@ -133,7 +132,7 @@ fn panic_to_backend_error(panic: Box<dyn Any + Send>) -> BackendError {
     }
     .to_string();
     BackendError {
-        kind: pb::backend::backend_error::Kind::AnkidroidPanicError as i32,
+        kind: backend_error::Kind::AnkidroidPanicError as i32,
         message,
         ..Default::default()
     }

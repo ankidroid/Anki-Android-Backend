@@ -18,7 +18,7 @@ package net.ankiweb.rsdroid.database
 import android.database.Cursor
 import android.database.CursorIndexOutOfBoundsException
 import android.database.sqlite.SQLiteException
-import anki.ankidroid.DBResponse
+import anki.ankidroid.DbResponse
 import anki.ankidroid.Row
 import anki.ankidroid.SqlValue
 import anki.ankidroid.SqlValue.DataCase
@@ -38,7 +38,7 @@ open class StreamingProtobufSQLiteCursor(
          * The next request should be for index: getSliceStartIndex() + getCurrentSliceRowCount()
          */
         private val backend: SQLHandler, private val query: String, bindArgs: Array<Any?>?) : AnkiDatabaseCursor() {
-    private var results: DBResponse? = null
+    private var results: DbResponse? = null
 
     /** The local position in the current slice  */
     private var positionInSlice = -1
