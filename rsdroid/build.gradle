@@ -95,12 +95,7 @@ task buildRust(type: Exec) {
         environment 'ANDROID_NDK_HOME', ndkPath
     }
     workingDir "$rootDir"
-    String toolPath = System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows') ? 'build-aar.bat' : './build-aar.sh'
-    if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
-        commandLine toolPath
-    } else {
-        commandLine 'sh', '-c', toolPath
-    }
+    commandLine "cargo", "run", "-p", "build_rust"
 }
 
 signing {

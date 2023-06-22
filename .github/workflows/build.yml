@@ -1,4 +1,4 @@
-name: Build AAR and Robo (single platform)
+name: Build quick (each platform)
 on:
   workflow_dispatch:
   push:
@@ -42,20 +42,6 @@ jobs:
           distribution: "adopt"
           java-version: "11" # minimum for Android API31
 
-      - name: Install Android Command Line Tools
-        uses: android-actions/setup-android@v2
-
-      - name: Install NDK
-        if: matrix.os != 'windows-latest'
-        run: .github/scripts/install_ndk.sh 25.2.9519653
-
-      - name: Install NDK (Windows)
-        if: matrix.os == 'windows-latest'
-        run: |
-          Write-Host "NDK Install Started"
-          (. sdkmanager.bat --install "ndk;25.2.9519653" --sdk_root="$Env:ANDROID_SDK_ROOT") | out-null
-          Write-Host "NDK Install Completed"
-
       - name: Rust Cache
         uses: actions/cache@v3
         with:
@@ -63,43 +49,15 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target
+            anki/out/rust
+            anki/out/extracted
           key: ${{ runner.os }}-rust-debug-v5-${{ hashFiles('Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-rust-debug-v5
             ${{ runner.os }}-rust-debug
 
-      - name: Anki cache (Unix)
-        uses: actions/cache@v3
-        if: matrix.os != 'windows-latest'
-        with:
-          path: |
-            anki/out/node_modules
-            anki/out/rust
-            anki/out/extracted
-          key: ${{ runner.os }}-anki-v6-${{ hashFiles('Cargo.lock', 'anki/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-anki-v6
-            ${{ runner.os }}-anki
-
-      - name: Anki cache (Windows)
-        uses: actions/cache@v3
-        if: matrix.os == 'windows-latest'
-        with:
-          path: |
-            anki/out/rust
-            anki/out/extracted
-          key: ${{ runner.os }}-anki-v6-${{ hashFiles('Cargo.lock', 'anki/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-anki-v6
-            ${{ runner.os }}-anki
-
       - name: Build Android/X86_64
-        if: matrix.os != 'windows-latest'
-        run: ./build-aar.sh
-
-      - name: Build Android/X86_64 (Win)
-        if: matrix.os == 'windows-latest'
-        run: ./build-aar.bat
+        run: cargo run -p build_rust
 
       - name: Check Rust (Linux)
         if: matrix.os == 'ubuntu-latest'
@@ -115,14 +73,6 @@ jobs:
           arch: x86_64
           profile: Nexus 6
           script: ./check-droid.sh
-
-      - name: Build Robolectric/X86_64
-        if: matrix.os != 'windows-latest'
-        run: ./build-robo.sh
-
-      - name: Build Robolectric/X86_64 (Win)
-        if: matrix.os == 'windows-latest'
-        run: ./build-robo.bat
 
       - name: Upload rsdroid AAR as artifact
         uses: actions/upload-artifact@v2

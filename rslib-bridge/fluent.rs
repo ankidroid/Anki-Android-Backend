@@ -1,5 +1,6 @@
 use std::{fs, path::Path};
 
+use anki_io::read_to_string;
 use inflections::Inflect;
 use serde::Deserialize;
 
@@ -24,7 +25,7 @@ struct Module {
 }
 
 fn get_strings() -> Vec<Module> {
-    let data = fs::read_to_string(env!("STRINGS_JSON")).unwrap();
+    let data = read_to_string(std::env::var("STRINGS_JSON_ANKIDROID").unwrap()).unwrap();
     serde_json::from_str(&data).unwrap()
 }
 
