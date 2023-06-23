@@ -90,7 +90,7 @@ fn build_android_jni() -> Result<()> {
     let ndk_targets = add_android_rust_targets(all_archs)?;
     let (is_release, _release_dir) = check_release();
 
-    Command::run(["cargo", "install", "cargo-ndk@3.2.0"])?;
+    Command::run("cargo install cargo-ndk@3.2.0")?;
 
     let mut command = Command::new("cargo");
     command
@@ -228,7 +228,10 @@ fn build_rsdroid(is_release: bool, target_arch: &str, target_dir: &Utf8Path) -> 
         command.args(["--target", target_arch]);
     }
     if OS == "macos" && target_arch == "x86_64-unknown-linux-gnu" {
-        command.env("CC", "x86_64-unknown-linux-gnu-gcc");
+        command.env("CC", "x86_64-unknown-linux-gnu-gcc").env(
+            "CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER",
+            "x86_64-unknown-linux-gnu-gcc",
+        );
     }
     command.ensure_success()?;
     Ok(())

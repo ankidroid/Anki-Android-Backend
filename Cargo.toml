@@ -8,18 +8,13 @@ edition = "2021"
 [workspace]
 members = [
   "rslib-bridge",
-  "anki/rslib",
   "build_rust"
 ]
-exclude = []
+exclude = ["anki"]
 resolver = "2"
 
 [profile.dev.package."*"]
 opt-level = 0
-debug = 0
-
-[profile.dev.package.sha2]
-opt-level = 1
 debug = 0
 
 # Debug info off by default, which speeds up incremental builds and produces a considerably
