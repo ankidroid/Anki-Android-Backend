@@ -1,0 +1,16 @@
+task buildRust(type: Exec) {
+    // ensure script doesn't try to start gradle again
+    environment 'RUNNING_FROM_GRADLE', '1'
+    if (!System.getenv('ANDROID_NDK_HOME')) {
+        String ndkPath = "${getSdkDir()}/ndk/25.2.9519653"
+        environment 'ANDROID_NDK_HOME', ndkPath
+    }
+    workingDir "$rootDir"
+    commandLine "cargo", "run", "-p", "build_rust"
+}
+
+def getSdkDir() {
+    Properties properties = new Properties()
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+    return properties.getProperty('sdk.dir')
+}

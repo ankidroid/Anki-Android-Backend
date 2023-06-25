@@ -56,7 +56,7 @@ jobs:
             ${{ runner.os }}-rust-debug-v5
             ${{ runner.os }}-rust-debug
 
-      - name: Build Android/X86_64
+      - name: Build all (current platform)
         run: cargo run -p build_rust
 
       - name: Check Rust (Linux)

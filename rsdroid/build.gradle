@@ -3,7 +3,8 @@ apply plugin: "kotlin-android"
 apply plugin: 'signing'
 apply plugin: 'com.vanniktech.maven.publish'
 
-apply from: "$rootDir/build-web-assets.gradle"
+apply from: "$rootDir/build-rust.gradle"
+preBuild.dependsOn "buildRust"
 
 def getAnkiCommitHash = { ->
     def hashStdOut = new ByteArrayOutputStream()
@@ -55,6 +56,19 @@ android {
     }
 }
 
+afterEvaluate {
+    tasks.withType(com.android.build.gradle.tasks.BundleAar).all { bundleAarTask ->
+        bundleAarTask.doLast {
+            def aarFile = bundleAarTask.outputs.files.singleFile
+            def zipFile = new java.util.zip.ZipFile(aarFile)
+            int libCount = zipFile.entries().toList().count { it.name.contains(".so") }
+            if (libCount == 0 || (System.getenv("ALL_ARCHS") == "1" && libCount != 4)) {
+                throw new GradleException("AAR appears to be missing shared library!")
+            }
+        }
+    }
+}
+
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar", '*.so'])
     implementation "androidx.appcompat:appcompat:${rootProject.ext.appcompatVersion}"
@@ -77,25 +91,6 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
     kotlinOptions {
         freeCompilerArgs = ["-opt-in=kotlin.RequiresOptIn"]
     }
-}
-
-preBuild.dependsOn "buildRust"
-
-def getSdkDir() {
-    Properties properties = new Properties()
-    properties.load(project.rootProject.file('local.properties').newDataInputStream())
-    return properties.getProperty('sdk.dir')
-}
-
-task buildRust(type: Exec) {
-    // ensure script doesn't try to start gradle again
-    environment 'RUNNING_FROM_GRADLE', '1'
-    if (!System.getenv('ANDROID_NDK_HOME')) {
-        String ndkPath = "${getSdkDir()}/ndk/25.2.9519653"
-        environment 'ANDROID_NDK_HOME', ndkPath
-    }
-    workingDir "$rootDir"
-    commandLine "cargo", "run", "-p", "build_rust"
 }
 
 signing {

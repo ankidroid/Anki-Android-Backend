@@ -19,7 +19,7 @@ apply plugin: 'kotlin'
 apply plugin: 'signing'
 apply plugin: 'com.vanniktech.maven.publish'
 
-apply from: "$rootDir/build-web-assets.gradle"
+apply from: "$rootDir/build-rust.gradle"
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -29,13 +29,19 @@ dependencies {
 }
 
 jar {
+    dependsOn("buildRust")
     sourceSets {
         main {
             resources {
-                def assetsPath = new File("${project.rootDir}", "rsdroid-testing/assets")
-                println "assets path: ${assetsPath.absolutePath}"
-                srcDirs assetsPath.absolutePath
+                srcDirs 'build/generated/jniLibs'
             }
+        }
+    }
+    doLast {
+        def jarFile = new java.util.jar.JarFile(archiveFile.get().getAsFile())
+        int libCount = jarFile.entries().toList().count { it.name.contains(".so") || it.name.contains(".dll") || it.name.contains(".dylib") }
+        if (libCount == 0 || (System.getenv("ALL_ARCHS") == "1" && libCount != 3)) {
+            throw new GradleException("Jar appears to be missing shared library!")
         }
     }
 }

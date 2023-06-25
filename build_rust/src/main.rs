@@ -7,6 +7,9 @@ use std::env::consts::OS;
 use std::path::Path;
 use std::process::Command;
 
+const ANDROID_OUT_DIR: &str = "rsdroid/build/generated/jniLibs";
+const ROBOLECTRIC_OUT_DIR: &str = "rsdroid-testing/build/generated/jniLibs";
+
 fn main() -> Result<()> {
     if env::var("RUNNING_FROM_BUILD_SCRIPT").is_ok() {
         return Ok(());
@@ -82,10 +85,12 @@ fn build_web_artifacts() -> Result<()> {
 
 fn build_android_jni() -> Result<()> {
     println!("*** Building Android JNI library + backend interface");
-    let jni_dir = Path::new("rsdroid/build/generated/jniLibs");
+    let jni_dir = Path::new(ANDROID_OUT_DIR);
     if jni_dir.exists() {
         std::fs::remove_dir_all(jni_dir)?;
     }
+    create_dir_all(jni_dir)?;
+
     let all_archs = env::var("ALL_ARCHS").is_ok();
     let ndk_targets = add_android_rust_targets(all_archs)?;
     let (is_release, _release_dir) = check_release();
@@ -159,6 +164,11 @@ fn add_rust_targets(targets: &[&str]) -> Result<()> {
 
 fn build_robolectric_jni() -> Result<()> {
     println!("*** Building Robolectric JNI library");
+    let jni_dir = Path::new(ROBOLECTRIC_OUT_DIR);
+    if jni_dir.exists() {
+        std::fs::remove_dir_all(jni_dir)?;
+    }
+    create_dir_all(jni_dir)?;
 
     let all_archs = env::var("ALL_ARCHS").is_ok();
     let (is_release, release_dir) = check_release();
@@ -182,7 +192,8 @@ fn build_robolectric_jni() -> Result<()> {
                 file_in_target("x86_64-apple-darwin", "librsdroid.dylib"),
                 file_in_target("aarch64-apple-darwin", "librsdroid.dylib"),
             ])
-            .args(["-output", "rsdroid-testing/assets/librsdroid.dylib"])
+            .arg("-output")
+            .arg(jni_dir.join("librsdroid.dylib"))
             .ensure_success()?;
 
         let linux_targets = &["x86_64-unknown-linux-gnu"];
@@ -190,7 +201,7 @@ fn build_robolectric_jni() -> Result<()> {
         build_rsdroid(is_release, linux_targets[0], target_root)?;
         copy_file(
             file_in_target(linux_targets[0], "librsdroid.so"),
-            "rsdroid-testing/assets/librsdroid.so",
+            jni_dir.join("librsdroid.so"),
         )?;
 
         let windows_targets = &["x86_64-pc-windows-gnu"];
@@ -198,17 +209,23 @@ fn build_robolectric_jni() -> Result<()> {
         build_rsdroid(is_release, windows_targets[0], target_root)?;
         copy_file(
             file_in_target(windows_targets[0], "rsdroid.dll"),
-            "rsdroid-testing/assets/rsdroid.dll",
+            jni_dir.join("rsdroid.dll"),
         )?;
     } else {
         // Just build for current architecture
         build_rsdroid(is_release, "", target_root)?;
-        for fname in ["librsdroid.so", "librsdroid.dylib"] {
+        let mut found_one = false;
+        for fname in ["librsdroid.so", "librsdroid.dylib", "rsdroid.dll"] {
             let file = target_root.join(release_dir).join(fname);
             if Path::new(&file).exists() {
-                copy_file(&file, Path::new("rsdroid-testing/assets").join(fname))?;
+                found_one = true;
+                copy_file(&file, jni_dir.join(fname))?;
             }
         }
+        assert!(
+            found_one,
+            "expected to find at least one robolectric library"
+        );
     }
 
     Ok(())
