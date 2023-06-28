@@ -46,11 +46,11 @@ task clean(type: Delete) {
 
 ext {
     jvmVersion = Jvm.current().javaVersion.majorVersion
-    if (jvmVersion != "11" && jvmVersion != "14" && jvmVersion != "16") {
+    if (jvmVersion != "17") {
         println "\n\n\n"
         println "**************************************************************************************************************"
         println "\n\n\n"
-        println "ERROR: Anki-Android-Backend builds with JVM version 11, 14, or 16."
+        println "ERROR: Anki-Android-Backend builds with JVM version 17."
         println "  Incompatible major version detected: '" + jvmVersion + "'"
         println "\n\n\n"
         println "**************************************************************************************************************"
