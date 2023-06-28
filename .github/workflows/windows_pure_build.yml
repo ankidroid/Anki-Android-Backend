@@ -16,11 +16,11 @@ jobs:
       - name: Fetch submodules
         run: git submodule update --init --recursive
 
-      - name: Configure JDK 1.11
+      - name: Configure JDK
         uses: actions/setup-java@v3
         with:
           distribution: "adopt"
-          java-version: "11" # minimum for Android API31
+          java-version: "17" # matches Anki-Android
 
       - name: Install Android Command Line Tools
         uses: android-actions/setup-android@v2

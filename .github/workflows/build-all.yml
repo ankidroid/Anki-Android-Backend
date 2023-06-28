@@ -38,11 +38,11 @@ jobs:
       - name: Make path absolute
         run: echo $(pwd)/ninja_bin >> $GITHUB_PATH
 
-      - name: Configure JDK 1.11
+      - name: Configure JDK
         uses: actions/setup-java@v3
         with:
           distribution: "adopt"
-          java-version: "11" # minimum for Android API31
+          java-version: "17" # matches Anki-Android
 
       - name: Install Windows cross compiler
         run: brew install mingw-w64 && x86_64-w64-mingw32-gcc -v
