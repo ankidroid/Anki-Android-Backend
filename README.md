@@ -52,7 +52,7 @@ and put it on your path.
 In Android Studio, choose the Tools>SDK menu option.
 
 - In SDK tools, enable "show package details"
-- Choose the NDK version that matches the number used in [.github/workflows/build.yml](.github/workflows/build.yml), eg 25.2.9519653
+- Choose NDK version 25.2.9519653.
 - After downloading, you may need to restart Android Studio to get it to
 synchronize gradle.
 
@@ -174,7 +174,7 @@ preceding section to learn how to do it).
 `VERSION_NAME`. Its value is of the form
 `$BACKEND_VERSION-$ANKI_VERSION`. `$ANKI_VERSION` should be as defined
 above. `$BACKEND_VERSION` should be incremented compared to the last release.
-1. Run the Github workflow `Build AAR and Robo (all platforms)` manually with a
+1. Run the Github workflow `Build release (from macOS)` manually with a
 string argument (I typically use `shipit`, but any string will work) - this will
 trigger a full release build ready for upload to maven.
 1. Check the workflow logs for the link to Maven Central where **if you have a
