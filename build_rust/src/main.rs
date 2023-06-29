@@ -1,7 +1,7 @@
 use anki_io::{copy_file, create_dir_all, read_dir_files};
 use anki_process::CommandExt;
 use anyhow::Result;
-use camino::Utf8Path;
+use camino::{Utf8Path, Utf8PathBuf};
 use std::env;
 use std::env::consts::OS;
 use std::path::Path;
@@ -13,6 +13,10 @@ const ROBOLECTRIC_OUT_DIR: &str = "rsdroid-testing/build/generated/jniLibs";
 fn main() -> Result<()> {
     if env::var("RUNNING_FROM_BUILD_SCRIPT").is_ok() {
         return Ok(());
+    }
+    let ndk_path = Utf8PathBuf::from(env::var("ANDROID_NDK_HOME").unwrap_or_default());
+    if !ndk_path.file_name().unwrap_or_default().starts_with("25.") {
+        panic!("Expected ANDROID_NDK_HOME to point to a 25.x NDK. Future versions may work, but are untested.");
     }
 
     build_web_artifacts()?;
