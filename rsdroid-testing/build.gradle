@@ -46,8 +46,8 @@ jar {
     }
 }
 
-sourceCompatibility = "1.8"
-targetCompatibility = "1.8"
+sourceCompatibility JavaVersion.VERSION_11
+targetCompatibility JavaVersion.VERSION_11
 
 signing {
     def hasPrivate = project.hasProperty('SIGNING_PRIVATE_KEY')
@@ -73,11 +73,11 @@ buildscript {
 }
 compileKotlin {
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = JavaVersion.VERSION_11
     }
 }
 compileTestKotlin {
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = JavaVersion.VERSION_11
     }
 }
