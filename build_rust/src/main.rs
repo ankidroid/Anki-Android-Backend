@@ -97,7 +97,7 @@ fn build_android_jni() -> Result<()> {
 
     let all_archs = env::var("ALL_ARCHS").is_ok();
     let ndk_targets = add_android_rust_targets(all_archs)?;
-    let (is_release, _release_dir) = check_release();
+    let (is_release, _release_dir) = check_release(false);
 
     Command::run("cargo install cargo-ndk@3.2.0")?;
 
@@ -121,9 +121,9 @@ fn build_android_jni() -> Result<()> {
 }
 
 // is_release, release/debug dir
-// windows is forced to release, as debug builds fail with an error
-fn check_release() -> (bool, &'static str) {
-    if env::var("RELEASE").is_ok() || cfg!(windows) {
+// windows robolectric is forced to release, as debug builds fail with an error
+fn check_release(force_release_on_windows: bool) -> (bool, &'static str) {
+    if env::var("RELEASE").is_ok() || (force_release_on_windows && cfg!(windows)) {
         (true, "release")
     } else {
         (false, "debug")
@@ -175,7 +175,7 @@ fn build_robolectric_jni() -> Result<()> {
     create_dir_all(jni_dir)?;
 
     let all_archs = env::var("ALL_ARCHS").is_ok();
-    let (is_release, release_dir) = check_release();
+    let (is_release, release_dir) = check_release(true);
     let target_root = Utf8Path::new("anki/out/rust");
     let file_in_target =
         |platform: &str, fname: &str| target_root.join(platform).join(release_dir).join(fname);
