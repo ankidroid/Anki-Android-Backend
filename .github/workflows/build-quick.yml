@@ -17,32 +17,7 @@ jobs:
   build:
     strategy:
       matrix:
-        include:
-          - os: ubuntu-latest
-            CACHE_PATHS: |
-              ~/.cargo/registry
-              ~/.cargo/git
-              target
-              anki/out/rust
-              anki/out/download
-              anki/out/node_modules
-          - os: macos-latest
-            CACHE_PATHS: |
-              ~/.cargo/registry
-              ~/.cargo/git
-              target
-              anki/out/rust
-              anki/out/download
-              anki/out/node_modules
-          - os: windows-latest
-            CACHE_PATHS: |
-              ~/.cargo/registry
-              ~/.cargo/git
-              target
-              anki/out/rust
-              anki/out/download
-              anki/out/node_modules
-              anki/node_modules
+        os: [ubuntu-latest, windows-latest, macos-latest]
       fail-fast: false
     runs-on: ${{ matrix.os }}
     timeout-minutes: 80
@@ -67,14 +42,35 @@ jobs:
           distribution: "adopt"
           java-version: "17" # matches Anki-Android
 
-      - name: Rust Cache
+      - name: Rust Cache (Windows)
         uses: actions/cache@v3
+        if: matrix.os == 'windows-latest'
         with:
-          path: ${{ matrix.CACHE_PATHS }}
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+            anki/out/rust
+            anki/out/download
+            # no node_modules, as it doesn't unpack properly
+          key: ${{ runner.os }}-rust-debug-v7-${{ hashFiles('Cargo.lock') }}-${{ hashFiles('anki/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-rust-debug-v7
+
+      - name: Rust Cache (Unix)
+        uses: actions/cache@v3
+        if: matrix.os != 'windows-latest'
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+            anki/out/rust
+            anki/out/download
+            anki/out/node_modules
           key: ${{ runner.os }}-rust-debug-v6-${{ hashFiles('Cargo.lock') }}-${{ hashFiles('anki/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-rust-debug-v6
-          #  ${{ runner.os }}-rust-debug
 
       - name: Build all (current platform)
         run: cargo run -p build_rust
