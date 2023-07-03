@@ -17,7 +17,32 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            CACHE_PATHS: |
+              ~/.cargo/registry
+              ~/.cargo/git
+              target
+              anki/out/rust
+              anki/out/download
+              anki/out/node_modules
+          - os: macos-latest
+            CACHE_PATHS: |
+              ~/.cargo/registry
+              ~/.cargo/git
+              target
+              anki/out/rust
+              anki/out/download
+              anki/out/node_modules
+          - os: windows-latest
+            CACHE_PATHS: |
+              ~/.cargo/registry
+              ~/.cargo/git
+              target
+              anki/out/rust
+              anki/out/download
+              anki/out/node_modules
+              anki/node_modules
       fail-fast: false
     runs-on: ${{ matrix.os }}
     timeout-minutes: 80
@@ -45,16 +70,11 @@ jobs:
       - name: Rust Cache
         uses: actions/cache@v3
         with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-            anki/out/rust
-            anki/out/extracted
-          key: ${{ runner.os }}-rust-debug-v5-${{ hashFiles('Cargo.lock') }}
+          path: ${{ matrix.CACHE_PATHS }}
+          key: ${{ runner.os }}-rust-debug-v6-${{ hashFiles('Cargo.lock') }}-${{ hashFiles('anki/yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-rust-debug-v5
-            ${{ runner.os }}-rust-debug
+            ${{ runner.os }}-rust-debug-v6
+          #  ${{ runner.os }}-rust-debug
 
       - name: Build all (current platform)
         run: cargo run -p build_rust
