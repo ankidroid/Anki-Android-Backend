@@ -14,6 +14,7 @@ on:
 env:
   ALL_ARCHS: 1
   RELEASE: 1
+  CARGO_PROFILE_RELEASE_LTO: fat
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-release
