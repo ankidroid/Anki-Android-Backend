@@ -108,20 +108,6 @@ thread.
 `BackendFactory.getBackend()` is used by AnkiDroid to get a `Backend` instance
 with translations set to the language currently configured by the user.
 
-The returned backend has a boolean legacySchema property, which is
-set to `BackendFactory.defaultLegacySchema`.
-
-When set to the default of true, collections are not upgraded on opening,
-and they remain in the legacy schema 11 format that AnkiDroid's legacy
-code expects. Many backend methods require the schema to be updated, so
-when this setting is enabled, the backend can effectively only be used
-for DB access, and a few routines that do not require an open collection
-to operate.
-
-When set to false, collections are upgraded to the latest schema on opening,
-allowing full use of backend functionality. This setting has not received
-much testing yet. To change it, see TESTING.md
-
 ## Error handling
 
 The API `rslib-bridge` exposes is defined in `rsdroid`'s NativeMethods.kt:
@@ -146,8 +132,7 @@ is created (or reused if provided), and stored in `Collection.backend`. As
 `Collection` is initialized, it calls `Storage.openDB(path, backend)` which
 creates a `DB` instance that delegates database calls to the provided backend.
 
-If `defaultLegacySchema` is false, a `CollectionV16` subclass of `Collection`
-is returned instead. It contains changes to work with the new backend methods,
+It contains changes to work with the new backend methods,
 such as requesting a list of decks from the backend instead of directly trying
 to query them via SQL, eg:
 
@@ -159,11 +144,6 @@ to query them via SQL, eg:
         }
     }
 ```
-
-V16 corresponds to the schema version that was current when this code was originally
-written, and is not technically correct anymore. The DecksV16/ModelsV16/etc classes
-also use a few layers of indirection, as they were written at a time when it wasn't
-clear whether AnkiDroid would be using the Rust backend or not.
 
 ## Usage in unit tests
 

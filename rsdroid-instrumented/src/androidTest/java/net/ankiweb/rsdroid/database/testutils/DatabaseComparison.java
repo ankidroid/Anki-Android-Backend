@@ -38,8 +38,7 @@ public class DatabaseComparison extends InstrumentedTest {
 
     @Parameterized.Parameters(name = "{0}")
     public static java.util.Collection<Object[]> initParameters() {
-        // This does one run with schedVersion injected as 1, and one run as 2
-        return Arrays.asList(new Object[][]{{DatabaseType.FRAMEWORK}, {DatabaseType.RUST_LEGACY}, {DatabaseType.RUST_NEW}});
+        return Arrays.asList(new Object[][]{{DatabaseType.FRAMEWORK}, {DatabaseType.RUST}});
     }
 
     @Before
@@ -60,12 +59,8 @@ public class DatabaseComparison extends InstrumentedTest {
 
     protected SupportSQLiteDatabase getDatabase() {
         switch (schedVersion) {
-            case RUST_LEGACY:
-                Backend backend = BackendFactory.getBackend(getContext(), Arrays.asList("en"), true);
-                backend.openCollection(getDatabasePath());
-                return AnkiSupportSQLiteDatabase.withRustBackend(backend);
-            case RUST_NEW:
-                Backend backend2 = BackendFactory.getBackend(getContext(), Arrays.asList("en"), false);
+            case RUST:
+                Backend backend2 = BackendFactory.getBackend(getContext(), Arrays.asList("en"));
                 backend2.openCollection(getDatabasePath());
                 return AnkiSupportSQLiteDatabase.withRustBackend(backend2);
             case FRAMEWORK:
@@ -78,8 +73,7 @@ public class DatabaseComparison extends InstrumentedTest {
         // TODO: look into this - null should work
         try {
             switch (schedVersion) {
-                case RUST_LEGACY:
-                case RUST_NEW:
+                case RUST:
                     return ":memory:";
                 case FRAMEWORK:
                     return null;
@@ -93,8 +87,7 @@ public class DatabaseComparison extends InstrumentedTest {
 
     public enum DatabaseType {
         FRAMEWORK,
-        RUST_LEGACY,
-        RUST_NEW,
+        RUST,
     }
 
 

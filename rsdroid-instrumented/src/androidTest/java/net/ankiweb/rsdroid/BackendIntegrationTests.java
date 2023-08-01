@@ -71,21 +71,6 @@ public class BackendIntegrationTests extends InstrumentedTest {
     }
 
     @Test
-    public void collectionIsVersion11AfterOpen() throws JSONException {
-        // This test will be decomissioned, but before we get an upgrade strategy, we need to ensure we're not upgrading the database.
-
-        Backend backendV1 = getBackend("initial_version_2_12_1.anki2");
-
-        JSONArray array = backendV1.fullQuery("select ver from col");
-
-        backendV1.closeCollection(false);
-
-        JSONArray firstResultRow = array.getJSONArray(0);
-
-        assertThat("Needs assertion", firstResultRow.getInt(0), is(11));
-    }
-
-    @Test
     public void fullQueryTest() {
         Backend backendV1 = getBackend("initial_version_2_12_1.anki2");
         JSONArray result = backendV1.fullQuery("select * from col");
