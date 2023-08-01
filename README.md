@@ -126,13 +126,6 @@ in the AnkiDroid repo, and add the following line:
 local_backend=true
 ```
 
-If you also want to test out the new schema code paths that make greater use of the backend,
-add the following line (be warned, do not use this on a collection you care about yet):
-
-```
-legacy_schema=false
-```
-
 Check `Anki-AndroidBackend/gradle.properties`'s `VERSION_NAME` and
 `Anki-Android/build.gradle`'s `ext.ankidroid_backend_version`. Both variables
 should have the same value. If it is not the case, you must edit Anki-Android's

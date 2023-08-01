@@ -17,20 +17,13 @@
 package net.ankiweb.rsdroid
 
 import android.content.Context
-import java.util.*
-
-typealias CustomBackendCreator = (context: Context, languages: Iterable<String>, legacySchema: Boolean) -> Backend
+typealias CustomBackendCreator = (context: Context, languages: Iterable<String>) -> Backend
 
 object BackendFactory {
-    /**
-     * If enabled, collections are upgraded to the latest schema version on open, and different
-     * code paths are used to access the collection, eg the major 'col' classes: models, decks, dconf,
-     * conf, tags are replaced with updated variants.
-     *
-     * UNSTABLE: DO NOT USE THIS ON A COLLECTION YOU CARE ABOUT.
-     */
+    /** To remove in 2.1.67 update */
     @JvmStatic
-    var defaultLegacySchema: Boolean = true
+    @Suppress("unused")
+    var defaultLegacySchema: Boolean = false
 
     /**
      * The language(es) the backend uses for translations.
@@ -42,10 +35,10 @@ object BackendFactory {
 
     @JvmStatic
     @JvmOverloads
-    fun getBackend(context: Context, languages: Iterable<String>? = null, legacySchema: Boolean? = null): Backend {
+    fun getBackend(context: Context, languages: Iterable<String>? = null): Backend {
         val langs = languages ?: defaultLanguages
-        val legacy = legacySchema ?: defaultLegacySchema
-        return backendForTesting?.invoke(context, langs, legacy) ?: Backend(
+        val legacy = false
+        return backendForTesting?.invoke(context, langs) ?: Backend(
                 context,
                 langs,
                 legacy
