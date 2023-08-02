@@ -1,5 +1,5 @@
 if not exist rsdroid\build\outputs\aar\rsdroid-release.aar (
-    echo "Run ./build-aar.bat first"
+    echo "Run ./build.bat first"
     exit 1
 )
 
