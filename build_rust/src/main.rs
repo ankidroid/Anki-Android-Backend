@@ -68,12 +68,13 @@ fn build_web_artifacts() -> Result<()> {
 
     create_dir_all(artifacts_dir.join("web"))?;
 
+    let web_dir = artifacts_dir.join("web");
     for file in read_dir_files("anki/out/qt/_aqt/data/web/pages")? {
         let file = file?;
         let path = file.path();
         copy_file(
             &path,
-            artifacts_dir.join(path.file_name().unwrap().to_str().unwrap()),
+            web_dir.join(path.file_name().unwrap().to_str().unwrap()),
         )?;
     }
     copy_file(
