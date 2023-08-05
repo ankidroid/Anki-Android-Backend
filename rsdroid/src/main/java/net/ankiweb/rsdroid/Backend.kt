@@ -319,7 +319,6 @@ private fun unpackResult(result: Array<ByteArray?>?): ByteArray {
         } catch (invalidProtocolBufferException: InvalidProtocolBufferException) {
             throw BackendException.fromException(invalidProtocolBufferException)
         }
-        print(pbError)
         throw BackendException.fromError(pbError)
     } else if (successBytes != null) {
         return successBytes
