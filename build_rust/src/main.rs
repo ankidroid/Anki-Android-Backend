@@ -78,6 +78,10 @@ fn build_web_artifacts() -> Result<()> {
         )?;
     }
     copy_file(
+        "anki/out/ts/reviewer/reviewer_extras_bundle.js",
+        artifacts_dir.join("web/reviewer_extras_bundle.js"),
+    )?;
+    copy_file(
         "anki/cargo/licenses.json",
         artifacts_dir.join("web/licenses-cargo.json"),
     )?;
