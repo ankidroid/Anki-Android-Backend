@@ -19,7 +19,7 @@ commands below are supposed to be executed in the current repo.
 
 ### Download Anki submodule
 
-git submodule update --init
+    git submodule update --init
 
 ### C toolchain
 
@@ -33,23 +33,23 @@ Install rustup from <https://rustup.rs/>
 
 #### Debian/Ubuntu:
 
-  sudo apt install ninja-build
+    sudo apt install ninja-build
 
 #### macOS:
 
-  brew upgrade
-  brew install ninja
+    brew upgrade
+    brew install ninja
 
 #### Windows if using choco:
 
-  choco install ninja
+    choco install ninja
 
 You can alternatively download a binary from <https://github.com/ninja-build/ninja/releases>
 and put it on your path.
 
 ### NDK
 
-In Android Studio, choose the Tools>SDK menu option.
+In Android Studio, choose the Tools>SDK Manager menu option.
 
 - In SDK tools, enable "show package details"
 - Choose the NDK version that matches the number used in [.github/workflows/build.yml](.github/workflows/build.yml), eg 22.0.7026061
