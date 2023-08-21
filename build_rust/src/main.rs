@@ -154,9 +154,9 @@ fn add_android_rust_targets(all_archs: bool) -> Result<&'static [&'static str]> 
             "-t",
             "x86_64-linux-android",
         ]
-    } else if cfg!(all(target_os = "macos", arch = "aarch64")) {
+    } else if cfg!(all(target_os = "macos", target_arch = "aarch64")) {
         add_rust_targets(&["aarch64-linux-android"])?;
-        &["-t", "aarch64"]
+        &["-t", "arm64-v8a"]
     } else {
         add_rust_targets(&["x86_64-linux-android"])?;
         &["-t", "x86_64"]
