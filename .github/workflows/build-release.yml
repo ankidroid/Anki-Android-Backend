@@ -63,10 +63,9 @@ jobs:
             target
             anki/out/rust
             anki/out/extracted
-          key: ${{ runner.os }}-rust-release-v5-${{ hashFiles('Cargo.lock') }}
+          key: ${{ runner.os }}-rust-release-v6-${{ hashFiles('Cargo.lock') }}
           restore-keys: |
-            ${{ runner.os }}-rust-release-v5
-            ${{ runner.os }}-rust-release
+            ${{ runner.os }}-rust-release-v6
 
       - name: Build all
         run: ./build.sh
