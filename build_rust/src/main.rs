@@ -104,7 +104,7 @@ fn build_android_jni() -> Result<()> {
     let ndk_targets = add_android_rust_targets(all_archs)?;
     let (is_release, _release_dir) = check_release(false);
 
-    Command::run("cargo install cargo-ndk@3.2.0")?;
+    Command::run("cargo install cargo-ndk@3.3.0")?;
 
     let mut command = Command::new("cargo");
     command
