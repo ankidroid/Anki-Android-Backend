@@ -89,20 +89,20 @@ jobs:
       - name: Publish AAR to Maven
         if: "${{ github.event.inputs.mavenPublish != '' && github.event_name == 'workflow_dispatch'}}"       
         env:
-          ORG_GRADLE_PROJECT_SIGNING_PRIVATE_KEY: ${{ secrets.SIGNING_PRIVATE_KEY }}
-          ORG_GRADLE_PROJECT_SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
-          SONATYPE_NEXUS_USERNAME: david-allison-1
-          SONATYPE_NEXUS_PASSWORD: ${{ secrets.SONATYPE_NEXUS_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_PRIVATE_KEY }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}
+          ORG_GRADLE_PROJECT_mavenCentralUsername: david-allison-1
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.SONATYPE_NEXUS_PASSWORD }}
         run: |
-          ./gradlew rsdroid:uploadArchives -DtestBuildType=release -Dorg.gradle.daemon=false -Dorg.gradle.console=plain
+          ./gradlew rsdroid:publishAllPublicationsToMavenCentral -DtestBuildType=release -Dorg.gradle.daemon=false -Dorg.gradle.console=plain
 
       - name: Publish JAR to Maven
         if: "${{ github.event.inputs.mavenPublish != '' && github.event_name == 'workflow_dispatch'}}"       
         env:
-          ORG_GRADLE_PROJECT_SIGNING_PRIVATE_KEY: ${{ secrets.SIGNING_PRIVATE_KEY }}
-          ORG_GRADLE_PROJECT_SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
-          SONATYPE_NEXUS_USERNAME: david-allison-1
-          SONATYPE_NEXUS_PASSWORD: ${{ secrets.SONATYPE_NEXUS_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_PRIVATE_KEY }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}
+          ORG_GRADLE_PROJECT_mavenCentralUsername: david-allison-1
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.SONATYPE_NEXUS_PASSWORD }}
         run: |
           export ANKIDROID_LINUX_CC=x86_64-unknown-linux-gnu-gcc
           export ANKIDROID_MACOS_CC=cc
@@ -110,8 +110,4 @@ jobs:
           export RUST_BACKTRACE=1
           export RUST_LOG=trace
           export NO_CROSS=true
-          ./gradlew rsdroid-testing:uploadArchives -Dorg.gradle.project.macCC=$ANKIDROID_MACOS_CC -DtestBuildType=debug -Dorg.gradle.daemon=false -Dorg.gradle.console=plain
-
-      - name: ℹ️Additional Release Instructions (requires human interaction)
-        if: "${{ github.event.inputs.mavenPublish != '' && github.event_name == 'workflow_dispatch'}}"       
-        run: echo "Sign in to https://oss.sonatype.org/#stagingRepositories , close the repository, then release it"
+          ./gradlew rsdroid-testing:publishAllPublicationsToMavenCentral -Dorg.gradle.project.macCC=$ANKIDROID_MACOS_CC -DtestBuildType=debug -Dorg.gradle.daemon=false -Dorg.gradle.console=plain

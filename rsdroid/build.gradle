@@ -96,6 +96,12 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
     }
 }
 
+mavenPublishing {
+    publishToMavenCentral("DEFAULT", true)
+    // publishToMavenCentral("S01") for publishing through s01.oss.sonatype.org
+    signAllPublications()
+}
+
 signing {
     def hasPrivate = project.hasProperty('SIGNING_PRIVATE_KEY')
     def hasPassword = project.hasProperty('SIGNING_PASSWORD')
