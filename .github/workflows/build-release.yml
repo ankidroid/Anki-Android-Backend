@@ -23,7 +23,7 @@ concurrency:
 jobs:
   build:
     runs-on: macos-latest
-    timeout-minutes: 120
+    timeout-minutes: 180
     steps:
       - uses: actions/checkout@v2
 
