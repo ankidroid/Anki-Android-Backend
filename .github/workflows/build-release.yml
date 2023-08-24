@@ -54,8 +54,8 @@ jobs:
           brew install x86_64-unknown-linux-gnu
           x86_64-unknown-linux-gnu-gcc -v
 
-      - name: Rust Cache
-        uses: actions/cache@v3
+      - name: Restore Rust Cache
+        uses: actions/cache/restore@v3
         with:
           path: |
             ~/.cargo/registry
@@ -111,3 +111,16 @@ jobs:
           export RUST_LOG=trace
           export NO_CROSS=true
           ./gradlew rsdroid-testing:publishAllPublicationsToMavenCentral -Dorg.gradle.project.macCC=$ANKIDROID_MACOS_CC -DtestBuildType=debug -Dorg.gradle.daemon=false -Dorg.gradle.console=plain
+
+      - name: Save Rust Cache
+        uses: actions/cache/save@v3
+        if: github.ref == 'refs/heads/main'
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+            anki/out/rust
+            anki/out/download
+            anki/out/node_modules
+          key: ${{ runner.os }}-rust-release-v6-${{ hashFiles('Cargo.lock') }}-${{ hashFiles('anki/yarn.lock') }}
