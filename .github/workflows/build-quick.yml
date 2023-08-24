@@ -42,8 +42,8 @@ jobs:
           distribution: "adopt"
           java-version: "17" # matches Anki-Android
 
-      - name: Rust Cache (Windows)
-        uses: actions/cache@v3
+      - name: Restore Rust Cache (Windows)
+        uses: actions/cache/restore@v3
         if: matrix.os == 'windows-latest'
         with:
           path: |
@@ -57,8 +57,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-rust-debug-v7
 
-      - name: Rust Cache (Unix)
-        uses: actions/cache@v3
+      - name: Restore Rust Cache (Unix)
+        uses: actions/cache/restore@v3
         if: matrix.os != 'windows-latest'
         with:
           path: |
@@ -103,3 +103,29 @@ jobs:
           name: rsdroid-robo-${{ matrix.os }}
           if-no-files-found: error
           path: rsdroid-testing/build/libs
+
+      - name: Save Rust Cache (Windows)
+        uses: actions/cache/save@v3
+        if: matrix.os == 'windows-latest' && github.ref == 'refs/heads/main'
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+            anki/out/rust
+            anki/out/download
+            # no node_modules, as it doesn't unpack properly
+          key: ${{ runner.os }}-rust-debug-v7-${{ hashFiles('Cargo.lock') }}-${{ hashFiles('anki/yarn.lock') }}
+
+      - name: Save Rust Cache (Unix)
+        uses: actions/cache/save@v3
+        if: matrix.os != 'windows-latest' && github.ref == 'refs/heads/main'
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+            anki/out/rust
+            anki/out/download
+            anki/out/node_modules
+          key: ${{ runner.os }}-rust-debug-v6-${{ hashFiles('Cargo.lock') }}-${{ hashFiles('anki/yarn.lock') }}
