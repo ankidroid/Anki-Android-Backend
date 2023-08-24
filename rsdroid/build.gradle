@@ -19,7 +19,7 @@ def getAnkiCommitHash = { ->
 
 android {
     namespace 'net.ankiweb.rsdroid'
-    compileSdkVersion rootProject.ext.compileSdkVersion
+    compileSdk rootProject.ext.compileSdk
     ndkVersion "25.2.9519653" // Used by GitHub actions - avoids an install step on some machines
 
     compileOptions {
@@ -28,8 +28,8 @@ android {
     }
 
     defaultConfig {
-        minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.targetSdkVersion
+        minSdk rootProject.ext.minSdk
+        targetSdk rootProject.ext.targetSdk
         versionCode 1
         versionName VERSION_NAME
 

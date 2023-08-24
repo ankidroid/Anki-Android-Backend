@@ -18,12 +18,12 @@ apply plugin: 'com.android.application'
 
 android {
     namespace 'net.ankiweb.rsdroid.instrumented'
-    compileSdkVersion rootProject.ext.compileSdkVersion
+    compileSdk rootProject.ext.compileSdk
 
     defaultConfig {
         applicationId "net.ankiweb.rsdroid.instrumented"
-        minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.targetSdkVersion
+        minSdk rootProject.ext.minSdk
+        targetSdk rootProject.ext.targetSdk
         versionCode 1
         versionName "1.0"
 
