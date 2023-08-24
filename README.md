@@ -100,7 +100,7 @@ export ANDROID_NDK_HOME=$HOME/Library/Android/sdk/ndk/25.2.9519653
 Or Windows using Powershell:
 
 ```
-$env:ANDROID_NDK_HOME="env:ANDROID_SDK_ROOT\ndk\25.2.9519653"
+$env:ANDROID_NDK_HOME="$env:ANDROID_SDK_ROOT\ndk\25.2.9519653"
 ```
 If you don't have Java installed, you may be able to use the version bundled
 with Android Studio. Eg on macOS:
