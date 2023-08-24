@@ -82,14 +82,14 @@ jobs:
         run: ./build.sh
 
       - name: Upload rsdroid AAR as artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: rsdroid-aar
           if-no-files-found: error
           path: rsdroid/build/outputs/aar
 
       - name: Upload rsdroid-robo JAR as artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: rsdroid-robo
           if-no-files-found: error
