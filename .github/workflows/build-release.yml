@@ -63,7 +63,8 @@ jobs:
             target
             anki/out/rust
             anki/out/extracted
-          key: ${{ runner.os }}-rust-release-v6-${{ hashFiles('Cargo.lock') }}
+            anki/out/node_modules
+          key: ${{ runner.os }}-rust-release-v6-${{ hashFiles('Cargo.lock') }}-${{ hashFiles('anki/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-rust-release-v6
 
