@@ -94,7 +94,7 @@ public class ExceptionTest {
 
     @Before
     public void errorProducesNamedException() {
-        backend = BackendForTesting.create(getContext());
+        backend = BackendForTesting.create();
     }
 
     protected Context getContext() {

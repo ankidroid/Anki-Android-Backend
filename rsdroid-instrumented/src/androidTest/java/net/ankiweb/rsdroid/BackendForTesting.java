@@ -16,7 +16,7 @@
 
 package net.ankiweb.rsdroid;
 
-import android.content.Context;
+import static java.lang.System.loadLibrary;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
@@ -25,12 +25,13 @@ import java.util.Arrays;
 
 public class BackendForTesting extends Backend {
 
-    public BackendForTesting(@NonNull Context context, @NonNull Iterable<String> langs, boolean legacySchema) {
-        super(context, langs, legacySchema);
+    public BackendForTesting(@NonNull Iterable<String> langs) {
+        super(langs);
     }
 
-    public static BackendForTesting create(@NonNull Context context) {
-        return new BackendForTesting(context, Arrays.asList("en"), true);
+    public static BackendForTesting create() {
+        loadLibrary("rsdroid");
+        return new BackendForTesting(Arrays.asList("en"));
     }
 
 

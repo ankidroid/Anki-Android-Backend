@@ -16,8 +16,7 @@
 
 package net.ankiweb.rsdroid
 
-import android.content.Context
-typealias CustomBackendCreator = (context: Context, languages: Iterable<String>) -> Backend
+typealias CustomBackendCreator = (languages: Iterable<String>) -> Backend
 
 object BackendFactory {
     /** To remove in 2.1.67 update */
@@ -35,13 +34,10 @@ object BackendFactory {
 
     @JvmStatic
     @JvmOverloads
-    fun getBackend(context: Context, languages: Iterable<String>? = null): Backend {
+    fun getBackend(languages: Iterable<String>? = null): Backend {
         val langs = languages ?: defaultLanguages
-        val legacy = false
-        return backendForTesting?.invoke(context, langs) ?: Backend(
-                context,
+        return backendForTesting?.invoke(langs) ?: Backend(
                 langs,
-                legacy
         )
     }
 

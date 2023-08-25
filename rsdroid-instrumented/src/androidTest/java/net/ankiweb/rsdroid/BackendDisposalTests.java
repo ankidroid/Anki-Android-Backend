@@ -42,7 +42,7 @@ public class BackendDisposalTests extends InstrumentedTest {
 
             Timber.d("Iteration %d", i);
             try (Backend backend = super.getBackend("initial_version_2_12_1.anki2")) {
-                SupportSQLiteDatabase db = AnkiSupportSQLiteDatabase.withRustBackend(BackendFactory.getBackend(getContext()));
+                SupportSQLiteDatabase db = AnkiSupportSQLiteDatabase.withRustBackend(BackendFactory.getBackend());
 
                 int count = DatabaseUtil.queryScalar(db, "select count(*) from revlog");
             }

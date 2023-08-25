@@ -36,6 +36,7 @@ import java.util.List;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertThat;
+import static java.lang.System.loadLibrary;
 
 public class InstrumentedTest {
 
@@ -112,6 +113,7 @@ public class InstrumentedTest {
 
     @NotNull
     protected Backend getBackend(String fileName) {
+        loadLibrary("rsdroid");
         String path = getAssetFilePath(fileName);
         return getBackendFromPath(path);
     }
@@ -126,6 +128,6 @@ public class InstrumentedTest {
     }
 
     protected Backend getClosedBackend() {
-        return BackendFactory.getBackend(getContext());
+        return BackendFactory.getBackend();
     }
 }
