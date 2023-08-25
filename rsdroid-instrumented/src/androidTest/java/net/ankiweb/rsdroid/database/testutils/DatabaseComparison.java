@@ -16,6 +16,8 @@
 
 package net.ankiweb.rsdroid.database.testutils;
 
+import static java.lang.System.loadLibrary;
+
 import androidx.annotation.NonNull;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 import androidx.sqlite.db.SupportSQLiteOpenHelper;
@@ -44,6 +46,7 @@ public class DatabaseComparison extends InstrumentedTest {
     @Before
     public void setUp() {
         try {
+            loadLibrary("rsdroid");
             mDatabase = getDatabase();
             mDatabase.execSQL("create table nums (id int)");
         } catch (Exception e) {
@@ -60,7 +63,7 @@ public class DatabaseComparison extends InstrumentedTest {
     protected SupportSQLiteDatabase getDatabase() {
         switch (schedVersion) {
             case RUST:
-                Backend backend2 = BackendFactory.getBackend(getContext(), Arrays.asList("en"));
+                Backend backend2 = BackendFactory.getBackend(Arrays.asList("en"));
                 backend2.openCollection(getDatabasePath());
                 return AnkiSupportSQLiteDatabase.withRustBackend(backend2);
             case FRAMEWORK:

@@ -15,7 +15,6 @@
  */
 package net.ankiweb.rsdroid
 
-import android.content.Context
 import android.os.Looper
 import androidx.annotation.CheckResult
 import androidx.annotation.VisibleForTesting
@@ -37,7 +36,7 @@ import java.io.File
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
-open class Backend(val context: Context, langs: Iterable<String> = listOf("en"), val legacySchema: Boolean = true) : GeneratedBackend(), SQLHandler, Closeable {
+open class Backend(langs: Iterable<String> = listOf("en")) : GeneratedBackend(), SQLHandler, Closeable {
     // Set on init; unset on .close(). Access via withBackend()
     private var backendPointer: Long? = null
     private val lock = ReentrantLock()
@@ -51,14 +50,14 @@ open class Backend(val context: Context, langs: Iterable<String> = listOf("en"),
     }
 
     fun openCollection(collectionPath: String) {
-        val (mediaFolder, mediaDb) = if (legacySchema || collectionPath == ":memory:") {
+        val (mediaFolder, mediaDb) = if (collectionPath == ":memory:") {
             listOf("", "")
         } else {
             listOf(collectionPath.replace(".anki2", ".media"),
                     collectionPath.replace(".anki2", ".media.db"))
         }
         checkMainThreadOp()
-        openCollection(collectionPath, mediaFolder, mediaDb, legacySchema)
+        openCollection(collectionPath, mediaFolder, mediaDb, false)
     }
 
     /** Forces a full media check on next sync. Only valid with new backend. */
@@ -75,7 +74,6 @@ open class Backend(val context: Context, langs: Iterable<String> = listOf("en"),
     init {
         checkMainThreadOp()
         Timber.d("Opening rust backend with lang=$langs")
-        NativeMethods.ensureSetup(context)
         val input = BackendInit.newBuilder()
                 .addAllPreferredLangs(langs)
                 .build()
