@@ -31,16 +31,15 @@ Install rustup from <https://rustup.rs/>
 
 ### Ninja
 
-#### Debian/Ubuntu:
+#### Linux/macOS:
 
-    sudo apt install ninja-build
+Anki can be built with Ninja or N2. N2 gives better status output.
 
-#### macOS:
+  anki/tools/install-n2
 
-    brew upgrade
-    brew install ninja
+#### Windows:
 
-#### Windows if using choco:
+If using choco:
 
     choco install ninja
 
