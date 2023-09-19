@@ -18,64 +18,53 @@
  *
  * https://github.com/mobanisto/gcc-bridge/blob/3bd5df076d7d3b6d7b0a66653c2d114e4bfaf381/runtime/src/main/java/org/renjin/gcc/runtime/Stdlib.java
  */
+package net.ankiweb.rsdroid.utils
 
-package net.ankiweb.rsdroid.utils;
-
-public class StringToLong {
-
-    public static long strtol(String s) {
-        int radix = 0;
+object StringToLong {
+    fun strtol(s: String): Long {
+        var s1 = s
+        var radix = 0
 
         // Find the start of the number
-        int start = 0;
+        var start = 0
 
         // Skip beginning whitespace
-        while (start < s.length() && Character.isWhitespace(s.charAt(start))) {
-            start++;
+        while (start < s1.length && Character.isWhitespace(s1[start])) {
+            start++
         }
-
-        int pos = start;
+        var pos = start
 
         // Check for +/- prefix
-        if (pos < s.length() && (s.charAt(pos) == '-' || s.charAt(pos) == '+')) {
-            pos++;
-        }
-
-        // Check for hex prefix 0x/0X if the radix is 16 or unspecified
-        else if(pos + 1 < s.length() && s.charAt(pos) == '0' && (s.charAt(pos + 1) == 'x' || s.charAt(pos + 1) == 'X')) {
-            start += 2;
-            pos = start;
-            radix = 16;
-
-        }
-
-        // If radix is not specified, then check for octal prefix
-        else if(pos < s.length() && s.charAt(pos) == '0') {
-            radix = 8;
+        if (pos < s1.length && (s1[pos] == '-' || s1[pos] == '+')) {
+            pos++
+        } else if (pos + 1 < s1.length && s1[pos] == '0' && (s1[pos + 1] == 'x' || s1[pos + 1] == 'X')) {
+            start += 2
+            pos = start
+            radix = 16
+        } else if (pos < s1.length && s1[pos] == '0') {
+            radix = 8
         }
 
         // Otherwise if radix is not specified, and there is no prefix,
         // assume decimal
         if (radix == 0) {
-            radix = 10;
+            radix = 10
         }
 
         // Advance until we run out of digits
-        while(pos < s.length() && Character.digit(s.charAt(pos), radix) != -1) {
-            pos++;
+        while (pos < s1.length && s1[pos].digitToIntOrNull(radix) ?: -1 != -1) {
+            pos++
         }
 
         // If empty, return 0 and exit
         if (start == pos) {
-            return 0;
+            return 0
         }
-
-        s = s.substring(start, pos);
-
-        try {
-            return Long.parseLong(s, radix);
-        } catch (NumberFormatException e) {
-            return Long.MAX_VALUE;
+        s1 = s1.substring(start, pos)
+        return try {
+            s1.toLong(radix)
+        } catch (e: NumberFormatException) {
+            Long.MAX_VALUE
         }
     }
 }

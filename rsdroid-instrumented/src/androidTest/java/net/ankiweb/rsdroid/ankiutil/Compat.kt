@@ -13,37 +13,55 @@
  * You should have received a copy of the GNU General Public License along with
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+package net.ankiweb.rsdroid.ankiutil
 
-package net.ankiweb.rsdroid.ankiutil;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
+import android.os.Build
+import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStream
 
 /**
  * This interface defines a set of functions that are not available on all platforms.
- * <p>
+ *
+ *
  * A set of implementations for the supported platforms are available.
- * <p>
- * Each implementation ends with a {@code V<n>} prefix, identifying the minimum API version on which this implementation
- * can be used. For example, see {@link CompatV16}.
- * <p>
+ *
+ *
+ * Each implementation ends with a `V<n>` prefix, identifying the minimum API version on which this implementation
+ * can be used. For example, see [CompatV16].
+ *
+ *
  * Each implementation should extend the previous implementation and implement this interface.
- * <p>
+ *
+ *
  * Each implementation should only override the methods that first become available in its own version, use @Override.
- * <p>
+ *
+ *
  * Methods not supported by its API will default to the empty implementations of CompatV8.  Methods first supported
  * by lower APIs will default to those implementations since we extended them.
- * <p>
+ *
+ *
  * Example: CompatV21 extends CompatV19. This means that the setSelectableBackground function using APIs only available
  * in API 21, should be implemented properly in CompatV19 with @Override annotation. On the other hand a method
  * like showViewWithAnimation that first becomes available in API 19 need not be implemented again in CompatV21,
  * unless the behaviour is supposed to be different there.
  */
-public interface Compat {
-    void copyFile(String source, String target) throws IOException;
-    long copyFile(String source, OutputStream target) throws IOException;
-    long copyFile(InputStream source, String target) throws IOException;
+interface Compat {
+    @Throws(IOException::class)
+    fun copyFile(source: String, target: String)
+
+    @Throws(IOException::class)
+    fun copyFile(source: String, target: OutputStream): Long
+
+    @Throws(IOException::class)
+    fun copyFile(source: InputStream, target: String): Long
 }
 
+
+fun getCompat(): Compat {
+    return if (Build.VERSION.SDK_INT >= 26) {
+        CompatV26()
+    } else {
+        CompatV16()
+    }
+}

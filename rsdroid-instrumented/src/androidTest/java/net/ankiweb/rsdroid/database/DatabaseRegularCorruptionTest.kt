@@ -13,41 +13,36 @@
  * You should have received a copy of the GNU General Public License along with
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+package net.ankiweb.rsdroid.database
 
-package net.ankiweb.rsdroid.database;
+import android.database.sqlite.SQLiteDatabaseCorruptException
+import net.ankiweb.rsdroid.database.testutils.DatabaseCorruption
+import org.hamcrest.MatcherAssert
+import org.hamcrest.Matchers
+import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
 
-import android.database.sqlite.SQLiteDatabaseCorruptException;
-
-import net.ankiweb.rsdroid.BackendException;
-import net.ankiweb.rsdroid.database.testutils.DatabaseCorruption;
-
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.typeCompatibleWith;
-
-@RunWith(Parameterized.class)
-public class DatabaseRegularCorruptionTest extends DatabaseCorruption {
+@RunWith(Parameterized::class)
+class DatabaseRegularCorruptionTest : DatabaseCorruption() {
     // In both cases, openCollection fails with the exception.
-
-    @Override
-    protected void assertCorruption(Exception setupException) {
+    override fun assertCorruption(setupException: Exception) {
         // Rust: net.ankiweb.rsdroid.BackendException$BackendDbException: DBError { info: "SqliteFailure(Error { code: DatabaseCorrupt, extended_code: 11 }, Some(\"database disk image is malformed\"))", kind: Other }
         // Java: database disk image is malformed (code 11): , while compiling: PRAGMA journal_mode
 
 //        assertThat(setupException.getClass(), typeCompatibleWith(BackendException.BackendDbException.class));
-        assertThat(setupException.getClass(), typeCompatibleWith(SQLiteDatabaseCorruptException.class));
+        MatcherAssert.assertThat(
+            setupException.javaClass, Matchers.typeCompatibleWith(
+                SQLiteDatabaseCorruptException::class.java
+            )
+        )
 
         // this mapping to an unrelated exception should be done at a higher level
-
-        assertThat(setupException.getLocalizedMessage(), containsString("database disk image is malformed"));
-        assertThat(setupException.getLocalizedMessage(), containsString("11"));
+        MatcherAssert.assertThat(
+            setupException.localizedMessage,
+            Matchers.containsString("database disk image is malformed")
+        )
+        MatcherAssert.assertThat(setupException.localizedMessage, Matchers.containsString("11"))
     }
 
-    @Override
-    protected String getCorruptDatabaseAssetName() {
-        return "initial_version_2_12_1_corrupt_regular.anki2";
-    }
+    override val corruptDatabaseAssetName = "initial_version_2_12_1_corrupt_regular.anki2"
 }
