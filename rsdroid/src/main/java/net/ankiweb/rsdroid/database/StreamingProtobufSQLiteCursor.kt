@@ -231,7 +231,7 @@ open class StreamingProtobufSQLiteCursor(
         return rowAtCurrentPosition.getFields(columnIndex)
     }
 
-    protected val currentSliceRowCount: Int
+    val currentSliceRowCount: Int
         get() = results!!.result.rowsCount
 
     private fun strtoll(stringValue: String): Long {
