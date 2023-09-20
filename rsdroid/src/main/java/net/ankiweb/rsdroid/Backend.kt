@@ -57,7 +57,7 @@ open class Backend(langs: Iterable<String> = listOf("en")) : GeneratedBackend(),
                     collectionPath.replace(".anki2", ".media.db"))
         }
         checkMainThreadOp()
-        openCollection(collectionPath, mediaFolder, mediaDb, false)
+        openCollection(collectionPath, mediaFolder, mediaDb)
     }
 
     /** Forces a full media check on next sync. Only valid with new backend. */
@@ -102,9 +102,9 @@ open class Backend(langs: Iterable<String> = listOf("en")) : GeneratedBackend(),
     /**
      * Open a collection. There must not already be an open collection.
      */
-    override fun openCollection(collectionPath: String, mediaFolderPath: String, mediaDbPath: String, forceSchema11: Boolean) {
+    override fun openCollection(collectionPath: String, mediaFolderPath: String, mediaDbPath: String) {
         try {
-            super.openCollection(collectionPath, mediaFolderPath, mediaDbPath, forceSchema11)
+            super.openCollection(collectionPath, mediaFolderPath, mediaDbPath)
         } catch (exc: BackendException.BackendDbException) {
             throw exc.toSQLiteException("db open")
         }

@@ -28,7 +28,7 @@ anki_i18n = { version = "0.0.0", path = "../anki/rslib/i18n" }
 anyhow = "1.0.75"
 glob = "0.3.1"
 inflections = "1.1.1"
-prost-reflect = "0.11.4"
+prost-reflect = "0.11.5"
 prost-types = "0.11.9"
-serde = { version = "1.0.186", features = ["derive"] }
-serde_json = "1.0.105"
+serde = { version = "1.0.188", features = ["derive"] }
+serde_json = "1.0.107"
