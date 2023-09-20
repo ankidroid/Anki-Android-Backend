@@ -43,7 +43,7 @@ public class CollectionCreationTest {
 
         Configuration config = getConfiguration(path);
 
-        Backend backend = BackendFactory.getBackend(getTargetContext());
+        Backend backend = BackendFactory.getBackend();
         backend.openCollection(":memory:");
         SupportSQLiteDatabase database = AnkiSupportSQLiteDatabase.withRustBackend(backend);
 
