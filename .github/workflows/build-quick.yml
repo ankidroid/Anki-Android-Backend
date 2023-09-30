@@ -34,7 +34,15 @@ jobs:
 
       # The action puts a relative path on the PATH 🙄
       - name: Make path absolute
+        if: matrix.os != 'windows-latest'
         run: echo $(pwd)/ninja_bin >> $GITHUB_PATH
+
+      - name: Make path absolute
+        if: matrix.os == 'windows-latest'
+        run: |
+          $CurrentPath = (Get-Location).Path
+          $NewPath = "${CurrentPath}/ninja_bin"
+          Add-Content -Path $env:GITHUB_PATH -Value $NewPath
 
       - name: Configure JDK
         uses: actions/setup-java@v3
