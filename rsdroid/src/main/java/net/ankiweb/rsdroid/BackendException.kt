@@ -124,6 +124,7 @@ open class BackendException : RuntimeException {
                 BackendError.Kind.CARD_TYPE_ERROR -> return BackendException(error)
                 BackendError.Kind.UNRECOGNIZED -> return BackendException(error)
                 BackendError.Kind.OS_ERROR -> return BackendException(error)
+                BackendError.Kind.SCHEDULER_UPGRADE_REQUIRED -> return BackendException(error)
             }
         }
 
