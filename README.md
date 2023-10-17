@@ -33,9 +33,11 @@ Install rustup from <https://rustup.rs/>
 
 #### Linux/macOS:
 
-Anki can be built with Ninja or N2. N2 gives better status output.
+Anki can be built with Ninja or N2. N2 gives better status output and may be installed like so:
 
-  anki/tools/install-n2
+`./anki/tools/install-n2`
+
+*Note:* n2 receives occasional mandatory updates. If you see build errors, you may need to re-run this command and re-try the build
 
 #### Windows:
 
