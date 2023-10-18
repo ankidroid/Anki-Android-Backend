@@ -67,6 +67,7 @@ abstract class AnkiDatabaseCursor : Cursor {
         throw NotImplementedException()
     }
 
+    @Deprecated("Deprecated in Java")
     override fun deactivate() {
         Timber.w("deactivate - not implemented - throwing")
         throw NotImplementedException()
@@ -76,6 +77,7 @@ abstract class AnkiDatabaseCursor : Cursor {
         throw NotImplementedException()
     }
 
+    @Deprecated("Deprecated in Java")
     override fun requery(): Boolean {
         Timber.w("requery - not implemented - throwing")
         throw NotImplementedException()
