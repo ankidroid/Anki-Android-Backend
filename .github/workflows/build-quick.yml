@@ -44,6 +44,14 @@ jobs:
           $NewPath = "${CurrentPath}/ninja_bin"
           Add-Content -Path $env:GITHUB_PATH -Value $NewPath
 
+      - name: Set NDK version
+        if: matrix.os != 'windows-latest'
+        run: echo "ANDROID_NDK_HOME=$ANDROID_NDK_LATEST_HOME" >> $GITHUB_ENV
+
+      - name: Set NDK version
+        if: matrix.os == 'windows-latest'
+        run: Add-Content -Path $env:GITHUB_ENV -Value ANDROID_NDK_HOME=$env:ANDROID_NDK_LATEST_HOME
+
       - name: Configure JDK
         uses: actions/setup-java@v3
         with:
