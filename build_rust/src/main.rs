@@ -62,6 +62,7 @@ fn build_web_artifacts() -> Result<()> {
         .args([
             "extract:protoc",
             "ts:reviewer:reviewer_extras_bundle.js",
+            "ts:reviewer:reviewer_extras.css",
             "qt:aqt:data:web:pages",
         ])
         .ensure_success()?;
@@ -80,6 +81,10 @@ fn build_web_artifacts() -> Result<()> {
     copy_file(
         "anki/out/ts/reviewer/reviewer_extras_bundle.js",
         artifacts_dir.join("web/reviewer_extras_bundle.js"),
+    )?;
+    copy_file(
+        "anki/out/ts/reviewer/reviewer_extras.css",
+        artifacts_dir.join("web/reviewer_extras.css"),
     )?;
     copy_file(
         "anki/cargo/licenses.json",
