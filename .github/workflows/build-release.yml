@@ -6,10 +6,14 @@ on:
         description: "Publish artifacts to Maven Central? non-empty to publish, empty to skip publish"
         required: false
         type: string
-  push:
   schedule:
     - cron: "0 0 * * *"
   pull_request:
+    branches:
+      - '**'
+  push:
+    branches:
+      - main
 
 env:
   ALL_ARCHS: 1

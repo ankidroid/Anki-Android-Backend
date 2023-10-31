@@ -1,10 +1,14 @@
 name: Build quick (each platform)
 on:
   workflow_dispatch:
-  push:
   schedule:
     - cron: "0 0 * * *"
   pull_request:
+    branches:
+      - '**'
+  push:
+    branches:
+      - main
 
 env:
   DEBUG: 1
