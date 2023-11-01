@@ -15,8 +15,8 @@ fn main() -> Result<()> {
         return Ok(());
     }
     let ndk_path = Utf8PathBuf::from(env::var("ANDROID_NDK_HOME").unwrap_or_default());
-    if !ndk_path.file_name().unwrap_or_default().starts_with("25.") {
-        panic!("Expected ANDROID_NDK_HOME to point to a 25.x NDK. Future versions may work, but are untested.");
+    if !ndk_path.file_name().unwrap_or_default().starts_with("26.") {
+        panic!("Expected ANDROID_NDK_HOME to point to a 26.x NDK. Future versions may work, but are untested.");
     }
 
     build_web_artifacts()?;
@@ -62,6 +62,7 @@ fn build_web_artifacts() -> Result<()> {
         .args([
             "extract:protoc",
             "ts:reviewer:reviewer_extras_bundle.js",
+            "ts:reviewer:reviewer_extras.css",
             "qt:aqt:data:web:pages",
         ])
         .ensure_success()?;
@@ -80,6 +81,10 @@ fn build_web_artifacts() -> Result<()> {
     copy_file(
         "anki/out/ts/reviewer/reviewer_extras_bundle.js",
         artifacts_dir.join("web/reviewer_extras_bundle.js"),
+    )?;
+    copy_file(
+        "anki/out/ts/reviewer/reviewer_extras.css",
+        artifacts_dir.join("web/reviewer_extras.css"),
     )?;
     copy_file(
         "anki/cargo/licenses.json",

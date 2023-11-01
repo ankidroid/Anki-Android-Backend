@@ -43,6 +43,9 @@ jobs:
       - name: Make path absolute
         run: echo $(pwd)/ninja_bin >> $GITHUB_PATH
 
+      - name: Set NDK version
+        run: echo "ANDROID_NDK_HOME=$ANDROID_NDK_LATEST_HOME" >> $GITHUB_ENV
+
       - name: Configure JDK
         uses: actions/setup-java@v3
         with:
