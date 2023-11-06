@@ -131,7 +131,7 @@ in the AnkiDroid repo, and add the following line:
 local_backend=true
 ```
 
-Check `Anki-AndroidBackend/gradle.properties`'s `VERSION_NAME` and
+Check `Anki-AndroidBackend/gradle.properties`'s `BACKEND_VERSION` and
 `Anki-Android/build.gradle`'s `ext.ankidroid_backend_version`. Both variables
 should have the same value. If it is not the case, you must edit Anki-Android's
 one.
