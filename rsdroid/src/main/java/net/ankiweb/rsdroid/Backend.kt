@@ -279,6 +279,15 @@ open class Backend(langs: Iterable<String> = listOf("en")) : GeneratedBackend(),
             }
         } catch (exc: NoSuchMethodError) {
             // running outside Android, or old API
+        } catch (ex: RuntimeException) {
+            // If running with no Android dependencies, we get the error:
+            // Method getMainLooper in android.os.Looper not mocked.
+            // See https://developer.android.com/r/studio-ui/build/not-mocked for details.
+            // runIfOnMainThread is non-vital, so we can ignore the exception
+            if (ex.message?.contains("android.os.Looper not mocked") == true) {
+                return
+            }
+            throw ex
         }
     }
 }
