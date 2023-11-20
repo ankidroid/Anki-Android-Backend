@@ -10,7 +10,7 @@ on:
     - cron: "0 0 * * *"
   pull_request:
     branches:
-      - '**'
+      - "**"
   push:
     branches:
       - main
@@ -105,7 +105,7 @@ jobs:
       # following steps only run on workflow dispatch
 
       - name: Publish AAR to Maven
-        if: "${{ github.event.inputs.mavenPublish != '' && github.event_name == 'workflow_dispatch'}}"       
+        if: "${{ github.event.inputs.mavenPublish != '' && github.event_name == 'workflow_dispatch'}}"
         env:
           ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_PRIVATE_KEY }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}
@@ -115,7 +115,7 @@ jobs:
           ./gradlew rsdroid:publishAllPublicationsToMavenCentral -DtestBuildType=release -Dorg.gradle.daemon=false -Dorg.gradle.console=plain
 
       - name: Publish JAR to Maven
-        if: "${{ github.event.inputs.mavenPublish != '' && github.event_name == 'workflow_dispatch'}}"       
+        if: "${{ github.event.inputs.mavenPublish != '' && github.event_name == 'workflow_dispatch'}}"
         env:
           ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_PRIVATE_KEY }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}
