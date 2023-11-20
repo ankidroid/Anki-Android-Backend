@@ -31,23 +31,6 @@ jobs:
       - name: Fetch submodules
         run: git submodule update --init
 
-      - name: Setup Ninja
-        uses: ashutoshvarma/setup-ninja@master
-        with:
-          version: 1.11.1
-
-      # The action puts a relative path on the PATH 🙄
-      - name: Make path absolute
-        if: matrix.os != 'windows-latest'
-        run: echo $(pwd)/ninja_bin >> $GITHUB_PATH
-
-      - name: Make path absolute
-        if: matrix.os == 'windows-latest'
-        run: |
-          $CurrentPath = (Get-Location).Path
-          $NewPath = "${CurrentPath}/ninja_bin"
-          Add-Content -Path $env:GITHUB_PATH -Value $NewPath
-
       - name: Set NDK version
         if: matrix.os != 'windows-latest'
         run: echo "ANDROID_NDK_HOME=$ANDROID_NDK_LATEST_HOME" >> $GITHUB_ENV
@@ -91,6 +74,16 @@ jobs:
           key: ${{ runner.os }}-rust-debug-v6-${{ hashFiles('Cargo.lock') }}-${{ hashFiles('anki/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-rust-debug-v6
+
+      - name: Setup N2 (Windows)
+        if: matrix.os == 'windows-latest'
+        # after metge of https://github.com/ankitects/anki/pull/2837
+        # run: ./anki/tools/install-n2.bat
+        run: cargo install --git https://github.com/ankitects/n2.git --rev 3b725cf9c321efb90496dd2458cf5c1abbef4dba
+
+      - name: Setup N2 (Unix)
+        if: matrix.os != 'windows-latest'
+        run: ./anki/tools/install-n2
 
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
