@@ -21,7 +21,7 @@ env:
   CARGO_PROFILE_RELEASE_LTO: fat
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}-release
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event.inputs.mavenPublish }}-release
   cancel-in-progress: true
 
 jobs:
