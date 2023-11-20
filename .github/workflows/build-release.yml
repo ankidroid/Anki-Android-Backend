@@ -34,15 +34,6 @@ jobs:
       - name: Fetch submodules
         run: git submodule update --init
 
-      - name: Setup Ninja
-        uses: ashutoshvarma/setup-ninja@master
-        with:
-          version: 1.11.1
-
-      # The action puts a relative path on the PATH 🙄
-      - name: Make path absolute
-        run: echo $(pwd)/ninja_bin >> $GITHUB_PATH
-
       - name: Set NDK version
         run: echo "ANDROID_NDK_HOME=$ANDROID_NDK_LATEST_HOME" >> $GITHUB_ENV
 
@@ -74,6 +65,9 @@ jobs:
           key: ${{ runner.os }}-rust-release-v6-${{ hashFiles('Cargo.lock') }}-${{ hashFiles('anki/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-rust-release-v6
+
+      - name: Setup N2
+        run: ./anki/tools/install-n2
 
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
