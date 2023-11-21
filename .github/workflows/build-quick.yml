@@ -75,15 +75,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-rust-debug-v6
 
-      - name: Setup N2 (Windows)
-        if: matrix.os == 'windows-latest'
-        # after metge of https://github.com/ankitects/anki/pull/2837
-        # run: ./anki/tools/install-n2.bat
-        run: cargo install --git https://github.com/ankitects/n2.git --rev 3b725cf9c321efb90496dd2458cf5c1abbef4dba
-
-      - name: Setup N2 (Unix)
-        if: matrix.os != 'windows-latest'
-        run: ./anki/tools/install-n2
+      - name: Setup N2
+        run: bash ./anki/tools/install-n2
 
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
