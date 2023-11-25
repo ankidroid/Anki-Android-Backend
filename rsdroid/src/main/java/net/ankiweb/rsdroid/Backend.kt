@@ -261,17 +261,14 @@ open class Backend(langs: Iterable<String> = listOf("en")) : GeneratedBackend(),
 /**
  * Build a JSON DB request
  */
-private fun dbRequestJson(sql: String = "", bindArgs: Array<Any?>? = null, kind: DbRequestKind = DbRequestKind.Query, firstRowOnly: Boolean = false): ByteString {
-    val o = JSONObject()
-    o.put("kind", kind.name.lowercase())
-    o.put("sql", sql)
-    o.put("args", JSONArray((bindArgs ?: arrayOf()).toList()))
-    o.put("first_row_only", firstRowOnly)
+private fun dbRequestJson(sql: String = "", bindArgs: Array<Any?>? = null, firstRowOnly: Boolean = false): ByteString {
+    val o = JSONObject().apply {
+        put("kind", "query")
+        put("sql", sql)
+        put("args", JSONArray((bindArgs ?: arrayOf()).toList()))
+        put("first_row_only", firstRowOnly)
+    }
     return ByteString.copyFromUtf8(o.toString())
-}
-
-enum class DbRequestKind {
-    Query,
 }
 
 /**
