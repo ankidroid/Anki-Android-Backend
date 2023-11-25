@@ -18,7 +18,6 @@ package net.ankiweb.rsdroid
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import anki.ankidroid.SchedTimingTodayLegacyRequest
 import net.ankiweb.rsdroid.ankiutil.InstrumentedTest
-import org.hamcrest.MatcherAssert
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.core.Is
 import org.junit.Assert

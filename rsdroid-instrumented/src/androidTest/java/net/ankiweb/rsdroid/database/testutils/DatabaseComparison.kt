@@ -16,7 +16,6 @@
 package net.ankiweb.rsdroid.database.testutils
 
 import androidx.sqlite.db.SupportSQLiteDatabase
-import androidx.sqlite.db.SupportSQLiteOpenHelper
 import net.ankiweb.rsdroid.BackendFactory.getBackend
 import net.ankiweb.rsdroid.ankiutil.InstrumentedTest
 import net.ankiweb.rsdroid.database.AnkiSupportSQLiteDatabase.Companion.withFramework
@@ -78,14 +77,6 @@ open class DatabaseComparison : InstrumentedTest() {
 
     enum class DatabaseType {
         FRAMEWORK, RUST
-    }
-
-    private class DefaultCallback : SupportSQLiteOpenHelper.Callback(1) {
-        override fun onCreate(db: SupportSQLiteDatabase) {}
-        override fun onUpgrade(db: SupportSQLiteDatabase, oldVersion: Int, newVersion: Int) {}
-        override fun onCorruption(db: SupportSQLiteDatabase) {
-            // do nothing
-        }
     }
 
     companion object {

@@ -15,7 +15,6 @@
  */
 package net.ankiweb.rsdroid.ankiutil
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.text.TextUtils
 import androidx.annotation.CheckResult

@@ -17,7 +17,7 @@ class BackendTranslationsTest : InstrumentedTest() {
 
     @Test
     fun ensureI18nWorks() {
-        var b = memoryBackend;
+        var b = memoryBackend
         assertThat(
             withoutIsolation(b.tr.mediaCheckTrashCount(5, 10)),
             CoreMatchers.equalTo("Trash folder: 5 files, 10MB")
