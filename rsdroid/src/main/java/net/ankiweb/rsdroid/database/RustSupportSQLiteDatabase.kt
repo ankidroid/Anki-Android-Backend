@@ -56,8 +56,7 @@ import java.util.*
  *   backend directly in testing) instead
  * - isOpen and getPath return dummy data
  */ 
-class RustSupportSQLiteDatabase(backend: Backend) : SupportSQLiteDatabase {
-    private val sessionFactory: ThreadLocal<Session>
+class RustSupportSQLiteDatabase(private val backend: Backend) : SupportSQLiteDatabase {
 
     override fun isReadOnly(): Boolean {
         return false
@@ -72,19 +71,19 @@ class RustSupportSQLiteDatabase(backend: Backend) : SupportSQLiteDatabase {
     }
 
     override fun beginTransaction() {
-        session.beginTransaction()
+        throw NotImplementedException()
     }
 
     override fun endTransaction() {
-        session.endTransaction()
+        throw NotImplementedException()
     }
 
     override fun setTransactionSuccessful() {
-        session.setTransactionSuccessful()
+        throw NotImplementedException()
     }
 
     override fun inTransaction(): Boolean {
-        return session.inTransaction()
+        return false
     }
 
     override fun getVersion(): Int {
@@ -100,7 +99,7 @@ class RustSupportSQLiteDatabase(backend: Backend) : SupportSQLiteDatabase {
     }
 
     override fun query(query: String, bindArgs: Array<Any?>?): Cursor {
-        return StreamingProtobufSQLiteCursor(session, query, bindArgs)
+        return StreamingProtobufSQLiteCursor(backend, query, bindArgs)
     }
 
     override fun query(query: SupportSQLiteQuery): Cursor {
@@ -221,7 +220,7 @@ class RustSupportSQLiteDatabase(backend: Backend) : SupportSQLiteDatabase {
     /* Not part of interface */
     fun executeGetRowsAffected(sql: String, bindArgs: Array<Any?>?): Int {
         return try {
-            session.executeGetRowsAffected(sql, bindArgs)
+            backend.executeGetRowsAffected(sql, bindArgs)
         } catch (e: Exception) {
             throw RuntimeException(e)
         }
@@ -229,15 +228,11 @@ class RustSupportSQLiteDatabase(backend: Backend) : SupportSQLiteDatabase {
 
     fun insertForForId(sql: String, bindArgs: Array<Any?>?): Long {
         return try {
-            session.insertForId(sql, bindArgs)
+            backend.insertForId(sql, bindArgs)
         } catch (e: Exception) {
             throw RuntimeException(e)
         }
     }
-
-    /** Helper methods  */
-    private val session: Session
-        get() = sessionFactory.get()!!
 
     /** Confirmed that the below are not used for our code  */
     override fun delete(table: String, whereClause: String, whereArgs: Array<Any>): Int {
@@ -307,9 +302,5 @@ class RustSupportSQLiteDatabase(backend: Backend) : SupportSQLiteDatabase {
 
     companion object {
         private val CONFLICT_VALUES = arrayOf("", " OR ROLLBACK ", " OR ABORT ", " OR FAIL ", " OR IGNORE ", " OR REPLACE ")
-    }
-
-    init {
-        sessionFactory = SessionThreadLocal(backend)
     }
 }

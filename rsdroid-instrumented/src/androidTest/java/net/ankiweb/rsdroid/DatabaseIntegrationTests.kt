@@ -78,56 +78,6 @@ class DatabaseIntegrationTests : DatabaseComparison() {
     }
 
     @Test
-    fun testTransactionSuccess() {
-        mDatabase.execSQL("create table test (id int)")
-        mDatabase.beginTransaction()
-        try {
-            MatcherAssert.assertThat(
-                "In transaction",
-                mDatabase.inTransaction(),
-                Matchers.`is`(true)
-            )
-            mDatabase.execSQL("insert into test (id) values (1)")
-            mDatabase.setTransactionSuccessful()
-        } finally {
-            if (mDatabase.inTransaction()) {
-                mDatabase.endTransaction()
-            } else {
-                Assert.fail("not in transaction")
-            }
-        }
-        Assert.assertFalse("transaction should have ended", mDatabase.inTransaction())
-        MatcherAssert.assertThat(
-            queryScalar(mDatabase, "select count(*) from test"),
-            Matchers.`is`(1)
-        )
-    }
-
-    @Test
-    fun testTransactionFailure() {
-        mDatabase.execSQL("create table test (id int)")
-        mDatabase.beginTransaction()
-        try {
-            mDatabase.execSQL("insert into test (id) values (1)")
-            mDatabase.execSQL("insert into invalid (abc) values (5)")
-            Assert.fail()
-        } catch (e: Exception) {
-            // expected
-        } finally {
-            if (mDatabase.inTransaction()) {
-                mDatabase.endTransaction()
-            } else {
-                Assert.fail("not in transaction")
-            }
-        }
-        Assert.assertFalse("transaction should be ended", mDatabase.inTransaction())
-        MatcherAssert.assertThat(
-            queryScalar(mDatabase, "select count(*) from test"),
-            Matchers.`is`(0)
-        )
-    }
-
-    @Test
     fun testCursorIndexException() {
         mDatabase.execSQL("create table tmp (id int)")
         mDatabase.execSQL("insert into tmp (id) VALUES (?)", arrayOf<Any>(1))
