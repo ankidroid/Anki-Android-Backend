@@ -15,8 +15,6 @@
  */
 package net.ankiweb.rsdroid
 
-import android.content.Context
-import androidx.test.platform.app.InstrumentationRegistry
 import net.ankiweb.rsdroid.BackendException.BackendDbException
 import net.ankiweb.rsdroid.BackendException.BackendDbException.BackendDbFileTooNewException
 import net.ankiweb.rsdroid.BackendException.BackendDbException.BackendDbFileTooOldException
@@ -54,14 +52,11 @@ class ExceptionTest {
 
     @Parameterized.Parameter(value = 1)
     @JvmField
-    public var clazz: Class<out Exception?>? = null
+    var clazz: Class<out Exception?>? = null
     @Before
     fun errorProducesNamedException() {
         backend = BackendForTesting.create()
     }
-
-    protected val context: Context
-        get() = InstrumentationRegistry.getInstrumentation().targetContext
 
     @Test
     fun testError() {

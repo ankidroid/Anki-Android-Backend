@@ -25,7 +25,6 @@ import net.ankiweb.rsdroid.exceptions.BackendInvalidInputException
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers
 import org.junit.After
-import org.junit.Assert
 import org.junit.Before
 
 open class InstrumentedTest {
@@ -43,8 +42,7 @@ open class InstrumentedTest {
     fun after() {
         for (b in backendList) {
             if (b.isOpen()) {
-                var numbers: List<Int>
-                numbers = try {
+                val numbers: List<Int> = try {
                     b.getActiveSequenceNumbers()
                 } catch (exc: BackendInvalidInputException) {
                     assertThat(
