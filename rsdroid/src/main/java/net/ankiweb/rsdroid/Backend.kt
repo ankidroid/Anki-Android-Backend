@@ -58,6 +58,7 @@ open class Backend(langs: Iterable<String> = listOf("en")) : GeneratedBackend(),
     }
 
     /** Forces a full media check on next sync. Only valid with new backend. */
+    @Suppress("unused") // used in AnkiDroid
     fun removeMediaDb(colPath: String) {
         val file = File(colPath.replace(".anki2", ".media.db"))
         if (file.exists()) {
