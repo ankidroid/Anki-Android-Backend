@@ -156,29 +156,6 @@ open class Backend(langs: Iterable<String> = listOf("en")) : GeneratedBackend(),
         }
     }
 
-    // transactions hold the lock until commit/rollback
-
-    override fun beginTransaction() {
-        lock.lock()
-        performTransaction(DbRequestKind.Begin)
-    }
-
-    override fun commitTransaction() {
-        try {
-            performTransaction(DbRequestKind.Commit)
-        } finally {
-            lock.unlock()
-        }
-    }
-
-    override fun rollbackTransaction() {
-        try {
-            performTransaction(DbRequestKind.Rollback)
-        } finally {
-            lock.unlock()
-        }
-    }
-
     // other DB methods
 
     override fun closeDatabase() {
@@ -231,10 +208,6 @@ open class Backend(langs: Iterable<String> = listOf("en")) : GeneratedBackend(),
 
     override fun cancelAllProtoQueries() {
         flushAllQueries()
-    }
-
-    private fun performTransaction(kind: DbRequestKind) {
-        runDbCommand(dbRequestJson(kind = kind))
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.NONE)
@@ -306,9 +279,6 @@ private fun dbRequestJson(sql: String = "", bindArgs: Array<Any?>? = null, kind:
 
 enum class DbRequestKind {
     Query,
-    Begin,
-    Commit,
-    Rollback,
 }
 
 /**

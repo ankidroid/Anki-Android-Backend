@@ -28,9 +28,6 @@ interface SQLHandler {
 
     fun executeGetRowsAffected(sql: String, bindArgs: Array<Any?>?): Int
     fun insertForId(sql: String, bindArgs: Array<Any?>?): Long
-    fun beginTransaction()
-    fun commitTransaction()
-    fun rollbackTransaction()
 
     @CheckResult
     fun getColumnNames(sql: String): Array<String>
