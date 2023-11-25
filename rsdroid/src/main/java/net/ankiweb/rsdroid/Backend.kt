@@ -33,13 +33,10 @@ import org.json.JSONObject
 import timber.log.Timber
 import java.io.Closeable
 import java.io.File
-import java.util.concurrent.locks.ReentrantLock
-import kotlin.concurrent.withLock
 
 open class Backend(langs: Iterable<String> = listOf("en")) : GeneratedBackend(), SQLHandler, Closeable {
     // Set on init; unset on .close(). Access via withBackend()
     private var backendPointer: Long? = null
-    private val lock = ReentrantLock()
 
     val tr: Translations by lazy {
         Translations(this)
@@ -88,13 +85,11 @@ open class Backend(langs: Iterable<String> = listOf("en")) : GeneratedBackend(),
     override fun close() {
         checkMainThreadOp()
         Timber.d("Closing rust backend")
-        lock.withLock {
-            // Must be checked inside lock to avoid race
-            if (backendPointer != null) {
-                withBackend {
-                    backendPointer = null
-                    NativeMethods.closeBackend(it)
-                }
+        // Must be checked inside lock to avoid race
+        if (backendPointer != null) {
+            withBackend {
+                backendPointer = null
+                NativeMethods.closeBackend(it)
             }
         }
     }
@@ -148,12 +143,10 @@ open class Backend(langs: Iterable<String> = listOf("en")) : GeneratedBackend(),
      * up to the backend.
      */
     private fun <T> withBackend(fn: (ptr: Long) -> T): T {
-        lock.withLock {
-            if (backendPointer == null) {
-                throw BackendException("Backend has been closed")
-            }
-            return fn(backendPointer!!)
+        if (backendPointer == null) {
+            throw BackendException("Backend has been closed")
         }
+        return fn(backendPointer!!)
     }
 
     // other DB methods
