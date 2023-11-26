@@ -48,18 +48,13 @@ fn render_method(service: &BackendService, method: &Method, out: &mut impl Write
     let output = method.proto.output();
     let service_idx = service.index;
     let method_idx = method.index;
-    let run_method = if should_skip_mutex(&method_name) {
-        "runMethodRawNoLock"
-    } else {
-        "runMethodRaw"
-    };
     let comments = format_comments(&method.comments);
 
     // raw bytes
     write!(
         out,
         r#"{comments}    fun {method_name}Raw(input: ByteArray): ByteArray {{
-        return {run_method}({service_idx}, {method_idx}, input)
+        return runMethodRaw({service_idx}, {method_idx}, input)
         }}
 "#
     )
@@ -88,19 +83,6 @@ fn format_comments(path: &Option<String>) -> String {
     path.as_ref()
         .map(|c| format!("/** {c} */\n"))
         .unwrap_or_default()
-}
-
-fn should_skip_mutex(method_name: &str) -> bool {
-    [
-        "latestProgress",
-        "syncMedia",
-        "translateString",
-        "awaitBackupCompletion",
-        "setWantsAbort",
-        "abortSync",
-        "abortMediaSync",
-    ]
-    .contains(&method_name)
 }
 
 /// If any of the following apply to the input type:
@@ -255,8 +237,6 @@ fn write_header(out: &mut impl Write) -> Result<()> {
         
         @Throws(BackendException::class)
         protected abstract fun runMethodRaw(service: Int, method: Int, input: ByteArray): ByteArray;
-        @Throws(BackendException::class)
-        protected abstract fun runMethodRawNoLock(service: Int, method: Int, input: ByteArray): ByteArray;
         
         "#,
     )?;

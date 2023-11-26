@@ -86,13 +86,8 @@ open class Backend(langs: Iterable<String> = listOf("en")) : GeneratedBackend(),
     override fun close() {
         checkMainThreadOp()
         Timber.d("Closing rust backend")
-        // Must be checked inside lock to avoid race
-        if (backendPointer != null) {
-            withBackend {
-                backendPointer = null
-                NativeMethods.closeBackend(it)
-            }
-        }
+        NativeMethods.closeBackend(backendPointer!!)
+        backendPointer = null
     }
 
     /**
@@ -115,8 +110,7 @@ open class Backend(langs: Iterable<String> = listOf("en")) : GeneratedBackend(),
     }
 
     /**
-     * All backend methods (except for backend init/close, and those explicitly
-     * excluded from the mutex) flow through this.
+     * All backend methods (except for backend init/close) flow through this.
      */
     override fun runMethodRaw(service: Int, method: Int, input: ByteArray): ByteArray {
         checkMainThreadOp()
@@ -125,23 +119,10 @@ open class Backend(langs: Iterable<String> = listOf("en")) : GeneratedBackend(),
         }
     }
 
-    /**
-     * Translations, progress fetching, and media sync do not require an outer lock.
-     */
-    override fun runMethodRawNoLock(service: Int, method: Int, input: ByteArray): ByteArray {
-        if (backendPointer == null) {
-            throw BackendException("Backend has been closed")
-        }
-        return unpackResult(NativeMethods.runMethodRaw(backendPointer!!, service, method, input))
-    }
 
     /**
-     * Run the provided closure with locked access to the backend.
-     * The backend maintains its own lock for backend commands, so this extra
-     * level of locks is only useful for executing begin+sql+commit/rollback commands
-     * without other commands being interleaved. When AnkiDroid has migrated to more
-     * of the backend, it can probably remove this and leave the transaction handling
-     * up to the backend.
+     * Run the provided closure with access to the backend.
+     * @throws BackendException if backend closed.
      */
     private fun <T> withBackend(fn: (ptr: Long) -> T): T {
         if (backendPointer == null) {
