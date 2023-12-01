@@ -64,7 +64,7 @@ android {
 }
 
 afterEvaluate {
-    tasks.withType(BundleAar).all { bundleAarTask ->
+    tasks.withType(BundleAar).configureEach { bundleAarTask ->
         bundleAarTask.doLast {
             def aarFile = bundleAarTask.outputs.files.singleFile
             def zipFile = new ZipFile(aarFile)
@@ -94,7 +94,7 @@ dependencies {
 
 }
 
-tasks.withType(KotlinCompile).all {
+tasks.withType(KotlinCompile).configureEach {
     kotlinOptions {
         freeCompilerArgs = ["-opt-in=kotlin.RequiresOptIn"]
     }
