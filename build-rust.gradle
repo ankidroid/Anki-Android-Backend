@@ -1,4 +1,4 @@
-task buildRust(type: Exec) {
+tasks.register('buildRust', Exec) {
     // ensure script doesn't try to start gradle again
     environment 'RUNNING_FROM_GRADLE', '1'
     if (!System.getenv('ANDROID_NDK_HOME')) {
