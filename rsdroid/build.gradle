@@ -64,7 +64,7 @@ android {
 }
 
 afterEvaluate {
-    tasks.withType(com.android.build.gradle.tasks.BundleAar).all { bundleAarTask ->
+    tasks.withType(BundleAar).all { bundleAarTask ->
         bundleAarTask.doLast {
             def aarFile = bundleAarTask.outputs.files.singleFile
             def zipFile = new ZipFile(aarFile)
