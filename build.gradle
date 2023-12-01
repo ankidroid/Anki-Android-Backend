@@ -9,7 +9,7 @@ buildscript {
         protobufVersion = "3.25.1"
         appcompatVersion = "1.6.1"
         androidxTestJunitVersion = "1.1.5"
-        sqliteVersion = "2.2.0"
+        sqliteVersion = "2.4.0"
         kotlin_version = '1.9.21'
     }
 

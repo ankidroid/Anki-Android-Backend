@@ -38,7 +38,7 @@ interface SQLHandler {
 
     /* Protobuf-related (#6) */
     fun getNextSlice(startIndex: Long, sequenceNumber: Int): DbResponse
-    fun fullQueryProto(query: String, bindArgs: Array<Any?>?): DbResponse
+    fun fullQueryProto(query: String, bindArgs: Array<out Any?>): DbResponse
     fun cancelCurrentProtoQuery(sequenceNumber: Int)
     fun cancelAllProtoQueries()
 

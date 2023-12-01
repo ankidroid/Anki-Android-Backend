@@ -37,7 +37,7 @@ open class StreamingProtobufSQLiteCursor(
          *
          * The next request should be for index: getSliceStartIndex() + getCurrentSliceRowCount()
          */
-        private val backend: SQLHandler, private val query: String, bindArgs: Array<Any?>?) : AnkiDatabaseCursor() {
+        private val backend: SQLHandler, private val query: String, bindArgs: Array<out Any?>) : AnkiDatabaseCursor() {
     private var results: DbResponse? = null
 
     /** The local position in the current slice  */
