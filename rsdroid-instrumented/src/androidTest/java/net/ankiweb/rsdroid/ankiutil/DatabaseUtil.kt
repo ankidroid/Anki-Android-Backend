@@ -22,7 +22,7 @@ object DatabaseUtil {
     @JvmStatic
     fun queryScalar(
         database: SupportSQLiteDatabase,
-        query: String?,
+        query: String,
         vararg selectionArgs: Any?
     ): Int {
         var cursor: Cursor? = null
@@ -42,7 +42,7 @@ object DatabaseUtil {
     @JvmStatic
     fun queryScalarFloat(
         database: SupportSQLiteDatabase,
-        query: String?,
+        query: String,
         vararg selectionArgs: Any?
     ): Double {
         var cursor: Cursor? = null

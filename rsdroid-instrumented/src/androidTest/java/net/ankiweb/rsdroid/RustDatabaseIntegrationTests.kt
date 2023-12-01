@@ -31,7 +31,7 @@ class RustDatabaseIntegrationTests : InstrumentedTest() {
         val query = "select count(), sum(time)/1000 from revlog where id > 100"
         var cur: Cursor? = null
         try {
-            cur = database.query(query, null)
+            cur = database.query(query, emptyArray())
             cur.moveToFirst()
             val count = cur.getInt(0)
             val minutes = Math.round(cur.getInt(1) / 60.0).toInt()

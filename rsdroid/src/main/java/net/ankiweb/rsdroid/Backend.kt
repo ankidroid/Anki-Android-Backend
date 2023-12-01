@@ -144,14 +144,14 @@ open class Backend(langs: Iterable<String> = listOf("en")) : GeneratedBackend(),
     @CheckResult
     override fun fullQuery(query: String, bindArgs: Array<Any?>?): JSONArray {
         return try {
-            fullQueryInternal(query, bindArgs)
+            fullQueryInternal(query, bindArgs ?: emptyArray())
         } catch (e: JSONException) {
             throw RuntimeException(e)
         }
     }
 
     @Throws(JSONException::class)
-    private fun fullQueryInternal(sql: String, bindArgs: Array<Any?>?): JSONArray {
+    private fun fullQueryInternal(sql: String, bindArgs: Array<Any?>): JSONArray {
         checkMainThreadSQL(sql)
         val output = runDbCommand(dbRequestJson(sql, bindArgs)).toStringUtf8()
         return JSONArray(output)
@@ -159,16 +159,16 @@ open class Backend(langs: Iterable<String> = listOf("en")) : GeneratedBackend(),
 
     override fun insertForId(sql: String, bindArgs: Array<Any?>?): Long {
         checkMainThreadSQL(sql)
-        return super.insertForId(dbRequestJson(sql, bindArgs))
+        return super.insertForId(dbRequestJson(sql, bindArgs ?: emptyArray()))
     }
 
     override fun executeGetRowsAffected(sql: String, bindArgs: Array<Any?>?): Int {
         checkMainThreadSQL(sql)
-        return runDbCommandForRowCount(dbRequestJson(sql, bindArgs)).toInt()
+        return runDbCommandForRowCount(dbRequestJson(sql, bindArgs ?: emptyArray())).toInt()
     }
 
     /* Begin Protobuf-based database streaming methods (#6) */
-    override fun fullQueryProto(query: String, bindArgs: Array<Any?>?): DbResponse {
+    override fun fullQueryProto(query: String, bindArgs: Array<out Any?>): DbResponse {
         checkMainThreadSQL(query)
         return runDbCommandProto(dbRequestJson(query, bindArgs))
     }
@@ -243,11 +243,11 @@ open class Backend(langs: Iterable<String> = listOf("en")) : GeneratedBackend(),
 /**
  * Build a JSON DB request
  */
-private fun dbRequestJson(sql: String = "", bindArgs: Array<Any?>? = null, firstRowOnly: Boolean = false): ByteString {
+private fun dbRequestJson(sql: String = "", bindArgs: Array<out Any?> = emptyArray(), firstRowOnly: Boolean = false): ByteString {
     val o = JSONObject().apply {
         put("kind", "query")
         put("sql", sql)
-        put("args", JSONArray((bindArgs ?: arrayOf()).toList()))
+        put("args", JSONArray(bindArgs.toList()))
         put("first_row_only", firstRowOnly)
     }
     return ByteString.copyFromUtf8(o.toString())

@@ -197,7 +197,7 @@ class StreamingProtobufSQLiteCursorTest : InstrumentedTest() {
         }
     }
 
-    private class TestCursor(backend: SQLHandler?, query: String?, bindArgs: Array<Any?>?) :
+    private class TestCursor(backend: SQLHandler?, query: String?, bindArgs: Array<Any?>) :
         StreamingProtobufSQLiteCursor(
             backend!!, query!!, bindArgs
         )

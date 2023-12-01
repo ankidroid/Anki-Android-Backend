@@ -58,13 +58,23 @@ import java.util.*
  */ 
 class RustSupportSQLiteDatabase(private val backend: Backend) : SupportSQLiteDatabase {
 
-    override fun isReadOnly(): Boolean {
-        return false
-    }
+    override var isReadOnly: Boolean
+        @Suppress("UNUSED_PARAMETER")
+        set(readOnly) {
+            throw NotImplementedException()
+        }
+        get() {
+            return false
+        }
 
-    override fun isOpen(): Boolean {
-        return true
-    }
+    override var isOpen: Boolean
+        @Suppress("UNUSED_PARAMETER")
+        set(open) {
+            throw NotImplementedException()
+        }
+        get() {
+            return true
+        }
 
     override fun compileStatement(sql: String): SupportSQLiteStatement {
         return RustSQLiteStatement(this, sql)
@@ -86,19 +96,20 @@ class RustSupportSQLiteDatabase(private val backend: Backend) : SupportSQLiteDat
         return false
     }
 
-    override fun getVersion(): Int {
-        throw NotImplementedException.todo()
-    }
-
-    override fun setVersion(version: Int) {
-        throw NotImplementedException.todo()
-    }
+    override var version: Int
+        @Suppress("UNUSED_PARAMETER")
+        set(version) {
+            throw NotImplementedException()
+        }
+        get() {
+            throw NotImplementedException.todo()
+        }
 
     override fun query(query: String): Cursor {
-        return query(query, null)
+        return query(query, emptyArray())
     }
 
-    override fun query(query: String, bindArgs: Array<Any?>?): Cursor {
+    override fun query(query: String, bindArgs: Array<out Any?>): Cursor {
         return StreamingProtobufSQLiteCursor(backend, query, bindArgs)
     }
 
@@ -106,7 +117,7 @@ class RustSupportSQLiteDatabase(private val backend: Backend) : SupportSQLiteDat
         throw NotImplementedException.todo()
     }
 
-    override fun query(query: SupportSQLiteQuery, cancellationSignal: CancellationSignal): Cursor {
+    override fun query(query: SupportSQLiteQuery, cancellationSignal: CancellationSignal?): Cursor {
         throw NotImplementedException.todo()
     }
 
@@ -118,7 +129,7 @@ class RustSupportSQLiteDatabase(private val backend: Backend) : SupportSQLiteDat
         sql.append(" INTO ")
         sql.append(table)
         sql.append('(')
-        var bindArgs: Array<Any?>? = null
+        var bindArgs: Array<out Any?> = emptyArray()
         val size = values.size()
         if (size > 0) {
             bindArgs = arrayOfNulls(size)
@@ -143,7 +154,7 @@ class RustSupportSQLiteDatabase(private val backend: Backend) : SupportSQLiteDat
         return 0
     }
 
-    override fun update(table: String, conflictAlgorithm: Int, values: ContentValues, whereClause: String?, whereArgs: Array<Any?>?): Int {
+    override fun update(table: String, conflictAlgorithm: Int, values: ContentValues, whereClause: String?, whereArgs: Array<out Any?>?): Int {
         // taken from SQLiteDatabase class.
         require(values.size() > 0) { "Empty values" }
         val sql = StringBuilder(120)
@@ -179,11 +190,11 @@ class RustSupportSQLiteDatabase(private val backend: Backend) : SupportSQLiteDat
 
     @Throws(SQLException::class)
     override fun execSQL(sql: String) {
-        execSQL(sql, null)
+        execSQL(sql, emptyArray())
     }
 
     @Throws(SQLException::class)
-    override fun execSQL(sql: String, bindArgs: Array<Any?>?) {
+    override fun execSQL(sql: String, bindArgs: Array<out Any?>) {
         query(sql, bindArgs).close()
     }
 
@@ -192,26 +203,41 @@ class RustSupportSQLiteDatabase(private val backend: Backend) : SupportSQLiteDat
         throw NotImplementedException.todo()
     }
 
-    override fun getPath(): String {
-        return "<rust>"
-    }
+    override var path: String
+        @Suppress("UNUSED_PARAMETER")
+        set(path) {
+            throw NotImplementedException()
+        }
+        get() {
+            return "<rust>"
+        }
 
-    override fun isWriteAheadLoggingEnabled(): Boolean {
-        return false
-    }
+    override var isWriteAheadLoggingEnabled: Boolean
+        @Suppress("UNUSED_PARAMETER")
+        set(walEnabled) {
+            throw NotImplementedException()
+        }
+        get() {
+            return false
+        }
 
     override fun disableWriteAheadLogging() {
         // Nothing to do - openAnkiDroidCollection does this
     }
 
-    override fun isDatabaseIntegrityOk(): Boolean {
-        val pragmaIntegrityCheck = query("pragma integrity_check")
-        if (!pragmaIntegrityCheck.moveToFirst()) {
-            return false
+    override var isDatabaseIntegrityOk: Boolean
+        @Suppress("UNUSED_PARAMETER")
+        set(ok) {
+            throw NotImplementedException()
         }
-        val value = pragmaIntegrityCheck.getString(0)
-        return "ok" == value
-    }
+        get() {
+            val pragmaIntegrityCheck = query("pragma integrity_check")
+            if (!pragmaIntegrityCheck.moveToFirst()) {
+                return false
+            }
+            val value = pragmaIntegrityCheck.getString(0)
+            return "ok" == value
+        }
 
     override fun close() {
         // no-op
@@ -235,20 +261,25 @@ class RustSupportSQLiteDatabase(private val backend: Backend) : SupportSQLiteDat
     }
 
     /** Confirmed that the below are not used for our code  */
-    override fun delete(table: String, whereClause: String, whereArgs: Array<Any>): Int {
+    override fun delete(table: String, whereClause: String?, whereArgs: Array<out Any?>?): Int {
         // Complex to implement and not required
         throw NotImplementedException()
     }
 
-    override fun isDbLockedByCurrentThread(): Boolean {
-        throw NotImplementedException()
-    }
+    override var isDbLockedByCurrentThread: Boolean
+        @Suppress("UNUSED_PARAMETER")
+        set(locked) {
+            throw NotImplementedException()
+        }
+        get() {
+            throw NotImplementedException()
+        }
 
     override fun yieldIfContendedSafely(): Boolean {
         throw NotImplementedException()
     }
 
-    override fun yieldIfContendedSafely(sleepAfterYieldDelay: Long): Boolean {
+    override fun yieldIfContendedSafely(sleepAfterYieldDelayMillis: Long): Boolean {
         throw NotImplementedException()
     }
 
@@ -260,23 +291,24 @@ class RustSupportSQLiteDatabase(private val backend: Backend) : SupportSQLiteDat
         throw NotImplementedException()
     }
 
-    override fun getMaximumSize(): Long {
-        throw NotImplementedException()
-    }
-
     override fun setMaximumSize(numBytes: Long): Long {
         throw NotImplementedException()
     }
+    override val maximumSize: Long
+        get() {
+            throw NotImplementedException()
+        }
 
-    override fun getPageSize(): Long {
-        throw NotImplementedException()
-    }
+    override var pageSize: Long
+        @Suppress("UNUSED_PARAMETER")
+        set(value) {
+            throw NotImplementedException()
+        }
+        get() {
+            throw NotImplementedException()
+        }
 
-    override fun setPageSize(numBytes: Long) {
-        throw NotImplementedException()
-    }
-
-    override fun setForeignKeyConstraintsEnabled(enable: Boolean) {
+    override fun setForeignKeyConstraintsEnabled(enabled: Boolean) {
         throw NotImplementedException()
     }
 
@@ -284,9 +316,14 @@ class RustSupportSQLiteDatabase(private val backend: Backend) : SupportSQLiteDat
         throw NotImplementedException()
     }
 
-    override fun getAttachedDbs(): List<Pair<String, String>> {
-        throw NotImplementedException()
-    }
+    override var attachedDbs: List<Pair<String, String>>
+        @Suppress("UNUSED_PARAMETER")
+        set(dbs) {
+            throw NotImplementedException()
+        }
+        get() {
+            throw NotImplementedException()
+        }
 
     override fun beginTransactionNonExclusive() {
         throw NotImplementedException()
