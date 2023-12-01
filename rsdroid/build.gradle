@@ -1,3 +1,7 @@
+import com.android.build.gradle.tasks.BundleAar
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.util.zip.ZipFile
+
 apply plugin: 'com.android.library' // required for aar generation to link to from AnkiDroid
 apply plugin: "kotlin-android"
 apply plugin: 'signing'
@@ -63,7 +67,7 @@ afterEvaluate {
     tasks.withType(com.android.build.gradle.tasks.BundleAar).all { bundleAarTask ->
         bundleAarTask.doLast {
             def aarFile = bundleAarTask.outputs.files.singleFile
-            def zipFile = new java.util.zip.ZipFile(aarFile)
+            def zipFile = new ZipFile(aarFile)
             int libCount = zipFile.entries().toList().count { it.name.contains(".so") }
             if (libCount == 0 || (System.getenv("ALL_ARCHS") == "1" && libCount != 4)) {
                 throw new GradleException("AAR appears to be missing shared library!")
@@ -90,7 +94,7 @@ dependencies {
 
 }
 
-tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+tasks.withType(KotlinCompile).all {
     kotlinOptions {
         freeCompilerArgs = ["-opt-in=kotlin.RequiresOptIn"]
     }

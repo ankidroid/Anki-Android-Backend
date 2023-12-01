@@ -1,3 +1,5 @@
+import java.util.jar.JarFile
+
 /*
  * Copyright (c) 2020 David Allison <davidallisongithub@gmail.com>
  *
@@ -38,7 +40,7 @@ jar {
         }
     }
     doLast {
-        def jarFile = new java.util.jar.JarFile(archiveFile.get().getAsFile())
+        def jarFile = new JarFile(archiveFile.get().getAsFile())
         int libCount = jarFile.entries().toList().count { it.name.contains(".so") || it.name.contains(".dll") || it.name.contains(".dylib") }
         if (libCount == 0 || (System.getenv("ALL_ARCHS") == "1" && libCount != 3)) {
             throw new GradleException("Jar appears to be missing shared library!")
