@@ -6,7 +6,7 @@ buildscript {
         compileSdk = 34
         targetSdk = 34
         minSdk = 21
-        protobufVersion = "3.23.3"
+        protobufVersion = "3.25.1"
         appcompatVersion = "1.6.1"
         androidxTestJunitVersion = "1.1.5"
         sqliteVersion = "2.2.0"
