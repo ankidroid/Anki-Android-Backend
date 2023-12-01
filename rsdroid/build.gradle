@@ -95,7 +95,7 @@ dependencies {
 }
 
 tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
+    compilerOptions {
         freeCompilerArgs = ["-opt-in=kotlin.RequiresOptIn"]
     }
 }
