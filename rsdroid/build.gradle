@@ -26,6 +26,10 @@ android {
     compileSdk rootProject.ext.compileSdk
     ndkVersion "26.1.10909125" // Used by GitHub actions - avoids an install step on some machines
 
+    buildFeatures {
+        buildConfig true // expose 'ANKI_DESKTOP_VERSION'
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
@@ -38,6 +42,8 @@ android {
         versionName VERSION_NAME
 
         consumerProguardFiles "consumer-rules.pro"
+
+        buildConfigField "String", "ANKI_COMMIT_HASH", "\"${getAnkiCommitHash()}\""
     }
 
     buildTypes {
