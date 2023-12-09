@@ -21,6 +21,13 @@ def getAnkiCommitHash = { ->
     return commit
 }
 
+def getAnkiDesktopVersion() {
+    Properties properties = new Properties()
+    properties.load(project.rootProject.file('gradle.properties').newDataInputStream())
+    def versionName = properties.getProperty('VERSION_NAME')
+    return versionName.substring(versionName.indexOf("anki") + "anki".length())
+}
+
 android {
     namespace 'net.ankiweb.rsdroid'
     compileSdk rootProject.ext.compileSdk
@@ -44,6 +51,7 @@ android {
         consumerProguardFiles "consumer-rules.pro"
 
         buildConfigField "String", "ANKI_COMMIT_HASH", "\"${getAnkiCommitHash()}\""
+        buildConfigField "String", "ANKI_DESKTOP_VERSION", "\"${getAnkiDesktopVersion()}\""
     }
 
     buildTypes {
