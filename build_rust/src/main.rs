@@ -61,6 +61,9 @@ fn build_web_artifacts() -> Result<()> {
     cmd.current_dir("anki")
         .args([
             "extract:protoc",
+            "css:_root-vars",
+            "ts:reviewer:reviewer.js",
+            "ts:reviewer:reviewer.css",
             "ts:reviewer:reviewer_extras_bundle.js",
             "ts:reviewer:reviewer_extras.css",
             "qt:aqt:data:web:pages",
@@ -85,6 +88,18 @@ fn build_web_artifacts() -> Result<()> {
     copy_file(
         "anki/out/ts/reviewer/reviewer_extras.css",
         artifacts_dir.join("web/reviewer_extras.css"),
+    )?;
+    copy_file(
+        "anki/out/ts/reviewer/reviewer.js",
+        artifacts_dir.join("web/reviewer.js"),
+    )?;
+    copy_file(
+        "anki/out/ts/reviewer/reviewer.css",
+        artifacts_dir.join("web/reviewer.css"),
+    )?;
+    copy_file(
+        "anki/out/sass/_root-vars.css",
+        artifacts_dir.join("web/root-vars.css"),
     )?;
     copy_file(
         "anki/cargo/licenses.json",
