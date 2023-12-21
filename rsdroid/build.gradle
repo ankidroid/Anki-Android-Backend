@@ -28,6 +28,14 @@ def getAnkiDesktopVersion() {
     return versionName.substring(versionName.indexOf("anki") + "anki".length())
 }
 
+/**
+ * @return the current git hash
+ * @example edf739d95bad7b370a6ed4398d46723f8219b3cd
+ */
+static def getBackendGitCommitHash() {
+    "git rev-parse HEAD".execute().text.trim()
+}
+
 android {
     namespace 'net.ankiweb.rsdroid'
     compileSdk rootProject.ext.compileSdk
@@ -52,6 +60,9 @@ android {
 
         buildConfigField "String", "ANKI_COMMIT_HASH", "\"${getAnkiCommitHash()}\""
         buildConfigField "String", "ANKI_DESKTOP_VERSION", "\"${getAnkiDesktopVersion()}\""
+
+        buildConfigField "String", "BACKEND_GIT_COMMIT_HASH", "\"${getBackendGitCommitHash()}\""
+        buildConfigField "long", "BACKEND_BUILD_TIME", System.currentTimeMillis().toString()
     }
 
     buildTypes {
