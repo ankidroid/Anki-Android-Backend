@@ -49,7 +49,7 @@ fn run_gradle() -> Result<()> {
 
 fn build_web_artifacts() -> Result<()> {
     println!("*** Building desktop web components");
-    let artifacts_dir = Path::new("rsdroid/build/generated/anki_artifacts");
+    let artifacts_dir = Path::new("rsdroid/build/generated/anki_artifacts/backend");
     let mut cmd = if cfg!(windows) {
         let mut cmd = Command::new("cmd");
         cmd.args(["/c", "tools\\ninja.bat"]);
