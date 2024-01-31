@@ -21,7 +21,7 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-13]
+        os: [ubuntu-latest, windows-latest, macos-14]
       fail-fast: false
     runs-on: ${{ matrix.os }}
     timeout-minutes: 80
@@ -97,7 +97,7 @@ jobs:
 
       - name: Run tests (Mac)
         uses: reactivecircus/android-emulator-runner@v2
-        if: matrix.os == 'macos-13'
+        if: matrix.os == 'macos-14'
         timeout-minutes: 30
         with:
           api-level: 23
