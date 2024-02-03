@@ -40,11 +40,15 @@ jobs:
 
       - name: Set NDK version (Unix)
         if: contains(matrix.os, 'windows') == false
-        run: echo "ANDROID_NDK_HOME=$ANDROID_NDK_LATEST_HOME" >> $GITHUB_ENV
+        run: |
+          echo "ANDROID_NDK_HOME=$ANDROID_NDK_LATEST_HOME" >> $GITHUB_ENV
+          echo "ANDROID_NDK_ROOT=$ANDROID_NDK_LATEST_HOME" >> $GITHUB_ENV
 
       - name: Set NDK version (Windows)
         if: contains(matrix.os, 'windows')
-        run: Add-Content -Path $env:GITHUB_ENV -Value ANDROID_NDK_HOME=$env:ANDROID_NDK_LATEST_HOME
+        run: |
+          Add-Content -Path $env:GITHUB_ENV -Value ANDROID_NDK_HOME=$env:ANDROID_NDK_LATEST_HOME
+          Add-Content -Path $env:GITHUB_ENV -Value ANDROID_NDK_ROOT=$env:ANDROID_NDK_LATEST_HOME
 
       - name: Configure JDK
         uses: actions/setup-java@v4
