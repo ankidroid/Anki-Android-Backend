@@ -31,12 +31,12 @@ jobs:
       - name: Fetch submodules
         run: git submodule update --init
 
-      - name: Set NDK version
-        if: matrix.os != 'windows-latest'
+      - name: Set NDK version (Unix)
+        if: contains(matrix.os, 'windows') == false
         run: echo "ANDROID_NDK_HOME=$ANDROID_NDK_LATEST_HOME" >> $GITHUB_ENV
 
-      - name: Set NDK version
-        if: matrix.os == 'windows-latest'
+      - name: Set NDK version (Windows)
+        if: contains(matrix.os, 'windows')
         run: Add-Content -Path $env:GITHUB_ENV -Value ANDROID_NDK_HOME=$env:ANDROID_NDK_LATEST_HOME
 
       - name: Configure JDK
@@ -47,7 +47,7 @@ jobs:
 
       - name: Restore Rust Cache (Windows)
         uses: actions/cache/restore@v3
-        if: matrix.os == 'windows-latest'
+        if: contains(matrix.os, 'windows')
         with:
           path: |
             ~/.cargo/registry
@@ -62,7 +62,7 @@ jobs:
 
       - name: Restore Rust Cache (Unix)
         uses: actions/cache/restore@v3
-        if: matrix.os != 'windows-latest'
+        if: contains(matrix.os, 'windows') == false
         with:
           path: |
             ~/.cargo/registry
@@ -91,8 +91,8 @@ jobs:
       - name: Build all (current platform)
         run: cargo run -p build_rust
 
-      - name: Check Rust (Linux)
-        if: matrix.os == 'ubuntu-latest'
+      - name: Check Rust (Unix)
+        if: contains(matrix.os, 'windows') == false
         run: ./check-rust.sh
 
       - name: Run tests (Mac)
@@ -122,7 +122,7 @@ jobs:
 
       - name: Save Rust Cache (Windows)
         uses: actions/cache/save@v3
-        if: matrix.os == 'windows-latest' && github.ref == 'refs/heads/main'
+        if: contains(matrix.os, 'windows') && github.ref == 'refs/heads/main'
         with:
           path: |
             ~/.cargo/registry
@@ -135,7 +135,7 @@ jobs:
 
       - name: Save Rust Cache (Unix)
         uses: actions/cache/save@v3
-        if: matrix.os != 'windows-latest' && github.ref == 'refs/heads/main'
+        if: contains(matrix.os, 'windows') == false && github.ref == 'refs/heads/main'
         with:
           path: |
             ~/.cargo/registry
