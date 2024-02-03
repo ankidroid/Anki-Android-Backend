@@ -102,6 +102,10 @@ jobs:
         if: contains(matrix.os, 'windows') == false
         run: ./check-rust.sh
 
+      - name: Check Rust (Windows)
+        if: contains(matrix.os, 'windows')
+        run: ./check-rust.bat
+
       - name: Run tests (Emulator)
         uses: reactivecircus/android-emulator-runner@v2
         if: contains(matrix.os, 'ubuntu')
