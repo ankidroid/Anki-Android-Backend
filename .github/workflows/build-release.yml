@@ -40,8 +40,8 @@ jobs:
       - name: Configure JDK
         uses: actions/setup-java@v4
         with:
-          distribution: "adopt"
-          java-version: "17" # matches Anki-Android
+          distribution: "temurin"
+          java-version: "21" # matches Anki-Android
 
       - name: Install Windows cross compiler
         run: brew install mingw-w64 && x86_64-w64-mingw32-gcc -v

@@ -44,7 +44,7 @@ tasks.register('clean', Delete) {
 
 ext {
     jvmVersion = Jvm.current().javaVersion.majorVersion
-    if (jvmVersion != "17" && jvmVersion != 21) {
+    if (jvmVersion != "17" && jvmVersion != "21") {
         println "\n\n\n"
         println "**************************************************************************************************************"
         println "\n\n\n"

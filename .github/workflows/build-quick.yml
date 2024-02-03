@@ -49,8 +49,8 @@ jobs:
       - name: Configure JDK
         uses: actions/setup-java@v4
         with:
-          distribution: "adopt"
-          java-version: "17" # matches Anki-Android
+          distribution: "temurin"
+          java-version: "21" # matches Anki-Android
 
       - name: Restore Rust Cache (Windows)
         uses: actions/cache/restore@v4
