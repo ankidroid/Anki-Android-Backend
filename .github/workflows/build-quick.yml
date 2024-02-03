@@ -21,12 +21,19 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-13]
+        os: [ubuntu-latest, windows-latest, macos-14]
       fail-fast: false
     runs-on: ${{ matrix.os }}
     timeout-minutes: 80
     steps:
       - uses: actions/checkout@v4
+
+      - name: Enable KVM group perms (Ubuntu)
+        if: contains(matrix.os, 'ubuntu')
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
 
       - name: Fetch submodules
         run: git submodule update --init
@@ -95,9 +102,9 @@ jobs:
         if: contains(matrix.os, 'windows') == false
         run: ./check-rust.sh
 
-      - name: Run tests (Mac)
+      - name: Run tests (Emulator)
         uses: reactivecircus/android-emulator-runner@v2
-        if: matrix.os == 'macos-13'
+        if: contains(matrix.os, 'ubuntu')
         timeout-minutes: 30
         with:
           api-level: 23
