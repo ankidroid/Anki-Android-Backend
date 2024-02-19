@@ -26,6 +26,18 @@ jobs:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 80
     steps:
+      - name: Liberate disk space (Ubuntu)
+        uses: jlumbroso/free-disk-space@main
+        if: contains(matrix.os, 'ubuntu')
+        with:
+          tool-cache: false
+          android: false
+          dotnet: true
+          haskell: true
+          large-packages: false
+          docker-images: true
+          swap-storage: false
+
       - uses: actions/checkout@v4
 
       - name: Enable KVM group perms (Ubuntu)
