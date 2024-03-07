@@ -10,7 +10,7 @@ buildscript {
         appcompatVersion = "1.6.1"
         androidxTestJunitVersion = "1.1.5"
         sqliteVersion = "2.4.0"
-        kotlin_version = '1.9.22'
+        kotlin_version = '1.9.23'
     }
 
     repositories {
