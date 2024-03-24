@@ -1,16 +1,30 @@
 tasks.register('buildRust', Exec) {
     // ensure script doesn't try to start gradle again
     environment 'RUNNING_FROM_GRADLE', '1'
-    if (!System.getenv('ANDROID_NDK_HOME')) {
-        String ndkPath = "${getSdkDir()}/ndk/26.1.10909125"
-        environment 'ANDROID_NDK_HOME', ndkPath
-    }
+
+    def ndkEnv = System.getenv('ANDROID_NDK_HOME')
+    if (!ndkEnv || !verifyNdkDir(ndkEnv))
+        environment 'ANDROID_NDK_HOME', getNdkProp()
+
     workingDir "$rootDir"
     commandLine "cargo", "run", "-p", "build_rust"
 }
 
-def getSdkDir() {
-    Properties properties = new Properties()
-    properties.load(project.rootProject.file('local.properties').newDataInputStream())
-    return properties.getProperty('sdk.dir')
+def getNdkProp() {
+    def localProperties = project.rootProject.file("local.properties")
+    if (localProperties.exists())
+    {
+        Properties properties = new Properties()
+        properties.load(localProperties.newDataInputStream())
+
+        def ndkDir = properties.getProperty('ndk.dir')
+        if (verifyNdkDir(ndkDir))
+            return ndkDir
+    }
+
+    throw new GradleException('Unable to locate NDK directory. Use environment variable ANDROID_NDK_HOME, or ndk.dir in local.properties, to specify the path to a valid NDK 26.x installation.')
+}
+
+def verifyNdkDir(String path) {
+    return new File(path, "build/ndk-build").exists()
 }
