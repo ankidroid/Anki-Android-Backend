@@ -34,7 +34,7 @@ import timber.log.Timber
 import java.io.Closeable
 import java.io.File
 
-open class Backend(langs: Iterable<String> = listOf("en")) : GeneratedBackend(), SQLHandler, Closeable {
+open class Backend(langs: Iterable<String> = listOf("en"), custom_cert: String = "") : GeneratedBackend(), SQLHandler, Closeable {
     // Set on init; unset on .close(). Access via withBackend()
     private var backendPointer: Long? = null
 
@@ -72,8 +72,13 @@ open class Backend(langs: Iterable<String> = listOf("en")) : GeneratedBackend(),
     init {
         checkMainThreadOp()
         Timber.d("Opening rust backend with lang=$langs")
+
+        if (custom_cert != "")
+            Timber.d("Also using a custom certificate with the backend")
+
         val input = BackendInit.newBuilder()
                 .addAllPreferredLangs(langs)
+                .setCustomCert(custom_cert)
                 .build()
                 .toByteArray()
         val outBytes = unpackResult(NativeMethods.openBackend(input))
