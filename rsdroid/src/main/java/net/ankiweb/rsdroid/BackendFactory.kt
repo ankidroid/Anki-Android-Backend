@@ -29,6 +29,12 @@ object BackendFactory {
      */
     var defaultLanguages: Iterable<String> = listOf("en")
 
+    /**
+     * Custom root certificate used in the Rust backend (PEM format)
+     */
+    @JvmStatic
+    private var custom_cert: String? = null
+
     @JvmStatic
     private var backendForTesting: CustomBackendCreator? = null
 
@@ -36,9 +42,28 @@ object BackendFactory {
     @JvmOverloads
     fun getBackend(languages: Iterable<String>? = null): Backend {
         val langs = languages ?: defaultLanguages
+        val custom_cert = this.custom_cert ?: ""
+
         return backendForTesting?.invoke(langs) ?: Backend(
                 langs,
+                custom_cert,
         )
+    }
+
+    /**
+     * Set the custom root certificate for use in the backend.
+     * Backend needs to reloaded after this operation.
+     */
+    @JvmStatic
+    fun setCustomCert(custom_cert: String?)
+    {
+        this.custom_cert = custom_cert
+    }
+
+    /** Get the current custom root certificate used in the backend */
+    @JvmStatic
+    fun getCustomCert(): String? {
+        return this.custom_cert
     }
 
     /** Allows overriding the returned backend for unit tests */
