@@ -1,28 +1,40 @@
 tasks.register('buildRust', Exec) {
+    def localProperties = project.rootProject.file("local.properties")
+    Properties properties = new Properties()
+    if (localProperties.exists())
+        properties.load(localProperties.newDataInputStream())
+
+    environment 'BUILD_ALL_ARCHS', tryGetProperty(properties, "build.all_archs", ["true", "false"], "false")
+    environment 'TEST_ALL_ARCHS', tryGetProperty(properties, "test.all_archs", ["true", "false"], "false")
     // ensure script doesn't try to start gradle again
     environment 'RUNNING_FROM_GRADLE', '1'
-
+    
     def ndkEnv = System.getenv('ANDROID_NDK_HOME')
     if (!ndkEnv || !verifyNdkDir(ndkEnv))
-        environment 'ANDROID_NDK_HOME', getNdkProp()
+    {
+        def ndkDir = properties.getProperty('ndk.dir')
+
+        if (verifyNdkDir(ndkDir))
+            environment 'ANDROID_NDK_HOME', ndkDir
+        else
+            throw new GradleException('Unable to locate NDK directory. Use environment variable ANDROID_NDK_HOME, or ndk.dir in local.properties, to specify the path to a valid NDK 26.x installation.')
+    }
 
     workingDir "$rootDir"
     commandLine "cargo", "run", "-p", "build_rust"
 }
 
-def getNdkProp() {
-    def localProperties = project.rootProject.file("local.properties")
-    if (localProperties.exists())
+def tryGetProperty(Properties properties, String name, ArrayList validValues, String defaultValue)
+{
+    if (properties != null)
     {
-        Properties properties = new Properties()
-        properties.load(localProperties.newDataInputStream())
-
-        def ndkDir = properties.getProperty('ndk.dir')
-        if (verifyNdkDir(ndkDir))
-            return ndkDir
+        String value = properties.getProperty(name)
+        if (value?.trim() && value in validValues)
+            return value
     }
-
-    throw new GradleException('Unable to locate NDK directory. Use environment variable ANDROID_NDK_HOME, or ndk.dir in local.properties, to specify the path to a valid NDK 26.x installation.')
+    
+    println "Using default value ${defaultValue} for ${name}."
+    return defaultValue
 }
 
 def verifyNdkDir(String path) {

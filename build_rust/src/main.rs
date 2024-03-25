@@ -120,7 +120,9 @@ fn build_android_jni() -> Result<()> {
     }
     create_dir_all(jni_dir)?;
 
-    let all_archs = env::var("ALL_ARCHS").is_ok();
+    let all_archs = env::var("BUILD_ALL_ARCHS")
+        .unwrap_or("false".to_string())
+        .eq("true");
     let ndk_targets = add_android_rust_targets(all_archs)?;
     let (is_release, _release_dir) = check_release(false);
 
@@ -199,7 +201,9 @@ fn build_robolectric_jni() -> Result<()> {
     }
     create_dir_all(jni_dir)?;
 
-    let all_archs = env::var("ALL_ARCHS").is_ok();
+    let all_archs = env::var("TEST_ALL_ARCHS")
+        .unwrap_or("false".to_string())
+        .eq("true");
     let (is_release, release_dir) = check_release(true);
     let target_root = Utf8Path::new("anki/out/rust");
     let file_in_target =
