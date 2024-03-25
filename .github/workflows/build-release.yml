@@ -16,8 +16,9 @@ on:
       - main
 
 env:
-  ALL_ARCHS: 1
-  RELEASE: 1
+  BUILD_ALL_ARCHS: true
+  TEST_ALL_ARCHS: true
+  BUILD_TYPE: release
   CARGO_PROFILE_RELEASE_LTO: fat
 
 concurrency:

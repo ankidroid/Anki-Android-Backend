@@ -4,9 +4,12 @@ tasks.register('buildRust', Exec) {
     if (localProperties.exists())
         properties.load(localProperties.newDataInputStream())
 
-    environment 'BUILD_ALL_ARCHS', tryGetProperty(properties, "build.all_archs", ["true", "false"], "false")
-    environment 'TEST_ALL_ARCHS', tryGetProperty(properties, "test.all_archs", ["true", "false"], "false")
-    environment 'BUILD_TYPE', tryGetProperty(properties, "build.type", ["release", "debug"], "debug")
+    if (!System.getenv('BUILD_ALL_ARCHS'))
+        environment 'BUILD_ALL_ARCHS', tryGetProperty(properties, "build.all_archs", ["true", "false"], "false")
+    if (!System.getenv('TEST_ALL_ARCHS'))
+        environment 'TEST_ALL_ARCHS', tryGetProperty(properties, "test.all_archs", ["true", "false"], "false")
+    if (!System.getenv('BUILD_TYPE'))
+        environment 'BUILD_TYPE', tryGetProperty(properties, "build.type", ["release", "debug"], "debug")
 
     // ensure script doesn't try to start gradle again
     environment 'RUNNING_FROM_GRADLE', '1'
