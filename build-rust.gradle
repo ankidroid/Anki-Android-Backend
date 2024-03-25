@@ -6,6 +6,8 @@ tasks.register('buildRust', Exec) {
 
     environment 'BUILD_ALL_ARCHS', tryGetProperty(properties, "build.all_archs", ["true", "false"], "false")
     environment 'TEST_ALL_ARCHS', tryGetProperty(properties, "test.all_archs", ["true", "false"], "false")
+    environment 'BUILD_TYPE', tryGetProperty(properties, "build.type", ["release", "debug"], "debug")
+
     // ensure script doesn't try to start gradle again
     environment 'RUNNING_FROM_GRADLE', '1'
     
