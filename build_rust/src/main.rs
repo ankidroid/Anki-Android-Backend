@@ -207,55 +207,57 @@ fn build_robolectric_jni() -> Result<()> {
 
     if all_archs {
         if cfg!(not(target_os = "macos")) {
-            panic!("Must be on macOS to do a multi-arch build.");
-        }
-
-        let mac_targets = &["x86_64-apple-darwin", "aarch64-apple-darwin"];
-        add_rust_targets(mac_targets)?;
-        for target in mac_targets {
-            build_rsdroid(is_release, target, target_root)?;
-        }
-        Command::new("lipo")
-            .arg("-create")
-            .args(&[
-                file_in_target("x86_64-apple-darwin", "librsdroid.dylib"),
-                file_in_target("aarch64-apple-darwin", "librsdroid.dylib"),
-            ])
-            .arg("-output")
-            .arg(jni_dir.join("librsdroid.dylib"))
-            .ensure_success()?;
-
-        let linux_targets = &["x86_64-unknown-linux-gnu"];
-        add_rust_targets(linux_targets)?;
-        build_rsdroid(is_release, linux_targets[0], target_root)?;
-        copy_file(
-            file_in_target(linux_targets[0], "librsdroid.so"),
-            jni_dir.join("librsdroid.so"),
-        )?;
-
-        let windows_targets = &["x86_64-pc-windows-gnu"];
-        add_rust_targets(windows_targets)?;
-        build_rsdroid(is_release, windows_targets[0], target_root)?;
-        copy_file(
-            file_in_target(windows_targets[0], "rsdroid.dll"),
-            jni_dir.join("rsdroid.dll"),
-        )?;
-    } else {
-        // Just build for current architecture
-        build_rsdroid(is_release, "", target_root)?;
-        let mut found_one = false;
-        for fname in ["librsdroid.so", "librsdroid.dylib", "rsdroid.dll"] {
-            let file = target_root.join(release_dir).join(fname);
-            if Path::new(&file).exists() {
-                found_one = true;
-                copy_file(&file, jni_dir.join(fname))?;
+            println!("Skipping multi-arch Robolectric build as macOS is required.");
+        } else {
+            let mac_targets = &["x86_64-apple-darwin", "aarch64-apple-darwin"];
+            add_rust_targets(mac_targets)?;
+            for target in mac_targets {
+                build_rsdroid(is_release, target, target_root)?;
             }
+            Command::new("lipo")
+                .arg("-create")
+                .args(&[
+                    file_in_target("x86_64-apple-darwin", "librsdroid.dylib"),
+                    file_in_target("aarch64-apple-darwin", "librsdroid.dylib"),
+                ])
+                .arg("-output")
+                .arg(jni_dir.join("librsdroid.dylib"))
+                .ensure_success()?;
+
+            let linux_targets = &["x86_64-unknown-linux-gnu"];
+            add_rust_targets(linux_targets)?;
+            build_rsdroid(is_release, linux_targets[0], target_root)?;
+            copy_file(
+                file_in_target(linux_targets[0], "librsdroid.so"),
+                jni_dir.join("librsdroid.so"),
+            )?;
+
+            let windows_targets = &["x86_64-pc-windows-gnu"];
+            add_rust_targets(windows_targets)?;
+            build_rsdroid(is_release, windows_targets[0], target_root)?;
+            copy_file(
+                file_in_target(windows_targets[0], "rsdroid.dll"),
+                jni_dir.join("rsdroid.dll"),
+            )?;
+
+            return Ok(());
         }
-        assert!(
-            found_one,
-            "expected to find at least one robolectric library"
-        );
     }
+
+    // Just build for current architecture
+    build_rsdroid(is_release, "", target_root)?;
+    let mut found_one = false;
+    for fname in ["librsdroid.so", "librsdroid.dylib", "rsdroid.dll"] {
+        let file = target_root.join(release_dir).join(fname);
+        if Path::new(&file).exists() {
+            found_one = true;
+            copy_file(&file, jni_dir.join(fname))?;
+        }
+    }
+    assert!(
+        found_one,
+        "expected to find at least one robolectric library"
+    );
 
     Ok(())
 }
