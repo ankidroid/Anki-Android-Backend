@@ -1,16 +1,47 @@
 tasks.register('buildRust', Exec) {
+    def localProperties = project.rootProject.file("local.properties")
+    Properties properties = new Properties()
+    if (localProperties.exists())
+        properties.load(localProperties.newDataInputStream())
+
+    if (!System.getenv('BUILD_ALL_ARCHS'))
+        environment 'BUILD_ALL_ARCHS', tryGetProperty(properties, "build.all_archs", ["true", "false"], "false")
+    if (!System.getenv('TEST_ALL_ARCHS'))
+        environment 'TEST_ALL_ARCHS', tryGetProperty(properties, "test.all_archs", ["true", "false"], "false")
+    if (!System.getenv('BUILD_TYPE'))
+        environment 'BUILD_TYPE', tryGetProperty(properties, "build.type", ["release", "debug"], "debug")
+
     // ensure script doesn't try to start gradle again
     environment 'RUNNING_FROM_GRADLE', '1'
-    if (!System.getenv('ANDROID_NDK_HOME')) {
-        String ndkPath = "${getSdkDir()}/ndk/26.1.10909125"
-        environment 'ANDROID_NDK_HOME', ndkPath
+    
+    def ndkEnv = System.getenv('ANDROID_NDK_HOME')
+    if (!ndkEnv || !verifyNdkDir(ndkEnv))
+    {
+        def ndkDir = properties.getProperty('ndk.dir')
+
+        if (verifyNdkDir(ndkDir))
+            environment 'ANDROID_NDK_HOME', ndkDir
+        else
+            throw new GradleException('Unable to locate NDK directory. Use environment variable ANDROID_NDK_HOME, or ndk.dir in local.properties, to specify the path to a valid NDK 26.x installation.')
     }
+
     workingDir "$rootDir"
     commandLine "cargo", "run", "-p", "build_rust"
 }
 
-def getSdkDir() {
-    Properties properties = new Properties()
-    properties.load(project.rootProject.file('local.properties').newDataInputStream())
-    return properties.getProperty('sdk.dir')
+def tryGetProperty(Properties properties, String name, ArrayList validValues, String defaultValue)
+{
+    if (properties != null)
+    {
+        String value = properties.getProperty(name)
+        if (value?.trim() && value in validValues)
+            return value
+    }
+    
+    println "Using default value ${defaultValue} for ${name}."
+    return defaultValue
+}
+
+def verifyNdkDir(String path) {
+    return new File(path, "build/ndk-build").exists()
 }

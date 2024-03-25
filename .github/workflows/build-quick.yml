@@ -11,7 +11,7 @@ on:
       - main
 
 env:
-  DEBUG: 1
+  BUILD_TYPE: debug
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

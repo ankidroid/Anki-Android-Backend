@@ -91,11 +91,13 @@ Or macOS:
 export ANDROID_SDK_ROOT=$HOME/Library/Android/sdk
 export ANDROID_NDK_HOME=$HOME/Library/Android/sdk/ndk/26.1.10909125
 ```
+
 Or Windows using Powershell:
 
 ```
 $env:ANDROID_NDK_HOME="$env:ANDROID_SDK_ROOT\ndk\26.1.10909125"
 ```
+
 If you don't have Java installed, you may be able to use the version bundled
 with Android Studio. Eg on macOS:
 
@@ -109,16 +111,17 @@ or Windows:
 set JAVA_HOME=C:\Program Files\Android\Android Studio\jre
 ```
 
-Now build with `./build.sh` or `build.bat`.
+Now build with `./gradlew build` on Linux/Mac or `gradlew build` on Windows.
 
-After you've confirmed building works, you may want to build again with the env
-var RELEASE=1 defined, to build a faster version.
+After you've confirmed building works, you may want to build again with the option
+`build.type=release` in `local.properties` to build a faster version (default value is `debug`).
+You can also build for all archs by setting `build.all_archs` to `true`.
 
 ## Modify AnkiDroid to use built library
 
 Now open the AnkiDroid project in AndroidStudio. To tell gradle to load the
 compiled .aar and .jar files from disk, edit `local.properties`
-in the AnkiDroid repo, and add the following line:
+***in the AnkiDroid repo***, and add the following line:
 
 ```
 local_backend=true
@@ -175,7 +178,7 @@ the repository.
 1. Head over to the main `Anki-Android` repository and update the
 `AnkiDroid/build.gradle` file there to adopt the new backend version once it
 shows up in
-https://repo1.maven.org/maven2/io/github/david-allison-1/anki-android-backend/
+<https://repo1.maven.org/maven2/io/github/david-allison-1/anki-android-backend/>
 
 ## Architecture
 
