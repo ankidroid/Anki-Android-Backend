@@ -128,7 +128,7 @@ tasks.withType(KotlinCompile).configureEach {
 }
 
 mavenPublishing {
-    publishToMavenCentral("CENTRAL_PORTAL", true)
+    publishToMavenCentral("DEFAULT", true)
     // publishToMavenCentral("S01") for publishing through s01.oss.sonatype.org
     signAllPublications()
 }
