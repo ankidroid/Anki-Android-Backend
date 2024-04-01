@@ -175,7 +175,7 @@ the repository.
 1. Head over to the main `Anki-Android` repository and update the
 `AnkiDroid/build.gradle` file there to adopt the new backend version once it
 shows up in
-https://repo1.maven.org/maven2/io/github/david-allison-1/anki-android-backend/
+https://repo1.maven.org/maven2/io/github/david-allison/anki-android-backend/
 
 ## Architecture
 

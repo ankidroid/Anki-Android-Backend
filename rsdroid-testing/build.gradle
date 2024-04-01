@@ -1,3 +1,5 @@
+import com.vanniktech.maven.publish.SonatypeHost
+
 import java.util.jar.JarFile
 
 /*
@@ -52,7 +54,7 @@ java.sourceCompatibility JavaVersion.VERSION_11
 java.targetCompatibility JavaVersion.VERSION_11
 
 mavenPublishing {
-    publishToMavenCentral("DEFAULT", true)
+    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL, true)
     // publishToMavenCentral("S01") for publishing through s01.oss.sonatype.org
     signAllPublications()
 }
