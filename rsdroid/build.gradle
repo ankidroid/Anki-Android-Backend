@@ -1,4 +1,5 @@
 import com.android.build.gradle.tasks.BundleAar
+import com.vanniktech.maven.publish.SonatypeHost
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.util.zip.ZipFile
 
@@ -128,7 +129,9 @@ tasks.withType(KotlinCompile).configureEach {
 }
 
 mavenPublishing {
-    publishToMavenCentral("DEFAULT", true)
+    // Use https://central.sonatype.com/account with david-allison's GitHub login, not Google
+    // the host should match rsdroid-testing
+    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL, true)
     // publishToMavenCentral("S01") for publishing through s01.oss.sonatype.org
     signAllPublications()
 }
