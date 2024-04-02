@@ -59,20 +59,6 @@ mavenPublishing {
     signAllPublications()
 }
 
-signing {
-    def hasPrivate = project.hasProperty('SIGNING_PRIVATE_KEY')
-    def hasPassword = project.hasProperty('SIGNING_PASSWORD')
-    if (hasPrivate && hasPassword) {
-        useInMemoryPgpKeys(project.getProperty('SIGNING_PRIVATE_KEY'), project.getProperty('SIGNING_PASSWORD'))
-    } else {
-        def message = "Publishing to Sonatype will not work - PGP keys not set for publishing"
-
-        def pk = System.getenv("ORG_GRADLE_PROJECT_SIGNING_PRIVATE_KEY")
-        def pwd = System.getenv("ORG_GRADLE_PROJECT_SIGNING_PASSWORD")
-
-        logger.warn("$message: ${hasPrivate}, ${hasPassword}, ${pk == null || "" == pk}, ${pwd == null || "" == pwd}")
-    }
-}
 buildscript {
     repositories {
         mavenCentral()
