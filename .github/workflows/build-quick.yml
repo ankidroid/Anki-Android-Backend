@@ -122,6 +122,11 @@ jobs:
         if: contains(matrix.os, 'windows')
         run: ./check-rust.bat
 
+      - name: Run tests (Unit)
+        uses: gradle/gradle-build-action@v3
+        with:
+          arguments: test rsdroid:lint --daemon
+
       - name: Run tests (Emulator)
         uses: reactivecircus/android-emulator-runner@v2
         if: contains(matrix.os, 'ubuntu')
