@@ -136,7 +136,7 @@ jobs:
           target: default
           arch: x86_64
           profile: Nexus 6
-          script: ./check-droid.sh
+          script: ./gradlew rsdroid-instrumented:connectedCheck
 
       - name: Upload rsdroid AAR as artifact
         uses: actions/upload-artifact@v4
