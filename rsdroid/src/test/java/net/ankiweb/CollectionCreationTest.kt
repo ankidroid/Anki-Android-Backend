@@ -27,7 +27,6 @@ class CollectionCreationTest {
         val backend = getBackend()
         backend.openCollection(":memory:")
         val database = withRustBackend(backend)
-        database.beginTransaction()
         try {
             val ver = database.query("select * from col")
             check(ver.moveToFirst()) { "no rows" }
