@@ -2,10 +2,12 @@ use anki_io::{copy_file, create_dir_all, read_dir_files};
 use anki_process::CommandExt;
 use anyhow::Result;
 use camino::{Utf8Path, Utf8PathBuf};
-use std::env;
 use std::env::consts::OS;
-use std::path::Path;
+use std::fs::File;
+use std::io::{BufRead, BufReader, BufWriter, Write};
+use std::path::{Path, PathBuf};
 use std::process::Command;
+use std::{env, io};
 
 const ANDROID_OUT_DIR: &str = "rsdroid/build/generated/jniLibs";
 const ROBOLECTRIC_OUT_DIR: &str = "rsdroid-testing/build/generated/jniLibs";
@@ -109,6 +111,19 @@ fn build_web_artifacts() -> Result<()> {
         "anki/ts/licenses.json",
         artifacts_dir.join("web/licenses-ts.json"),
     )?;
+    // Replaces "/_anki/" with `${ankidroid.postBaseUrl}_anki/` in postProto()
+    // so the POSTs can be mapped to a different base url by changing the following line:
+    // path = "/_anki/".concat(method); → path = `${ankidroid.postBaseUrl}_anki/`.concat(method);
+    let _ = replace_string_in_file(
+        &artifacts_dir.join("web/reviewer.js"),
+        "\"/_anki/\"",
+        "`${ankidroid.postBaseUrl}_anki/`",
+    );
+    let _ = replace_string_in_file(
+        &artifacts_dir.join("web/reviewer_extras_bundle.js"),
+        "\"/_anki/\"",
+        "`${ankidroid.postBaseUrl}_anki/`",
+    );
     Ok(())
 }
 
@@ -280,5 +295,26 @@ fn build_rsdroid(is_release: bool, target_arch: &str, target_dir: &Utf8Path) -> 
         );
     }
     command.ensure_success()?;
+    Ok(())
+}
+
+fn replace_string_in_file(file_path: &PathBuf, old_word: &str, new_word: &str) -> io::Result<()> {
+    let input_file = File::open(file_path)?;
+    let reader = BufReader::new(input_file);
+
+    let temp_file_path = file_path.with_extension("tmp");
+    let temp_file = File::create(&temp_file_path)?;
+    let mut writer = BufWriter::new(temp_file);
+
+    for line in reader.lines() {
+        let line = line?;
+        let modified_line = line.replace(old_word, new_word);
+        writeln!(writer, "{}", modified_line)?;
+    }
+
+    writer.flush()?;
+
+    std::fs::rename(&temp_file_path, file_path)?;
+
     Ok(())
 }
