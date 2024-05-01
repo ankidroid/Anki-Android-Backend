@@ -100,7 +100,7 @@ fn build_web_artifacts() -> Result<()> {
         artifacts_dir.join("web/reviewer.css"),
     )?;
     copy_file(
-        "anki/out/sass/_root-vars.css",
+        "anki/out/ts/lib/sass/_root-vars.css",
         artifacts_dir.join("web/root-vars.css"),
     )?;
     copy_file(
