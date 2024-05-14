@@ -119,6 +119,7 @@ jobs:
         with:
           timeout_minutes: 20
           max_attempts: ${{ contains(matrix.os, 'ubuntu') == true && 5 || 1 }}
+          retry_wait_seconds: 0
           retry_on: error
           command: cargo run -p build_rust
 
