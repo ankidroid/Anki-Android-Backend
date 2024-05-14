@@ -117,7 +117,7 @@ jobs:
           target
           anki/out/rust
           anki/out/download
-           anki/out/node_modules
+          anki/out/node_modules
         key: ${{ runner.os }}-rust-debug-v6-${{ hashFiles('Cargo.lock') }}-${{ hashFiles('anki/yarn.lock') }}
         restore-keys: |
           ${{ runner.os }}-rust-debug-v6
@@ -139,9 +139,18 @@ jobs:
 
     - name: Build all (current platform)
       if: matrix.build-mode == 'manual'
-      run: |
-        cargo run -p build_rust
-        ./gradlew build
+      # Ubuntu currently requires multiple build attempts before it succeeds - it builds a little further each time then works
+      # This happens the same way every time in CI so far, and is reproducible locally if you have an Ubuntu system
+      # This needs a root-cause analysis (see #373) but we will use a retry hack for Ubuntu only to unblock PRs until that is done
+      uses: nick-fields/retry@v3
+      with:
+        timeout_minutes: 20
+        max_attempts: 5
+        retry_wait_seconds: 0
+        retry_on: error
+        command: |
+          cargo run -p build_rust
+          ./gradlew build
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
