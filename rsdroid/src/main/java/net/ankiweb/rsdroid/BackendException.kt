@@ -125,6 +125,7 @@ open class BackendException : RuntimeException {
                 BackendError.Kind.UNRECOGNIZED -> return BackendException(error)
                 BackendError.Kind.OS_ERROR -> return BackendException(error)
                 BackendError.Kind.SCHEDULER_UPGRADE_REQUIRED -> return BackendException(error)
+                BackendError.Kind.INVALID_CERTIFICATE_FORMAT -> return BackendException(error)
             }
         }
 
