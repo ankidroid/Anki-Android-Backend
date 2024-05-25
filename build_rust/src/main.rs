@@ -1,9 +1,11 @@
-use anki_io::{copy_file, create_dir_all, read_dir_files};
+use anki_io::{copy_file, create_dir_all};
 use anki_process::CommandExt;
 use anyhow::Result;
 use camino::{Utf8Path, Utf8PathBuf};
 use std::env;
 use std::env::consts::OS;
+use std::fs;
+use std::io;
 use std::path::Path;
 use std::process::Command;
 
@@ -66,21 +68,20 @@ fn build_web_artifacts() -> Result<()> {
             "ts:reviewer:reviewer.css",
             "ts:reviewer:reviewer_extras_bundle.js",
             "ts:reviewer:reviewer_extras.css",
-            "qt:aqt:data:web:pages",
+            "sveltekit",
         ])
         .ensure_success()?;
 
-    create_dir_all(artifacts_dir.join("web"))?;
-
-    let web_dir = artifacts_dir.join("web");
-    for file in read_dir_files("anki/out/qt/_aqt/data/web/pages")? {
-        let file = file?;
-        let path = file.path();
-        copy_file(
-            &path,
-            web_dir.join(path.file_name().unwrap().to_str().unwrap()),
-        )?;
+    copy_dir_all("anki/out/sveltekit", artifacts_dir.join("sveltekit"))?;
+    // directories starting with `_` are ignored by default:
+    // https://cs.android.com/android/platform/superproject/main/+/main:frameworks/base/tools/aapt/AaptAssets.cpp;l=63;drc=835dfe50a73c6f6de581aaa143c333af79bcca4d
+    let new_svelte_app_path = artifacts_dir.join("sveltekit/app");
+    if new_svelte_app_path.exists() {
+        fs::remove_dir_all(&new_svelte_app_path)?;
     }
+    fs::rename(artifacts_dir.join("sveltekit/_app"), &new_svelte_app_path)?;
+
+    create_dir_all(artifacts_dir.join("web"))?;
     copy_file(
         "anki/out/ts/reviewer/reviewer_extras_bundle.js",
         artifacts_dir.join("web/reviewer_extras_bundle.js"),
@@ -98,7 +99,7 @@ fn build_web_artifacts() -> Result<()> {
         artifacts_dir.join("web/reviewer.css"),
     )?;
     copy_file(
-        "anki/out/sass/_root-vars.css",
+        "anki/out/ts/lib/sass/_root-vars.css",
         artifacts_dir.join("web/root-vars.css"),
     )?;
     copy_file(
@@ -280,5 +281,20 @@ fn build_rsdroid(is_release: bool, target_arch: &str, target_dir: &Utf8Path) -> 
         );
     }
     command.ensure_success()?;
+    Ok(())
+}
+
+// Copies a directory and all of its files and subdirectories
+fn copy_dir_all(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> io::Result<()> {
+    fs::create_dir_all(&dst)?;
+    for entry in fs::read_dir(src)? {
+        let entry = entry?;
+        let file_type = entry.file_type()?;
+        if file_type.is_dir() {
+            copy_dir_all(entry.path(), dst.as_ref().join(entry.file_name()))?;
+        } else {
+            fs::copy(entry.path(), dst.as_ref().join(entry.file_name()))?;
+        }
+    }
     Ok(())
 }
