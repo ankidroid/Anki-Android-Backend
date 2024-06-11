@@ -196,6 +196,7 @@ open class Backend(langs: Iterable<String> = listOf("en")) : GeneratedBackend(),
     }
 
     private fun checkMainThreadOp(sql: String? = null) {
+        if (!checkOperationsRunOnMainThread) return
         runIfOnMainThread {
             val stackTraceElements = Thread.currentThread().stackTrace
             val firstElem = stackTraceElements.filter {
@@ -237,6 +238,15 @@ open class Backend(langs: Iterable<String> = listOf("en")) : GeneratedBackend(),
             }
             throw ex
         }
+    }
+
+    companion object {
+        /**
+         * Debug setting: if true, logs all operations executed on the main thread
+         */
+        // This is false by default: translate() ais an extremely fast operation
+        // which does not require execution on a worker thread
+        var checkOperationsRunOnMainThread: Boolean = false
     }
 }
 
