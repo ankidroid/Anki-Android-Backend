@@ -117,7 +117,7 @@ jobs:
         # This needs a root-cause analysis (see #373) but we will use a retry hack for Ubuntu only to unblock PRs until that is done
         uses: nick-fields/retry@v3
         with:
-          timeout_minutes: 20
+          timeout_minutes: 30
           max_attempts: ${{ contains(matrix.os, 'ubuntu') == true && 5 || 1 }}
           retry_wait_seconds: 0
           retry_on: error
