@@ -17,8 +17,8 @@ fn main() -> Result<()> {
         return Ok(());
     }
     let ndk_path = Utf8PathBuf::from(env::var("ANDROID_NDK_HOME").unwrap_or_default());
-    if !ndk_path.file_name().unwrap_or_default().starts_with("26.") {
-        panic!("Expected ANDROID_NDK_HOME to point to a 26.x NDK. Future versions may work, but are untested.");
+    if !ndk_path.file_name().unwrap_or_default().starts_with("27.") {
+        panic!("Expected ANDROID_NDK_HOME to point to a 27.x NDK. Future versions may work, but are untested.");
     }
 
     build_web_artifacts()?;
@@ -125,7 +125,7 @@ fn build_android_jni() -> Result<()> {
     let ndk_targets = add_android_rust_targets(all_archs)?;
     let (is_release, _release_dir) = check_release(false);
 
-    Command::run("cargo install cargo-ndk@3.3.0")?;
+    Command::run("cargo install cargo-ndk@3.5.4")?;
 
     let mut command = Command::new("cargo");
     command
@@ -141,6 +141,7 @@ fn build_android_jni() -> Result<()> {
     if is_release {
         command.arg("--release");
     }
+    command.env("RUSTFLAGS", "-C link-args=-Wl,-z,max-page-size=16384");
     command.ensure_success()?;
 
     Ok(())

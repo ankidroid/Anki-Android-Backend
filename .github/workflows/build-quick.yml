@@ -12,6 +12,7 @@ on:
 
 env:
   DEBUG: 1
+  ANDROID_NDK_VERSION: "27.0.12077973"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -50,15 +51,21 @@ jobs:
       - name: Fetch submodules
         run: git submodule update --init
 
-      - name: Set NDK version (Unix)
-        if: contains(matrix.os, 'windows') == false
+      - name: Install/Set NDK version (Unix)
+        if: contains(matrix.os, 'ubuntu') || contains(matrix.os, 'macos')
         run: |
+          export PATH="$PATH:$ANDROID_HOME/cmdline-tools/latest/bin"
+          ./.github/scripts/install_ndk.sh ${ANDROID_NDK_VERSION}
+          export ANDROID_NDK_LATEST_HOME="${ANDROID_SDK_ROOT}/ndk/${ANDROID_NDK_VERSION}"
           echo "ANDROID_NDK_HOME=$ANDROID_NDK_LATEST_HOME" >> $GITHUB_ENV
           echo "ANDROID_NDK_ROOT=$ANDROID_NDK_LATEST_HOME" >> $GITHUB_ENV
 
-      - name: Set NDK version (Windows)
+      - name: Install/Set NDK version (Windows)
         if: contains(matrix.os, 'windows')
         run: |
+          $env:PATH = "$env:PATH;$env:ANDROID_HOME\cmdline-tools\latest\bin"
+          ./.github/scripts/install_ndk.bat $env:ANDROID_NDK_VERSION
+          $env:ANDROID_NDK_LATEST_HOME = "$env:ANDROID_SDK_ROOT\ndk\$env:ANDROID_NDK_VERSION"
           Add-Content -Path $env:GITHUB_ENV -Value ANDROID_NDK_HOME=$env:ANDROID_NDK_LATEST_HOME
           Add-Content -Path $env:GITHUB_ENV -Value ANDROID_NDK_ROOT=$env:ANDROID_NDK_LATEST_HOME
 
