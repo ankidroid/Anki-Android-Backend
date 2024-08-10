@@ -19,6 +19,7 @@ env:
   ALL_ARCHS: 1
   RELEASE: 1
   CARGO_PROFILE_RELEASE_LTO: fat
+  ANDROID_NDK_VERSION: "27.0.12077973"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event.inputs.mavenPublish }}-release
@@ -34,8 +35,11 @@ jobs:
       - name: Fetch submodules
         run: git submodule update --init
 
-      - name: Set NDK version
+      - name: Install/Set NDK version
         run: |
+          export PATH="$PATH:$ANDROID_HOME/cmdline-tools/latest/bin"
+          ./.github/scripts/install_ndk.sh ${ANDROID_NDK_VERSION}
+          export ANDROID_NDK_LATEST_HOME="${ANDROID_SDK_ROOT}/ndk/${ANDROID_NDK_VERSION}"
           echo "ANDROID_NDK_HOME=$ANDROID_NDK_LATEST_HOME" >> $GITHUB_ENV
           echo "ANDROID_NDK_ROOT=$ANDROID_NDK_LATEST_HOME" >> $GITHUB_ENV
 

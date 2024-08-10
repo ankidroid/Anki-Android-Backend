@@ -33,7 +33,7 @@ fn main() -> Result<()> {
         } else {
             "windows-x86_64"
         };
-        let lib_dir = format!("/toolchains/llvm/prebuilt/{platform}/lib/clang/17/lib/linux/");
+        let lib_dir = format!("/toolchains/llvm/prebuilt/{platform}/lib/clang/18/lib/linux/");
         println!("cargo:rustc-link-search={android_ndk_home}/{lib_dir}");
         println!("cargo:rustc-link-lib=static=clang_rt.builtins-x86_64-android");
     }

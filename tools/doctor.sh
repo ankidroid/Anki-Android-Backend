@@ -2,7 +2,7 @@
 
 set -e # Error out if there were any problems
 
-ANDROID_NDK_VERSION="26.1.10909125"
+ANDROID_NDK_VERSION="27.0.12077973"
 
 red=31
 green=32

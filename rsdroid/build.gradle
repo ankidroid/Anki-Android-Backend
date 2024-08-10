@@ -40,7 +40,7 @@ static def getBackendGitCommitHash() {
 android {
     namespace 'net.ankiweb.rsdroid'
     compileSdk rootProject.ext.compileSdk
-    ndkVersion "26.1.10909125" // Used by GitHub actions - avoids an install step on some machines
+    ndkVersion "27.0.12077973" // Used by GitHub actions - avoids an install step on some machines
 
     buildFeatures {
         buildConfig true // expose 'ANKI_DESKTOP_VERSION'
