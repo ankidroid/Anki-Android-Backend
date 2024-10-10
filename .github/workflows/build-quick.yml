@@ -57,12 +57,16 @@ jobs:
           c:\msys64\usr\bin\pacman.exe -S --noconfirm git rsync
           rm -force c:\msys64\usr\bin\zstd.exe
 
-      - name: Enable KVM group perms (Ubuntu)
+      - name: Ubuntu setup
+        # We get KVM set up on Ubuntu as we run the emulator there (only platform with nested virt)
+        # We also install some system software needed for the build on ubuntu
         if: contains(matrix.os, 'ubuntu')
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
+          sudo apt update
+          sudo apt -y install liblzma-dev
 
       - name: Fetch submodules
         run: git submodule update --init
