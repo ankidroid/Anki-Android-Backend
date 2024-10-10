@@ -41,6 +41,17 @@ jobs:
           sudo apt update
           sudo apt -y install liblzma-dev
 
+      - name: Start Emulator early for test only
+        uses: mikehardy/android-emulator-runner@ubuntu-24-releasev2
+        if: contains(matrix.os, 'ubuntu')
+        timeout-minutes: 30
+        with:
+          api-level: 23
+          target: default
+          arch: x86_64
+          profile: Nexus 6
+          script: echo "just started emulator, nothing else"
+
       - name: Fetch submodules
         run: git submodule update --init
 
