@@ -32,6 +32,7 @@ jobs:
       - name: Ubuntu setup
         # We get KVM set up on Ubuntu as we run the emulator there (only platform with nested virt)
         # We also install some system software needed for the build on ubuntu
+        # We also clear out the command-line tools, the emulator runner will reinstall, but latest version
         if: contains(matrix.os, 'ubuntu')
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
@@ -137,7 +138,7 @@ jobs:
           arguments: test rsdroid:lint --daemon
 
       - name: Run tests (Emulator)
-        uses: reactivecircus/android-emulator-runner@v2
+        uses: mikehardy/android-emulator-runner@ubuntu-24-releasev2
         if: contains(matrix.os, 'ubuntu')
         timeout-minutes: 30
         with:
