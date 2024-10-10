@@ -77,18 +77,11 @@ jobs:
     # to build your code.
     # ℹ️ Command-line programs to run using the OS shell.
     # 📚 See https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun
-    # We need a great deal of pre-build stuff for the Java to work, because it relies on the Rust working...
-    - name: Liberate disk space (Ubuntu)
-      if: matrix.build-mode == 'manual'
-      uses: jlumbroso/free-disk-space@main
-      with:
-        tool-cache: false
-        android: false
-        dotnet: true
-        haskell: true
-        large-packages: false
-        docker-images: true
-        swap-storage: false
+    - name: Ubuntu setup
+      # We also install some system software needed for the build on ubuntu
+      run: |
+        sudo apt update
+        sudo apt -y install liblzma-dev
 
     - name: Fetch submodules
       if: matrix.build-mode == 'manual'
