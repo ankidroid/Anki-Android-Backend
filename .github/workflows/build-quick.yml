@@ -122,10 +122,11 @@ jobs:
         # Ubuntu currently requires multiple build attempts before it succeeds - it builds a little further each time then works
         # This happens the same way every time in CI so far, and is reproducible locally if you have an Ubuntu system
         # This needs a root-cause analysis (see #373) but we will use a retry hack for Ubuntu only to unblock PRs until that is done
+        # For non-Ubuntu systems, we use retries as the build fetches network resources and those may flake
         uses: nick-fields/retry@v3
         with:
           timeout_minutes: 30
-          max_attempts: ${{ contains(matrix.os, 'ubuntu') == true && 5 || 1 }}
+          max_attempts: ${{ contains(matrix.os, 'ubuntu') == true && 5 || 3 }}
           retry_wait_seconds: 0
           retry_on: error
           command: cargo run -p build_rust
