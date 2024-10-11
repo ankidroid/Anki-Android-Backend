@@ -3,9 +3,9 @@ import org.gradle.internal.jvm.Jvm
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
     ext {
-        compileSdk = 34
-        targetSdk = 34
-        minSdk = 21
+        compileSdk = 35
+        targetSdk = 35
+        minSdk = 23
         protobufVersion = "4.26.1"
         appcompatVersion = "1.6.1"
         androidxTestJunitVersion = "1.1.5"
