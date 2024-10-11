@@ -41,6 +41,19 @@ jobs:
 
       - uses: actions/checkout@v4
 
+      - name: Install windows pre-requisites
+        # Windows requires git and rsync to build correctly, and specifies them from msys2
+        # msys2 is already in the windows action runner images, but not in path so add it
+        # use msys2 to install git and rsync per the README documentation in this repo
+        #
+        # note: zstd without absolute path is used in standard github cache restore though,
+        #       and msys2 zstd is 100x slower than default, so remove msys2 zstd
+        if: contains(matrix.os, 'windows')
+        run: |
+          Add-Content $env:GITHUB_PATH "C:\msys64\usr\bin"
+          c:\msys64\usr\bin\pacman.exe -S --noconfirm git rsync
+          rm -force c:\msys64\usr\bin\zstd.exe
+
       - name: Enable KVM group perms (Ubuntu)
         if: contains(matrix.os, 'ubuntu')
         run: |
