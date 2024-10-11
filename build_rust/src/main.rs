@@ -84,47 +84,48 @@ fn build_web_artifacts() -> Result<()> {
     }
     fs::rename(artifacts_dir.join("sveltekit/_app"), &new_svelte_app_path)?;
 
-    create_dir_all(artifacts_dir.join("web"))?;
+    create_dir_all(artifacts_dir.join("js"))?;
+    create_dir_all(artifacts_dir.join("css"))?;
     copy_file(
         "anki/out/ts/reviewer/reviewer_extras_bundle.js",
-        artifacts_dir.join("web/reviewer_extras_bundle.js"),
+        artifacts_dir.join("js/reviewer_extras_bundle.js"),
     )?;
     copy_file(
         "anki/out/ts/reviewer/reviewer_extras.css",
-        artifacts_dir.join("web/reviewer_extras.css"),
+        artifacts_dir.join("css/reviewer_extras.css"),
     )?;
     copy_file(
         "anki/out/ts/reviewer/reviewer.js",
-        artifacts_dir.join("web/reviewer.js"),
+        artifacts_dir.join("js/reviewer.js"),
     )?;
     copy_file(
         "anki/out/ts/reviewer/reviewer.css",
-        artifacts_dir.join("web/reviewer.css"),
+        artifacts_dir.join("css/reviewer.css"),
     )?;
 
     copy_dir_all(
         "anki/out/qt/_aqt/data/web/js/vendor/mathjax",
-        artifacts_dir.join("web/vendor/mathjax"),
+        artifacts_dir.join("js/vendor/mathjax"),
     )?;
     copy_file(
         "anki/out/ts/mathjax/mathjax.js",
-        artifacts_dir.join("web/mathjax.js"),
+        artifacts_dir.join("js/mathjax.js"),
     )?;
     copy_file(
         "anki/out/node_modules/jquery/dist/jquery.min.js",
-        artifacts_dir.join("web/jquery.min.js"),
+        artifacts_dir.join("js/jquery.min.js"),
     )?;
     copy_file(
         "anki/out/ts/lib/sass/_root-vars.css",
-        artifacts_dir.join("web/root-vars.css"),
+        artifacts_dir.join("css/root-vars.css"),
     )?;
     copy_file(
         "anki/cargo/licenses.json",
-        artifacts_dir.join("web/licenses-cargo.json"),
+        artifacts_dir.join("licenses-cargo.json"),
     )?;
     copy_file(
         "anki/ts/licenses.json",
-        artifacts_dir.join("web/licenses-ts.json"),
+        artifacts_dir.join("licenses-ts.json"),
     )?;
     Ok(())
 }
