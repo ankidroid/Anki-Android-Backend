@@ -68,6 +68,9 @@ fn build_web_artifacts() -> Result<()> {
             "ts:reviewer:reviewer.css",
             "ts:reviewer:reviewer_extras_bundle.js",
             "ts:reviewer:reviewer_extras.css",
+            "ts:mathjax",
+            "qt:aqt:data:web:js:vendor:mathjax",
+            "node_modules:jquery",
             "sveltekit",
         ])
         .ensure_success()?;
@@ -97,6 +100,19 @@ fn build_web_artifacts() -> Result<()> {
     copy_file(
         "anki/out/ts/reviewer/reviewer.css",
         artifacts_dir.join("web/reviewer.css"),
+    )?;
+
+    copy_dir_all(
+        "anki/out/qt/_aqt/data/web/js/vendor/mathjax",
+        artifacts_dir.join("web/vendor/mathjax"),
+    )?;
+    copy_file(
+        "anki/out/ts/mathjax/mathjax.js",
+        artifacts_dir.join("web/mathjax.js"),
+    )?;
+    copy_file(
+        "anki/out/node_modules/jquery/dist/jquery.min.js",
+        artifacts_dir.join("web/jquery.min.js"),
     )?;
     copy_file(
         "anki/out/ts/lib/sass/_root-vars.css",
