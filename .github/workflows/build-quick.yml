@@ -138,7 +138,7 @@ jobs:
           arguments: test rsdroid:lint --daemon
 
       - name: Run tests (Emulator)
-        uses: mikehardy/android-emulator-runner@ubuntu-24-releasev2
+        uses: reactivecircus/android-emulator-runner@8c07710601c4b0e50139034f86054e4b09abf601
         if: contains(matrix.os, 'ubuntu')
         timeout-minutes: 30
         with:
