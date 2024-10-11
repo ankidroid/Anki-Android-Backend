@@ -153,9 +153,7 @@ jobs:
         run: ./check-rust.bat
 
       - name: Run tests (Unit)
-        uses: gradle/gradle-build-action@v3
-        with:
-          arguments: test rsdroid:lint --daemon
+        run: ./gradlew test rsdroid:lint --daemon
 
       - name: Run tests (Emulator)
         uses: reactivecircus/android-emulator-runner@v2
