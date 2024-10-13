@@ -19,7 +19,7 @@ commands below are supposed to be executed in the current repo.
 
 ### Download Anki submodule
 
-    git submodule update --init
+    git submodule update --init --recursive
 
 ### C toolchain
 
@@ -151,6 +151,7 @@ latest stable release. You can find the latest tag by running `git tag|sort
 1. run `cd anki` to change into the anki submodule directory,
 1. run `git fetch $SOME_REPO` to ensure you obtain the latest change from this repo.
 1. run `git checkout $COMMIT_IDENTIFIER --recurse-submodules` to obtain the version of the code at this particular commit.
+1. move back to the root of the repo (not the submodule) and run `cargo check` to update our Cargo.lock with any updated versions from the submodule
 
 ### Creating and Publishing a release
 
