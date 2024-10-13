@@ -2,6 +2,7 @@ import com.android.build.gradle.tasks.BundleAar
 import com.vanniktech.maven.publish.SonatypeHost
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.util.zip.ZipFile
+import org.gradle.internal.os.OperatingSystem
 
 apply plugin: 'com.android.library' // required for aar generation to link to from AnkiDroid
 apply plugin: "kotlin-android"
@@ -20,6 +21,31 @@ def getAnkiCommitHash = { ->
     def commit = hashStdOut.toString().trim()
     println("Anki commit: ${commit}")
     return commit
+}
+
+def getFsrsVersion = { ->
+    def pkgStdout = new ByteArrayOutputStream()
+    exec {
+        commandLine "cargo", "metadata", "--format-version=1", "--manifest-path=" + new File("${project.rootDir}", "anki/Cargo.toml")
+        standardOutput = pkgStdout
+    }
+
+    def verArgs = OperatingSystem.current() == OperatingSystem.WINDOWS ?
+    ".packages[] | select(.name==\\\"fsrs\\\") | .version" :
+    ".packages[] | select(.name==\"fsrs\") | .version"
+    def verStdout = new ByteArrayOutputStream()
+    def verStdin = new ByteArrayInputStream(pkgStdout.toByteArray())
+    exec {
+        // use "jaq" cargo module installed during rust build: self-contained + cross-platform
+        // if we use `jq` we are dependent on local system utility installation status
+        commandLine "jaq", verArgs
+        standardInput = verStdin
+        standardOutput = verStdout
+    }
+
+    def version = verStdout.toString().trim().replace("\"", "")
+    println("FSRS version: ${version}")
+    return version
 }
 
 def getAnkiDesktopVersion() {
@@ -61,6 +87,7 @@ android {
 
         buildConfigField "String", "ANKI_COMMIT_HASH", "\"${getAnkiCommitHash()}\""
         buildConfigField "String", "ANKI_DESKTOP_VERSION", "\"${getAnkiDesktopVersion()}\""
+        buildConfigField "String", "FSRS_VERSION", "\"${getFsrsVersion()}\""
 
         buildConfigField "String", "BACKEND_GIT_COMMIT_HASH", "\"${getBackendGitCommitHash()}\""
         buildConfigField "long", "BACKEND_BUILD_TIME", System.currentTimeMillis().toString()
