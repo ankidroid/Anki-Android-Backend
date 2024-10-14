@@ -26,7 +26,7 @@ def getAnkiCommitHash = { ->
 def getFsrsVersion = { ->
     def pkgStdout = new ByteArrayOutputStream()
     exec {
-        commandLine "cargo", "metadata", "--format-version=1", "--manifest-path=" + new File("${project.rootDir}", "anki/Cargo.toml")
+        commandLine "cargo", "metadata", "--locked", "--format-version=1", "--manifest-path=" + new File("${project.rootDir}", "anki/Cargo.toml")
         standardOutput = pkgStdout
     }
 
