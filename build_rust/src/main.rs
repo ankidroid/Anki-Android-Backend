@@ -1,13 +1,16 @@
 use anki_io::{copy_file, create_dir_all};
+use anki_io::{create_file, read_file};
 use anki_process::CommandExt;
 use anyhow::Result;
 use camino::{Utf8Path, Utf8PathBuf};
 use std::env;
 use std::env::consts::OS;
 use std::fs;
-use std::io;
+use std::io::{self, Write};
 use std::path::Path;
 use std::process::Command;
+use streaming_iterator::StreamingIterator;
+use tree_sitter::{Parser, Query, QueryCursor};
 
 const ANDROID_OUT_DIR: &str = "rsdroid/build/generated/jniLibs";
 const ROBOLECTRIC_OUT_DIR: &str = "rsdroid-testing/build/generated/jniLibs";
@@ -86,6 +89,32 @@ fn build_web_artifacts() -> Result<()> {
 
     create_dir_all(artifacts_dir.join("js"))?;
     create_dir_all(artifacts_dir.join("css"))?;
+
+    let query = String::from_utf8(
+        read_file(Path::new("build_rust/tree_sitter_queries/ts_imports.scm")).unwrap(),
+    )
+    .unwrap();
+    let mut ts_funcs = vec![];
+    let mut ts_code = vec![];
+    ts_code.append(&mut ts_all_scripts(Path::new("anki/ts")).unwrap());
+    // Also include scripts inside of Svelte files.
+    ts_code.append(&mut svelte_all_scripts(Path::new("anki/ts/routes")).unwrap());
+    for script_code in ts_code {
+        // Get all of the imported backend funcs from the code.
+        ts_funcs.append(&mut ts_imported_funcs(script_code, &query).unwrap());
+    }
+
+    if let Ok(mut funcs_file) = create_file(artifacts_dir.join("ts_funcs.txt")) {
+        let mut content = ts_funcs
+            .iter()
+            .map(|name| name.to_string())
+            .collect::<Vec<String>>();
+        // Make sure the file ends with a newline.
+        content.push(String::new());
+        content.dedup();
+        funcs_file.write_all(content.join("\n").as_bytes()).unwrap();
+    }
+
     copy_file(
         "anki/out/ts/reviewer/reviewer_extras_bundle.js",
         artifacts_dir.join("js/reviewer_extras_bundle.js"),
@@ -316,4 +345,94 @@ fn copy_dir_all(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> io::Result<()> 
         }
     }
     Ok(())
+}
+
+fn ts_all_scripts(dir: &Path) -> Result<Vec<String>> {
+    let ts_scripts = fs::read_dir(dir).unwrap();
+    let mut script_code = vec![];
+
+    for script in ts_scripts {
+        let script_path = script.as_ref().unwrap().path();
+        if script_path.is_dir() {
+            script_code.append(&mut ts_all_scripts(script_path.as_path()).unwrap());
+        } else if let Some(extension) = script_path.extension() {
+            if extension == "ts" {
+                script_code.push(
+                    String::from_utf8(read_file(Path::new(script_path.to_str().unwrap())).unwrap())
+                        .unwrap(),
+                );
+            }
+        }
+    }
+
+    Ok(script_code)
+}
+
+fn svelte_all_scripts(dir: &Path) -> Result<Vec<String>> {
+    let mut parser = Parser::new();
+    parser
+        .set_language(&tree_sitter_svelte_ng::LANGUAGE.into())
+        .unwrap();
+    let svelte_files = fs::read_dir(dir).unwrap();
+    let mut script_code = vec![];
+
+    for file in svelte_files {
+        let file_path = file.as_ref().unwrap().path();
+        if file_path.is_dir() {
+            script_code.append(&mut svelte_all_scripts(file_path.as_path()).unwrap());
+        } else if let Some(extension) = file_path.extension() {
+            if extension == "svelte" {
+                let svelte_code = &read_file(file_path).unwrap();
+                let tree = parser.parse(svelte_code, None).unwrap();
+                let root_node = tree.root_node();
+                let mut root_cursor = root_node.walk();
+                // Always expect scripts in Svelte files to be a child of the root node.
+                for script_node in root_node.named_children(&mut root_cursor) {
+                    if script_node.kind() != "script_element" {
+                        continue;
+                    }
+
+                    script_code.push(
+                        String::from_utf8(
+                            svelte_code[script_node.start_byte()..script_node.end_byte()].to_vec(),
+                        )
+                        .unwrap(),
+                    );
+                }
+            }
+        }
+    }
+
+    Ok(script_code)
+}
+
+fn ts_imported_funcs(code: String, query: &String) -> Result<Vec<String>> {
+    let mut parser = Parser::new();
+    let code_bytes = code.as_bytes();
+    parser
+        .set_language(&tree_sitter_typescript::LANGUAGE_TYPESCRIPT.into())
+        .unwrap();
+    let tree = parser.parse(code_bytes, None).unwrap();
+    let mut query_cursor = QueryCursor::new();
+    let query = Query::new(&tree_sitter_typescript::LANGUAGE_TYPESCRIPT.into(), query).unwrap();
+
+    let mut imports = vec![];
+    let mut matches = query_cursor.matches(&query, tree.root_node(), code_bytes);
+    while let Some(item) = matches.next() {
+        let captures = item.captures;
+        // The name of an import. E.g. "importDone" if the import line is:
+        // "import { importDone } from "@generated/backend";
+        // Should always be the first captured field.
+        let name = captures.get(0).unwrap().node.utf8_text(code_bytes).unwrap();
+        // The source of an import. E.g. "@generated/backend" if the import line is:
+        // "import { importDone } from "@generated/backend";
+        // Should always be the second captured field.
+        let src = captures.get(1).unwrap().node.utf8_text(code_bytes).unwrap();
+
+        if src == "\"@generated/backend\"" {
+            imports.push(name.to_string());
+        }
+    }
+
+    Ok(imports)
 }
