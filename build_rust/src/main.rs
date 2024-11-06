@@ -3,10 +3,12 @@ use anki_io::{create_file, read_file};
 use anki_process::CommandExt;
 use anyhow::Result;
 use camino::{Utf8Path, Utf8PathBuf};
+use std::collections::HashSet;
 use std::env;
 use std::env::consts::OS;
 use std::fs;
 use std::io::{self, Write};
+use std::ops::Deref;
 use std::path::Path;
 use std::process::Command;
 use streaming_iterator::StreamingIterator;
@@ -94,14 +96,14 @@ fn build_web_artifacts() -> Result<()> {
         read_file(Path::new("build_rust/tree_sitter_queries/ts_imports.scm")).unwrap(),
     )
     .unwrap();
-    let mut ts_funcs = vec![];
+    let mut ts_funcs = HashSet::new();
     let mut ts_code = vec![];
     ts_code.append(&mut ts_all_scripts(Path::new("anki/ts")).unwrap());
     // Also include scripts inside of Svelte files.
     ts_code.append(&mut svelte_all_scripts(Path::new("anki/ts/routes")).unwrap());
     for script_code in ts_code {
         // Get all of the imported backend funcs from the code.
-        ts_funcs.append(&mut ts_imported_funcs(script_code, &query).unwrap());
+        ts_funcs.extend(ts_imported_funcs(script_code, &query).unwrap());
     }
 
     if let Ok(mut funcs_file) = create_file(artifacts_dir.join("ts_funcs.txt")) {
@@ -352,13 +354,15 @@ fn ts_all_scripts(dir: &Path) -> Result<Vec<String>> {
     let mut script_code = vec![];
 
     for script in ts_scripts {
-        let script_path = script.as_ref().unwrap().path();
-        if script_path.is_dir() {
-            script_code.append(&mut ts_all_scripts(script_path.as_path()).unwrap());
-        } else if let Some(extension) = script_path.extension() {
+        let file_path = script.as_ref().unwrap().path();
+        let file_name = file_path.file_name().unwrap().to_string_lossy();
+
+        if file_path.is_dir() && !file_name.starts_with(".") {
+            script_code.append(&mut ts_all_scripts(file_path.as_path()).unwrap());
+        } else if let Some(extension) = file_path.extension() {
             if extension == "ts" {
                 script_code.push(
-                    String::from_utf8(read_file(Path::new(script_path.to_str().unwrap())).unwrap())
+                    String::from_utf8(read_file(Path::new(file_path.to_str().unwrap())).unwrap())
                         .unwrap(),
                 );
             }
@@ -378,26 +382,30 @@ fn svelte_all_scripts(dir: &Path) -> Result<Vec<String>> {
 
     for file in svelte_files {
         let file_path = file.as_ref().unwrap().path();
-        if file_path.is_dir() {
+        let file_name = file_path.file_name().unwrap().to_string_lossy();
+
+        if file_path.is_dir() && !file_name.starts_with(".") {
             script_code.append(&mut svelte_all_scripts(file_path.as_path()).unwrap());
         } else if let Some(extension) = file_path.extension() {
             if extension == "svelte" {
-                let svelte_code = &read_file(file_path).unwrap();
+                let svelte_code = &read_file(file_path.clone()).unwrap();
                 let tree = parser.parse(svelte_code, None).unwrap();
                 let root_node = tree.root_node();
                 let mut root_cursor = root_node.walk();
+
                 // Always expect scripts in Svelte files to be a child of the root node.
-                for script_node in root_node.named_children(&mut root_cursor) {
+                for script_node in root_node.children(&mut root_cursor) {
                     if script_node.kind() != "script_element" {
                         continue;
                     }
 
-                    script_code.push(
-                        String::from_utf8(
-                            svelte_code[script_node.start_byte()..script_node.end_byte()].to_vec(),
-                        )
-                        .unwrap(),
-                    );
+                    let code = script_node
+                        .child(1)
+                        .unwrap()
+                        .utf8_text(svelte_code)
+                        .unwrap()
+                        .to_string();
+                    script_code.push(code.clone());
                 }
             }
         }
