@@ -100,7 +100,7 @@ fn build_web_artifacts() -> Result<()> {
     let mut ts_code = vec![];
     ts_code.append(&mut ts_all_scripts(Path::new("anki/ts")).unwrap());
     // Also include scripts inside of Svelte files.
-    ts_code.append(&mut svelte_all_scripts(Path::new("anki/ts/routes")).unwrap());
+    ts_code.append(&mut svelte_all_scripts(Path::new("anki/ts")).unwrap());
     for script_code in ts_code {
         // Get all of the imported backend funcs from the code.
         ts_funcs.extend(ts_imported_funcs(script_code, &query).unwrap());
