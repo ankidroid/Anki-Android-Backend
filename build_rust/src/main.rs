@@ -8,7 +8,6 @@ use std::env;
 use std::env::consts::OS;
 use std::fs;
 use std::io::{self, Write};
-use std::ops::Deref;
 use std::path::Path;
 use std::process::Command;
 use streaming_iterator::StreamingIterator;

@@ -22,6 +22,7 @@ import android.database.sqlite.SQLiteFullException
 import anki.backend.BackendError
 import net.ankiweb.rsdroid.exceptions.*
 import net.ankiweb.rsdroid.exceptions.BackendSyncException.BackendSyncAuthFailedException
+import net.ankiweb.rsdroid.exceptions.BackendSyncException.BackendSyncServerMessageException
 import java.util.*
 import java.util.regex.Pattern
 
@@ -105,6 +106,7 @@ open class BackendException : RuntimeException {
                 BackendError.Kind.JSON_ERROR -> return BackendJsonException(error)
                 BackendError.Kind.SYNC_AUTH_ERROR -> return BackendSyncAuthFailedException(error)
                 BackendError.Kind.SYNC_OTHER_ERROR -> return BackendSyncException(error)
+                BackendError.Kind.SYNC_SERVER_MESSAGE -> return BackendSyncServerMessageException(error)
                 BackendError.Kind.ANKIDROID_PANIC_ERROR -> return BackendFatalError(error)
                 BackendError.Kind.EXISTS -> return BackendExistingException(error)
                 BackendError.Kind.FILTERED_DECK_ERROR -> return BackendDeckIsFilteredException(error)

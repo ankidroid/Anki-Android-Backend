@@ -30,7 +30,7 @@ class BackendForTesting(langs: Iterable<String>) : Backend(langs) {
     }
 
     enum class ErrorType {
-        InvalidInput, TemplateError, DbErrorFileTooNew, DbErrorFileTooOld, DbErrorMissingEntity, DbErrorCorrupt, DbErrorLocked, DbErrorOther, NetworkError, SyncErrorAuthFailed, SyncErrorOther, JSONError, ProtoError, Interrupted, CollectionNotOpen, CollectionAlreadyOpen, NotFound, Existing, FilteredDeckError, SearchError, FatalError
+        InvalidInput, TemplateError, DbErrorFileTooNew, DbErrorFileTooOld, DbErrorMissingEntity, DbErrorCorrupt, DbErrorLocked, DbErrorOther, NetworkError, SyncErrorAuthFailed, SyncErrorOther, SyncErrorServerMessage, JSONError, ProtoError, Interrupted, CollectionNotOpen, CollectionAlreadyOpen, NotFound, Existing, FilteredDeckError, SearchError, FatalError
     }
 
     companion object {
