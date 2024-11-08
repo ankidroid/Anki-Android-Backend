@@ -35,13 +35,19 @@ def getFsrsVersion = { ->
     ".packages[] | select(.name==\"fsrs\") | .version"
     def verStdout = new ByteArrayOutputStream()
     def verStdin = new ByteArrayInputStream(pkgStdout.toByteArray())
-    exec {
-        // use "jaq" cargo module installed during rust build: self-contained + cross-platform
-        // if we use `jq` we are dependent on local system utility installation status
-        commandLine "jaq", verArgs
-        standardInput = verStdin
-        standardOutput = verStdout
+
+    try {
+        exec {
+            // use "jaq" cargo module installed during rust build: self-contained + cross-platform
+            // if we use `jq` we are dependent on local system utility installation status
+            commandLine "jaq", verArgs
+            standardInput = verStdin
+            standardOutput = verStdout
+        }
+    } catch (ex) {
+        throw new IOException("'jaq' failed. Ensure you followed the build instructions", ex)
     }
+
 
     def version = verStdout.toString().trim().replace("\"", "")
     println("FSRS version: ${version}")
