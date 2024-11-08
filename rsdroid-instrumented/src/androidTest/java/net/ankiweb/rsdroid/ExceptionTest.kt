@@ -104,6 +104,10 @@ class ExceptionTest {
                         BackendForTesting.ErrorType.SyncErrorOther,
                         BackendSyncException::class.java
                     ),
+                    arrayOf(
+                        BackendForTesting.ErrorType.SyncErrorServerMessage,
+                        BackendSyncException.BackendSyncServerMessageException::class.java
+                    ),
                     arrayOf(BackendForTesting.ErrorType.DbErrorCorrupt, NOT_POSSIBLE),
                     arrayOf(
                         BackendForTesting.ErrorType.DbErrorFileTooNew,

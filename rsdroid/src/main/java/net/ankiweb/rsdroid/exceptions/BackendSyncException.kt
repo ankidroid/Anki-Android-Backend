@@ -20,4 +20,5 @@ import net.ankiweb.rsdroid.BackendException
 
 open class BackendSyncException(error: BackendError?) : BackendException(error!!) {
     class BackendSyncAuthFailedException(error: BackendError?) : BackendSyncException(error)
+    class BackendSyncServerMessageException(error: BackendError?) : BackendSyncException(error)
 }
