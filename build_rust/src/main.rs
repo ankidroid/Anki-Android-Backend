@@ -174,7 +174,6 @@ fn build_android_jni() -> Result<()> {
     let (is_release, _release_dir) = check_release(false);
 
     Command::run("cargo install cargo-ndk@3.5.4")?;
-    Command::run("cargo install jaq@1.6.0")?;
 
     let mut command = Command::new("cargo");
     command
