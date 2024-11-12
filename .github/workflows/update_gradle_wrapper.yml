@@ -24,7 +24,7 @@ jobs:
         java-version: "21"
 
     - name: Install Android Command Line Tools
-      uses: android-actions/setup-android@v2
+      uses: android-actions/setup-android@v3
 
     # COULD_BE_BETTER: Consider turning this into a GitHub action - help the wider community
     # NDK install (unzipping) is really noisy - silence the log spam with grep, while keeping errors
