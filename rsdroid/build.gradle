@@ -24,6 +24,15 @@ def getAnkiCommitHash = { ->
 }
 
 def getFsrsVersion = { ->
+    // Ensure "jaq" cargo module is installed before we try to use it
+    def checkCratesProcess = new ProcessBuilder().command("cargo", "install", "--list").start()
+    checkCratesProcess.waitFor()
+    def crateInfo = new String(checkCratesProcess.getInputStream().readAllBytes())
+    if (!crateInfo.contains("jaq v1.6.0")) {
+        println("jaq rust crate not installed, needed to fetch FSRS version. Installing...")
+        new ProcessBuilder().command("cargo", "install", "jaq@1.6.0").start().waitFor()
+    }
+
     def pkgStdout = new ByteArrayOutputStream()
     exec {
         commandLine "cargo", "metadata", "--locked", "--format-version=1", "--manifest-path=" + new File("${project.rootDir}", "anki/Cargo.toml")
@@ -36,18 +45,13 @@ def getFsrsVersion = { ->
     def verStdout = new ByteArrayOutputStream()
     def verStdin = new ByteArrayInputStream(pkgStdout.toByteArray())
 
-    try {
-        exec {
-            // use "jaq" cargo module installed during rust build: self-contained + cross-platform
-            // if we use `jq` we are dependent on local system utility installation status
-            commandLine "jaq", verArgs
-            standardInput = verStdin
-            standardOutput = verStdout
-        }
-    } catch (ex) {
-        throw new IOException("'jaq' failed. Ensure you followed the build instructions", ex)
+    exec {
+        // use "jaq" cargo module installed during rust build: self-contained + cross-platform
+        // if we use `jq` we are dependent on local system utility installation status
+        commandLine "jaq", verArgs
+        standardInput = verStdin
+        standardOutput = verStdout
     }
-
 
     def version = verStdout.toString().trim().replace("\"", "")
     println("FSRS version: ${version}")
