@@ -1,6 +1,7 @@
 import com.android.build.gradle.tasks.BundleAar
 import com.vanniktech.maven.publish.SonatypeHost
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 import java.util.zip.ZipFile
 import org.gradle.internal.os.OperatingSystem
 
@@ -13,47 +14,40 @@ apply from: "$rootDir/build-rust.gradle"
 preBuild.dependsOn "buildRust"
 
 def getAnkiCommitHash = { ->
-    def hashStdOut = new ByteArrayOutputStream()
-    exec {
+    def commit = providers.exec {
         commandLine "git", "-C", new File("${project.rootDir}", "anki"), "rev-parse", "HEAD"
-        standardOutput = hashStdOut
-    }
-    def commit = hashStdOut.toString().trim()
+    }.standardOutput.asText.get().trim()
     println("Anki commit: ${commit}")
     return commit
 }
 
 def getFsrsVersion = { ->
     // Ensure "jaq" cargo module is installed before we try to use it
-    def checkCratesProcess = new ProcessBuilder().command("cargo", "install", "--list").start()
-    checkCratesProcess.waitFor()
-    def crateInfo = new String(checkCratesProcess.getInputStream().readAllBytes())
+    def crateInfo = providers.exec {
+        commandLine "cargo", "install", "--list"
+    }.standardOutput.asText.get()
     if (!crateInfo.contains("jaq v1.6.0")) {
         println("jaq rust crate not installed, needed to fetch FSRS version. Installing...")
         new ProcessBuilder().command("cargo", "install", "jaq@1.6.0").start().waitFor()
     }
-
-    def pkgStdout = new ByteArrayOutputStream()
-    exec {
-        commandLine "cargo", "metadata", "--locked", "--format-version=1", "--manifest-path=" + new File("${project.rootDir}", "anki/Cargo.toml")
-        standardOutput = pkgStdout
-    }
+    def verStdin = providers.exec {
+         commandLine "cargo", "metadata", "--locked", "--format-version=1", "--manifest-path=" + new File("${project.rootDir}", "anki/Cargo.toml")
+    }.standardOutput.asBytes.get()
 
     def verArgs = OperatingSystem.current() == OperatingSystem.WINDOWS ?
-    ".packages[] | select(.name==\\\"fsrs\\\") | .version" :
-    ".packages[] | select(.name==\"fsrs\") | .version"
-    def verStdout = new ByteArrayOutputStream()
-    def verStdin = new ByteArrayInputStream(pkgStdout.toByteArray())
+            ".packages[] | select(.name==\\\"fsrs\\\") | .version" :
+            ".packages[] | select(.name==\"fsrs\") | .version"
 
-    exec {
-        // use "jaq" cargo module installed during rust build: self-contained + cross-platform
-        // if we use `jq` we are dependent on local system utility installation status
-        commandLine "jaq", verArgs
-        standardInput = verStdin
-        standardOutput = verStdout
-    }
+    // use "jaq" cargo module installed during rust build: self-contained + cross-platform
+    // if we use `jq` we are dependent on local system utility installation status
+    def getFsrsVersionProcess = new ProcessBuilder().command("jaq", verArgs).start()
+    def getFsrsVersionStdin = getFsrsVersionProcess.getOutputStream()
+    getFsrsVersionStdin.write(verStdin)
+    getFsrsVersionStdin.flush()
+    getFsrsVersionStdin.close()
 
-    def version = verStdout.toString().trim().replace("\"", "")
+    def verStdout = new String(getFsrsVersionProcess.getInputStream().readAllBytes())
+    def version = verStdout.trim().replace("\"", "")
     println("FSRS version: ${version}")
     return version
 }
