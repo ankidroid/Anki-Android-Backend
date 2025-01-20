@@ -413,7 +413,7 @@ fn svelte_all_scripts(dir: &Path) -> Result<Vec<String>> {
     Ok(script_code)
 }
 
-fn ts_imported_funcs(code: String, query: &String) -> Result<Vec<String>> {
+fn ts_imported_funcs(code: String, query: &str) -> Result<Vec<String>> {
     let mut parser = Parser::new();
     let code_bytes = code.as_bytes();
     parser
@@ -430,7 +430,12 @@ fn ts_imported_funcs(code: String, query: &String) -> Result<Vec<String>> {
         // The name of an import. E.g. "importDone" if the import line is:
         // "import { importDone } from "@generated/backend";
         // Should always be the first captured field.
-        let name = captures.get(0).unwrap().node.utf8_text(code_bytes).unwrap();
+        let name = captures
+            .first()
+            .unwrap()
+            .node
+            .utf8_text(code_bytes)
+            .unwrap();
         // The source of an import. E.g. "@generated/backend" if the import line is:
         // "import { importDone } from "@generated/backend";
         // Should always be the second captured field.
