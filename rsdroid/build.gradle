@@ -28,7 +28,18 @@ def getFsrsVersion = { ->
     }.standardOutput.asText.get()
     if (!crateInfo.contains("jaq v1.6.0")) {
         println("jaq rust crate not installed, needed to fetch FSRS version. Installing...")
-        new ProcessBuilder().command("cargo", "install", "jaq@1.6.0").start().waitFor()
+        def jaqInstallProcess = new ProcessBuilder()
+                .command("cargo", "install", "jaq@1.6.0")
+                .redirectErrorStream(true)
+                .start()
+        def jaqOutput = new BufferedReader(new InputStreamReader(jaqInstallProcess.getInputStream()))
+        while (jaqInstallProcess.isAlive()) {
+            def jaqOutputLine = jaqOutput.readLine()
+            if (jaqOutputLine != null) {
+                System.out.println(jaqOutput.readLine())
+            }
+        }
+        jaqInstallProcess.waitFor()
     }
     def verStdin = providers.exec {
          commandLine "cargo", "metadata", "--locked", "--format-version=1", "--manifest-path=" + new File("${project.rootDir}", "anki/Cargo.toml")
