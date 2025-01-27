@@ -9,13 +9,16 @@ on:
   push:
     branches:
       - main
+  merge_group:
 
 env:
   DEBUG: 1
   ANDROID_NDK_VERSION: "27.0.12077973"
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  # if a workflow is run against the same ref, only one at a time...
+  # ...but allow different triggers to run concurrent (push, manual flake run, scheduled flake run...)
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}
   cancel-in-progress: true
 
 jobs:
