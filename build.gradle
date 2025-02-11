@@ -6,9 +6,9 @@ buildscript {
         compileSdk = 34
         targetSdk = 34
         minSdk = 21
-        protobufVersion = "4.26.1"
-        appcompatVersion = "1.6.1"
-        androidxTestJunitVersion = "1.1.5"
+        protobufVersion = "4.29.3"
+        appcompatVersion = "1.7.0"
+        androidxTestJunitVersion = "1.2.1"
         sqliteVersion = "2.4.0"
         kotlin_version = '2.1.10'
     }
