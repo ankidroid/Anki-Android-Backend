@@ -152,6 +152,8 @@ latest stable release. You can find the latest tag by running `git tag|sort
 1. run `git fetch $SOME_REPO` to ensure you obtain the latest change from this repo.
 1. run `git checkout $COMMIT_IDENTIFIER --recurse-submodules` to obtain the version of the code at this particular commit.
 1. move back to the root of the repo (not the submodule) and run `cargo check` to update our Cargo.lock with any updated versions from the submodule
+1. make sure `rust-toolchain.toml` matches the rust version in the anki git submodule
+
 
 ### Creating and Publishing a release
 
