@@ -18,22 +18,22 @@ apply plugin: 'com.android.application'
 apply plugin: "kotlin-android"
 
 android {
-    namespace 'net.ankiweb.rsdroid.instrumented'
-    compileSdk rootProject.ext.compileSdk
+    namespace = 'net.ankiweb.rsdroid.instrumented'
+    compileSdk = rootProject.ext.compileSdk
 
     defaultConfig {
-        applicationId "net.ankiweb.rsdroid.instrumented"
-        minSdk rootProject.ext.minSdk
-        targetSdk rootProject.ext.targetSdk
-        versionCode 1
-        versionName "1.0"
+        applicationId = "net.ankiweb.rsdroid.instrumented"
+        minSdk = rootProject.ext.minSdk
+        targetSdk = rootProject.ext.targetSdk
+        versionCode = 1
+        versionName = "1.0"
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled = false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }

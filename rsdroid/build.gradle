@@ -79,24 +79,24 @@ static def getBackendGitCommitHash() {
 }
 
 android {
-    namespace 'net.ankiweb.rsdroid'
-    compileSdk rootProject.ext.compileSdk
-    ndkVersion "27.0.12077973" // Used by GitHub actions - avoids an install step on some machines
+    namespace = 'net.ankiweb.rsdroid'
+    compileSdk = rootProject.ext.compileSdk
+    ndkVersion = "27.0.12077973" // Used by GitHub actions - avoids an install step on some machines
 
     buildFeatures {
-        buildConfig true // expose 'ANKI_DESKTOP_VERSION'
+        buildConfig = true // expose 'ANKI_DESKTOP_VERSION'
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 
     defaultConfig {
-        minSdk rootProject.ext.minSdk
-        targetSdk rootProject.ext.targetSdk
-        versionCode 1
-        versionName VERSION_NAME
+        minSdk = rootProject.ext.minSdk
+        targetSdk = rootProject.ext.targetSdk
+        versionCode = 1
+        versionName = VERSION_NAME
 
         consumerProguardFiles "consumer-rules.pro"
 
@@ -110,7 +110,7 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled = false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }

@@ -50,8 +50,8 @@ jar {
     }
 }
 
-java.sourceCompatibility JavaVersion.VERSION_11
-java.targetCompatibility JavaVersion.VERSION_11
+java.sourceCompatibility = JavaVersion.VERSION_11
+java.targetCompatibility = JavaVersion.VERSION_11
 
 mavenPublishing {
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL, true)
