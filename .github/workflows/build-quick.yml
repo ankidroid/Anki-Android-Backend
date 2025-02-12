@@ -22,13 +22,51 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # We want to generate our matrix dynamically
+  # Initial job generates the matrix as a JSON, and following job will use deserialize and use the result
+  matrix_prep:
+    # Do not run the scheduled jobs on forks
+    if: (github.event_name == 'schedule' && github.repository == 'ankidroid/Anki-Android-Backend') || (github.event_name != 'schedule')
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.build-matrix.outputs.result }}
+    steps:
+      - id: build-matrix
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // by default, we will include all 3 platforms we test on
+            // "latest" would be easy everywhere, but "macos-15" isn't "latest" so we are specific there
+            let osArray = ["ubuntu-latest", "macos-15", "windows-latest"]
+
+            let includeArray = [];
+            for(const os of osArray) {
+              // we do this work to define 'name' so we don't need to update branch protection rules
+              // if the os changes, the name is used in the expanded workflow run name, which is then
+              // used as a "required check" on branch protection merge rules, this keeps it stable
+              // even if "macos-15" changes to "macos-latest" in the future so we just change the list here
+              // but don't have to go into organization settings / protection rules etc etc
+              includeArray.push({"os": os, "name": os.split('-')[0]});
+            }
+            return {
+              "os": osArray,
+              "include": includeArray,
+            }
+      - name: Debug Output
+        run: echo "${{ steps.build-matrix.outputs.result }}"
+
+  # This uses the matrix generated from the matrix-prep stage
   build:
+    needs: matrix_prep
+    # Do not run the scheduled jobs on forks
+    if: (github.event_name == 'schedule' && github.repository == 'ankidroid/Anki-Android-Backend') || (github.event_name != 'schedule')
     strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-15]
       fail-fast: false
+      matrix: ${{fromJson(needs.matrix_prep.outputs.matrix)}}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 80
+    # Stable name so branch protection required checks set is stable regardless of runner version (-latest, -15, etc)
+    name: build (${{ matrix.name }})
     steps:
       - name: Liberate disk space (Ubuntu)
         uses: jlumbroso/free-disk-space@main
