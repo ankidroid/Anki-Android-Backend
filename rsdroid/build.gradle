@@ -80,7 +80,7 @@ static def getBackendGitCommitHash() {
 
 android {
     namespace = 'net.ankiweb.rsdroid'
-    compileSdk = rootProject.ext.compileSdk
+    compileSdk = libs.versions.compileSdk.get().toInteger()
     ndkVersion = "27.0.12077973" // Used by GitHub actions - avoids an install step on some machines
 
     buildFeatures {
@@ -93,8 +93,8 @@ android {
     }
 
     defaultConfig {
-        minSdk = rootProject.ext.minSdk
-        targetSdk = rootProject.ext.targetSdk
+        minSdk = libs.versions.minSdk.get().toInteger()
+        targetSdk = libs.versions.targetSdk.get().toInteger()
         versionCode = 1
         versionName = VERSION_NAME
 
@@ -149,18 +149,18 @@ afterEvaluate {
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar", '*.so'])
-    implementation "androidx.appcompat:appcompat:${rootProject.ext.appcompatVersion}"
+    implementation libs.androidx.appcompat
     // Protobuf is part of the ABI, so include it as a compile/api dependency.
-    api "com.google.protobuf:protobuf-kotlin-lite:${rootProject.ext.protobufVersion}"
+    api libs.protobuf.kotlin.lite
 
-    implementation "androidx.sqlite:sqlite-ktx:${rootProject.ext.sqliteVersion}"
-    implementation "androidx.sqlite:sqlite-framework:${rootProject.ext.sqliteVersion}"
-    implementation 'com.jakewharton.timber:timber:5.0.1'
+    implementation libs.androidx.sqlite.ktx
+    implementation libs.androidx.sqlite.framework
+    implementation libs.jakewharton.timber
 
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
-    testImplementation "org.robolectric:robolectric:4.14.1"
-    testImplementation 'androidx.test:core:1.6.1'
-    testImplementation "androidx.test.ext:junit:${rootProject.ext.androidxTestJunitVersion}"
+    testImplementation libs.junit.jupiter
+    testImplementation libs.robolectric
+    testImplementation libs.androidx.core
+    testImplementation libs.androidx.test.junit
     testImplementation project(path: ':rsdroid-testing')
 }
 

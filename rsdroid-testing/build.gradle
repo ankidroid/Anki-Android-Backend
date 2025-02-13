@@ -28,8 +28,8 @@ apply from: "$rootDir/build-rust.gradle"
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     // obtaining the OS
-    implementation 'org.apache.commons:commons-exec:1.4.0'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation libs.commons.exec
+    implementation libs.kotlin.stdlib.jdk8
 }
 
 jar {
@@ -64,7 +64,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath libs.kotlin.gradle.plugin
     }
 }
 compileKotlin {
