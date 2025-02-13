@@ -209,7 +209,12 @@ jobs:
           target: default
           arch: x86_64
           profile: Nexus 6
-          script: ./gradlew rsdroid-instrumented:connectedCheck
+          script: |
+            touch adb-log.txt
+            $ANDROID_HOME/platform-tools/adb logcat '*:D' >> adb-log.txt &
+            adb emu screenrecord start --time-limit 1800 video.webm
+            sleep 5
+            ./gradlew rsdroid-instrumented:connectedCheck
 
       - name: Upload rsdroid AAR as artifact
         uses: actions/upload-artifact@v4
@@ -226,6 +231,20 @@ jobs:
           name: rsdroid-robo-${{ matrix.os }}
           if-no-files-found: error
           path: rsdroid-testing/build/libs
+
+      - name: Upload Emulator Log
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ${{ matrix.name }}-adb_logs
+          path: adb-log.txt
+
+      - name: Upload Emulator Screen Record
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ${{ matrix.name }}-adb_video
+          path: video.webm
 
       - name: Save Rust Cache (Windows)
         uses: actions/cache/save@v4
