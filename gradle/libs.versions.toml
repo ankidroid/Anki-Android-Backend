@@ -15,7 +15,7 @@ androidxTestJunit = "1.2.1"
 commonsExec = "1.4.0"
 espresso = "3.6.1"
 # https://github.com/JetBrains/kotlin/releases/
-gradle = "8.8.0"
+gradle = "8.8.1"
 gradleMavenPublishPlugin = "0.30.0"
 junitJupiter = "5.11.4"
 kotlin = '2.1.10'
