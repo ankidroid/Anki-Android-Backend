@@ -70,9 +70,9 @@ jobs:
             anki/out/rust
             anki/out/extracted
             anki/out/node_modules
-          key: ${{ runner.os }}-rust-release-v7-${{ hashFiles('Cargo.lock') }}-${{ hashFiles('anki/yarn.lock') }}
+          key: ${{ runner.os }}-rust-release-${{ hashFiles('Cargo.lock') }}-${{ hashFiles('anki/yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-rust-release-v7
+            ${{ runner.os }}-rust-release
 
       - name: Setup N2
         run: ./anki/tools/install-n2
@@ -149,4 +149,4 @@ jobs:
             anki/out/rust
             anki/out/download
             anki/out/node_modules
-          key: ${{ runner.os }}-rust-release-v7-${{ hashFiles('Cargo.lock') }}-${{ hashFiles('anki/yarn.lock') }}
+          key: ${{ runner.os }}-rust-release-${{ hashFiles('Cargo.lock') }}-${{ hashFiles('anki/yarn.lock') }}
