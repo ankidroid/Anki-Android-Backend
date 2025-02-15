@@ -46,7 +46,7 @@ On Windows:
 In Android Studio, choose the Tools>SDK Manager menu option.
 
 - In SDK tools, enable "show package details"
-- Choose NDK version 27.0.12077973
+- Choose NDK version listed in `gradle/libs.versions.tml` for the `ndk` key
 - After downloading, you may need to restart Android Studio to get it to
 synchronize gradle.
 
@@ -81,21 +81,29 @@ to tell the script to use the Java libraries and NDK downloaded by Android Studi
 eg on Linux:
 
 ```
+cargo install toml-cli
+ANDROID_NDK_VERSION=$(toml get gradle/libs.versions.toml versions.ndk --raw)
 export ANDROID_SDK_ROOT=$HOME/Android/Sdk
-export ANDROID_NDK_HOME=$HOME/Android/Sdk/ndk/27.0.12077973
+export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION
 ```
 
 Or macOS:
 
 ```
+cargo install toml-cli
+ANDROID_NDK_VERSION=$(toml get gradle/libs.versions.toml versions.ndk --raw)
 export ANDROID_SDK_ROOT=$HOME/Library/Android/sdk
-export ANDROID_NDK_HOME=$HOME/Library/Android/sdk/ndk/27.0.12077973
+export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION
 ```
+
 Or Windows using Powershell:
 
 ```
-$env:ANDROID_NDK_HOME="$env:ANDROID_SDK_ROOT\ndk\27.0.12077973"
+cargo install toml-cli
+$env:ANDROID_NDK_VERSION=toml get gradle/libs.versions.toml versions.ndk --raw
+$env:ANDROID_NDK_HOME="$env:ANDROID_SDK_ROOT\ndk\$env:ANDROID_NDK_VERSION"
 ```
+
 If you don't have Java installed, you may be able to use the version bundled
 with Android Studio. Eg on macOS:
 
