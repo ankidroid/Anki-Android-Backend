@@ -217,7 +217,7 @@ jobs:
 
       - name: Upload rsdroid AAR as artifact
         uses: actions/upload-artifact@v4
-        if: ${{ always() }}
+        if: '!cancelled()'
         with:
           name: rsdroid-aar-${{ matrix.os }}
           if-no-files-found: error
@@ -225,7 +225,7 @@ jobs:
 
       - name: Upload rsdroid-robo JAR as artifact
         uses: actions/upload-artifact@v4
-        if: ${{ always() }}
+        if: '!cancelled()'
         with:
           name: rsdroid-robo-${{ matrix.os }}
           if-no-files-found: error
@@ -233,14 +233,14 @@ jobs:
 
       - name: Upload Emulator Log
         uses: actions/upload-artifact@v4
-        if: always()
+        if: ('!cancelled()' && contains(matrix.os, 'ubuntu'))
         with:
           name: ${{ matrix.name }}-adb_logs
           path: adb-log.txt
 
       - name: Upload Emulator Screen Record
         uses: actions/upload-artifact@v4
-        if: always()
+        if: ('!cancelled()' && contains(matrix.os, 'ubuntu'))
         with:
           name: ${{ matrix.name }}-adb_video
           path: video.webm
