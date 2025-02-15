@@ -144,9 +144,9 @@ jobs:
             anki/out/rust
             anki/out/download
             # no node_modules, as it doesn't unpack properly
-          key: ${{ runner.os }}-rust-debug-v7-${{ hashFiles('Cargo.lock') }}-${{ hashFiles('anki/yarn.lock') }}
+          key: ${{ runner.os }}-rust-debug-${{ hashFiles('Cargo.lock') }}-${{ hashFiles('anki/yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-rust-debug-v7
+            ${{ runner.os }}-rust-debug
 
       - name: Restore Rust Cache (Unix)
         uses: actions/cache/restore@v4
@@ -159,9 +159,9 @@ jobs:
             anki/out/rust
             anki/out/download
             anki/out/node_modules
-          key: ${{ runner.os }}-rust-debug-v6-${{ hashFiles('Cargo.lock') }}-${{ hashFiles('anki/yarn.lock') }}
+          key: ${{ runner.os }}-rust-debug-${{ hashFiles('Cargo.lock') }}-${{ hashFiles('anki/yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-rust-debug-v6
+            ${{ runner.os }}-rust-debug
 
       - name: Setup N2
         run: bash ./anki/tools/install-n2
@@ -256,7 +256,7 @@ jobs:
             anki/out/rust
             anki/out/download
             # no node_modules, as it doesn't unpack properly
-          key: ${{ runner.os }}-rust-debug-v7-${{ hashFiles('Cargo.lock') }}-${{ hashFiles('anki/yarn.lock') }}
+          key: ${{ runner.os }}-rust-debug-${{ hashFiles('Cargo.lock') }}-${{ hashFiles('anki/yarn.lock') }}
 
       - name: Save Rust Cache (Unix)
         uses: actions/cache/save@v4
@@ -269,4 +269,4 @@ jobs:
             anki/out/rust
             anki/out/download
             anki/out/node_modules
-          key: ${{ runner.os }}-rust-debug-v6-${{ hashFiles('Cargo.lock') }}-${{ hashFiles('anki/yarn.lock') }}
+          key: ${{ runner.os }}-rust-debug-${{ hashFiles('Cargo.lock') }}-${{ hashFiles('anki/yarn.lock') }}
