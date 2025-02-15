@@ -4,7 +4,7 @@ targetSdk = "34"
 minSdk = "21"
 
 # https://developer.android.com/ndk/downloads
-ndk = "27.0.12077973"
+ndk = "28.0.13004108"
 
 # https://developer.android.com/jetpack/androidx/releases/appcompat
 androidxAppCompat = "1.7.0"
