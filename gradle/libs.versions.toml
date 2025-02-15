@@ -2,7 +2,9 @@
 compileSdk = "34"
 targetSdk = "34"
 minSdk = "21"
-
+# WARN: this is not yet consolidated. Manually replace when updating
+# Used by GitHub Actions - avoids an install step on some machines
+ndkVersion = "27.0.12077973"
 
 # https://developer.android.com/jetpack/androidx/releases/appcompat
 androidxAppCompat = "1.7.0"
