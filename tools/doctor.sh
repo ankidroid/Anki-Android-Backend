@@ -35,6 +35,10 @@ cecho $lgray "##################################\n"
 cecho $lgray "Getting anki submodules"
 git submodule update --init
 
+which cargo || (
+  echo "Rustup should be installed"
+  exit 1
+)
 
 if [[ -n "$ANDROID_SDK_ROOT" ]]; then
   ok_echo "ANDROID_SDK_ROOT is set"
@@ -42,18 +46,15 @@ else
   error_echo "ANDROID_SDK_ROOT should point to your SDK installation"
 fi
 
+cargo install toml-cli
+ANDROID_NDK_VERSION=$(toml get gradle/libs.versions.toml versions.ndk --raw)
 
 if [[ -d "$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION" ]]; then
   ok_echo "NDK $ANDROID_NDK_VERSION directory found"
 else
   echo -e "Expected to find: $ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION"
-  error_echo "NDK $ANDROID_NDK_VERSION directory found"
+  error_echo "NDK $ANDROID_NDK_VERSION directory not found"
 fi
-
-which cargo || (
-  echo "Rustup should be installed"
-  exit 1
-))
 
 if [ "$(uname)" == "Darwin" ]; then
   # We do not want to run under Rosetta 2

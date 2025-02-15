@@ -13,7 +13,6 @@ on:
 
 env:
   DEBUG: 1
-  ANDROID_NDK_VERSION: "27.0.12077973"
 
 concurrency:
   # if a workflow is run against the same ref, only one at a time...
@@ -108,6 +107,13 @@ jobs:
 
       - name: Fetch submodules
         run: git submodule update --init
+
+      - name: Read configured NDK version
+        run: |
+          cargo install toml-cli
+          ANDROID_NDK_VERSION=$(toml get gradle/libs.versions.toml versions.ndk --raw)
+          echo "ANDROID_NDK_VERSION=$ANDROID_NDK_VERSION" >> $GITHUB_ENV
+        shell: bash
 
       - name: Install/Set NDK version (Unix)
         if: contains(matrix.os, 'ubuntu') || contains(matrix.os, 'macos')

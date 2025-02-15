@@ -1,10 +1,6 @@
 tasks.register('buildRust', Exec) {
     // ensure script doesn't try to start gradle again
     environment 'RUNNING_FROM_GRADLE', '1'
-    if (!System.getenv('ANDROID_NDK_HOME')) {
-        String ndkPath = "${getSdkDir()}/ndk/27.0.12077973"
-        environment 'ANDROID_NDK_HOME', ndkPath
-    }
     workingDir "$rootDir"
     commandLine "cargo", "run", "-p", "build_rust"
 }

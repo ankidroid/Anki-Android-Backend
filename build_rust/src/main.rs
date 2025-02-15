@@ -21,9 +21,8 @@ fn main() -> Result<()> {
         return Ok(());
     }
     let ndk_path = Utf8PathBuf::from(env::var("ANDROID_NDK_HOME").unwrap_or_default());
-    if !ndk_path.file_name().unwrap_or_default().starts_with("27.") {
-        // Future NDKs may work, but are untested.
-        panic!("error: ANDROID_NDK_HOME must point to a 27.x NDK.");
+    if !ndk_path.exists() {
+        panic!("error: ANDROID_NDK_HOME must point to your NDK installation.");
     }
 
     build_web_artifacts()?;

@@ -87,9 +87,20 @@ jobs:
       if: matrix.build-mode == 'manual'
       run: git submodule update --init
 
-    - name: Set NDK version (Unix)
+    - name: Read configured NDK version
+      run: |
+        cargo install toml-cli
+        ANDROID_NDK_VERSION=$(toml get gradle/libs.versions.toml versions.ndk --raw)
+        echo "ANDROID_NDK_VERSION=$ANDROID_NDK_VERSION" >> $GITHUB_ENV
+      shell: bash
+
+    - name: Install/Set NDK version
       if: matrix.build-mode == 'manual'
       run: |
+        export PATH="$PATH:$ANDROID_HOME/cmdline-tools/latest/bin"
+        ./.github/scripts/install_ndk.sh ${ANDROID_NDK_VERSION}
+        ./.github/scripts/purge_ndk.sh ${ANDROID_NDK_VERSION}
+        export ANDROID_NDK_LATEST_HOME="${ANDROID_SDK_ROOT}/ndk/${ANDROID_NDK_VERSION}"
         echo "ANDROID_NDK_HOME=$ANDROID_NDK_LATEST_HOME" >> $GITHUB_ENV
         echo "ANDROID_NDK_ROOT=$ANDROID_NDK_LATEST_HOME" >> $GITHUB_ENV
 

@@ -26,10 +26,17 @@ jobs:
     - name: Install Android Command Line Tools
       uses: android-actions/setup-android@v3
 
+    - name: Read configured NDK version
+      run: |
+        cargo install toml-cli
+        ANDROID_NDK_VERSION=$(toml get gradle/libs.versions.toml versions.ndk --raw)
+        echo "ANDROID_NDK_VERSION=$ANDROID_NDK_VERSION" >> $GITHUB_ENV
+      shell: bash
+
     # COULD_BE_BETTER: Consider turning this into a GitHub action - help the wider community
     # NDK install (unzipping) is really noisy - silence the log spam with grep, while keeping errors
     - name: Install NDK (silent)
-      run: .github/scripts/install_ndk.sh 27.0.12077973
+      run: .github/scripts/install_ndk.sh $ANDROID_NDK_VERSION
 
     - name: Update Gradle Wrapper
       uses: gradle-update/update-gradle-wrapper-action@v2
