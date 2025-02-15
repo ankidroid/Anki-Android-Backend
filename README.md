@@ -43,6 +43,18 @@ On Windows:
 
 ### NDK
 
+#### Command-line install
+
+Assuming `sdkmanager` from the "Command-Line Tools" package is in your PATH:
+
+```bash
+cargo install toml-cli
+ANDROID_NDK_VERSION=$(toml get gradle/libs.versions.toml versions.ndk --raw)
+sdkmanager --install "ndk;$ANDROID_NDK_VERSION"
+```
+
+#### GUI install
+
 In Android Studio, choose the Tools>SDK Manager menu option.
 
 - In SDK tools, enable "show package details"
