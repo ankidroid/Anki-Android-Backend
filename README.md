@@ -156,7 +156,7 @@ emulator/device (arm64 on M1 Macs), and run unit tests.
 
 Only the current platform is built by default. In CI, the .aar and .jar files
 are built for multiple platforms, so one release library can be used on a variety
-of devices. See [.github/workflows] for how this is done.
+of devices. See [the release workflow](https://github.com/ankidroid/Anki-Android-Backend/blob/main/.github/workflows/build-release.yml) for how this is done.
 
 ### Testing with a specific version of anki
 

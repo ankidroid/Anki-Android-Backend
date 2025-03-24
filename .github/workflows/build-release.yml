@@ -17,6 +17,11 @@ on:
   merge_group:
 
 env:
+  # NOTE: ALL_ARCHS and RELEASE variables are the *main* difference between generating
+  #       regular / single-arch builds and release builds. If you are on an Apple Silicon
+  #       mac and you want to build test for release mode, something like
+  #       'ALL_ARCHS=1 RELEASE=1 cargo run -p build_rust'
+  #       is how you do it, once you install the cross-compilers like in the sections below
   ALL_ARCHS: 1
   RELEASE: 1
   CARGO_PROFILE_RELEASE_LTO: fat
@@ -62,8 +67,7 @@ jobs:
 
       - name: Install Linux cross compiler
         run: |
-          brew tap SergioBenitez/osxct
-          brew install x86_64-unknown-linux-gnu
+          brew install MaterializeInc/crosstools/x86_64-unknown-linux-gnu
           x86_64-unknown-linux-gnu-gcc -v
 
       - name: Restore Rust Cache
