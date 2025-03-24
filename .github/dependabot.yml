@@ -16,3 +16,6 @@ updates:
     - "/rslib-bridge"
   schedule:
     interval: daily
+  ignore:
+    # Ignore anki dependencies, those are managed upstream
+    - dependency-name: "anki*"
