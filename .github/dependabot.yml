@@ -9,3 +9,10 @@ updates:
   directory: "/"
   schedule:
     interval: daily
+- package-ecosystem: cargo
+  directories:
+    - "/"
+    - "/build_rust"
+    - "/rslib-bridge"
+  schedule:
+    interval: daily
