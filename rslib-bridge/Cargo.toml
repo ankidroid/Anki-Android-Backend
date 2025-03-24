@@ -11,7 +11,7 @@ crate-type = ["cdylib"]
 anki = { path = "../anki/rslib", features = ["rustls"] }
 anki_proto = { path = "../anki/rslib/proto" }
 
-android_logger = "0.13.3"
+android_logger = "0.15.0"
 gag = "1.0.0"
 jni = { version = "0.21.1", default-features = false }
 log = "0.4.20"
