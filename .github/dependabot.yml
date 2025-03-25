@@ -21,3 +21,9 @@ updates:
   ignore:
     # Ignore anki dependencies, those are managed upstream
     - dependency-name: "anki*"
+  groups:
+    non-breaking:
+      update-types:
+        - "minor"
+        - "patch"
+  open-pull-requests-limit: 10
