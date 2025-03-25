@@ -11,11 +11,11 @@ cc="*"
 [dependencies]
 anki_io = { version = "0.0.0", path = "../anki/rslib/io" }
 anki_process = { version = "0.0.0", path = "../anki/rslib/process" }
-anyhow = "1.0.75"
-camino = "1.1.6"
-glob = "0.3.1"
+anyhow = "1.0.97"
+camino = "1.1.9"
+glob = "0.3.2"
 streaming-iterator = "0.1.9"
 tree-sitter = "0.25.3"
 tree-sitter-svelte-ng = "1.0.2"
-tree-sitter-typescript = "0.23.0"
+tree-sitter-typescript = "0.23.2"
 which = "7.0.2"
