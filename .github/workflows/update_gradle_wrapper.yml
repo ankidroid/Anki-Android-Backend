@@ -33,10 +33,13 @@ jobs:
         echo "ANDROID_NDK_VERSION=$ANDROID_NDK_VERSION" >> $GITHUB_ENV
       shell: bash
 
-    # COULD_BE_BETTER: Consider turning this into a GitHub action - help the wider community
-    # NDK install (unzipping) is really noisy - silence the log spam with grep, while keeping errors
-    - name: Install NDK (silent)
-      run: .github/scripts/install_ndk.sh $ANDROID_NDK_VERSION
+    - name: Setup NDK
+      uses: nttld/setup-ndk@v1
+      with:
+        ndk-version: ${{ env.ANDROID_NDK_VERSION }}
+        retry-count: 3
+        retry-delay: 30
+        retry-on-error: true
 
     - name: Update Gradle Wrapper
       uses: gradle-update/update-gradle-wrapper-action@v2
