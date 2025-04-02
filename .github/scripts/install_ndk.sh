@@ -3,5 +3,6 @@
 echo "installing NDK $1"
 echo $PATH
 sdkmanager --list_installed|grep ndk
+yes | sdkmanager --licenses
 sdkmanager --install "ndk;$1" --sdk_root=${ANDROID_SDK_ROOT} | grep -v =
 sdkmanager --list_installed|grep ndk
