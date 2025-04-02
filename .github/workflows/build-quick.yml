@@ -36,7 +36,7 @@ jobs:
           script: |
             // by default, we will include all 3 platforms we test on
             // "latest" would be easy everywhere, but "macos-15" isn't "latest" so we are specific there
-            let osArray = ["ubuntu-latest", "macos-15", "windows-latest"]
+            let osArray = ["ubuntu-latest", "macos-15", "windows-2025"]
 
             let includeArray = [];
             for(const os of osArray) {
