@@ -11,7 +11,7 @@ androidxAppCompat = "1.7.0"
 # https://developer.android.com/jetpack/androidx/releases/core
 androidxCore = "1.6.1"
 # https://developer.android.com/jetpack/androidx/releases/sqlite
-androidxSqlite = "2.4.0"
+androidxSqlite = "2.5.0"
 androidxTestJunit = "1.2.1"
 # https://commons.apache.org/proper/commons-exec/changes-report.html
 commonsExec = "1.4.0"
