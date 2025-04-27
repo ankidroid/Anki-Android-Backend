@@ -170,6 +170,21 @@ tasks.withType(KotlinCompile).configureEach {
     }
 }
 
+
+
+// Install Git pre-commit hook for format-rust
+tasks.register('installGitHook', Copy) {
+    from new File(rootProject.rootDir, 'pre-commit')
+    into { new File(rootProject.rootDir, '.git/hooks') }
+    filePermissions {
+        user {
+            read = write = execute = true
+        }
+    }
+}
+// to run manually: `./gradlew installGitHook`
+tasks.named('preBuild').configure { dependsOn('installGitHook') }
+
 mavenPublishing {
     // Use https://central.sonatype.com/account with david-allison's GitHub login, not Google
     // the host should match rsdroid-testing
