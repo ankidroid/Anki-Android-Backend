@@ -55,7 +55,7 @@ fn render_method(service: &BackendService, method: &Method, out: &mut impl Write
         out,
         r#"{comments}    fun {method_name}Raw(input: ByteArray): ByteArray {{
         return runMethodRaw({service_idx}, {method_idx}, input)
-        }}
+    }}
 "#
     )
     .unwrap();
@@ -68,12 +68,12 @@ fn render_method(service: &BackendService, method: &Method, out: &mut impl Write
     write!(
         out,
         r#"{comments}
-        open fun {method_name}({input_params}): {output_type} {{
-        {input_assign}
+    open fun {method_name}({input_params}): {output_type} {{{input_assign}
         val outputData = {method_name}Raw(input.toByteArray())
         val output = {output_constructor}.parseFrom(outputData)
         return {output_msg_or_single_field}
     }}
+
 "#
     )
     .unwrap();
@@ -92,6 +92,7 @@ fn format_comments(path: &Option<String>) -> String {
 ///
 /// ...then destructuring will be skipped, and the method will take the input
 /// message directly. Returns (params_line, assignment_lines)
+// Returns the string with 4 spaces of identation.
 fn maybe_destructured_input(input: &MessageDescriptor) -> (String, String) {
     if (input.name().ends_with("Request") || input.fields().len() < 2)
         && input.oneofs().next().is_none()
@@ -100,7 +101,7 @@ fn maybe_destructured_input(input: &MessageDescriptor) -> (String, String) {
         let method_args = build_method_arguments(input);
         let input_type = full_name_to_kotlin_class(input.full_name());
         let input_message_args = build_input_message_arguments(input);
-        let assignment =format!("val builder = {input_type}.newBuilder(); {input_message_args}; val input = builder.build() ",) ;
+        let assignment =format!("\n        val builder = {input_type}.newBuilder(){input_message_args}\n        val input = builder.build() ",) ;
         (method_args, assignment)
     } else {
         // no destructure
@@ -124,6 +125,7 @@ fn build_method_arguments(input: &MessageDescriptor) -> String {
     args.join(", ")
 }
 
+// Starts each instruction with a new line and 8 spaces of identation
 fn build_input_message_arguments(input: &MessageDescriptor) -> String {
     input
         .fields()
@@ -137,15 +139,15 @@ fn build_input_message_arguments(input: &MessageDescriptor) -> String {
             } else {
                 "set"
             };
-            let setter = format!("builder.{op}{pascal_name}({name})");
+            let setter = format!("\n        builder.{op}{pascal_name}({name})");
             if field.field_descriptor_proto().proto3_optional() {
-                format!("if ({name} != null) {{ {setter} }}")
+                format!("if ({name} != null) {{\n    {setter}\n      }}")
             } else {
                 setter
             }
         })
         .collect::<Vec<_>>()
-        .join("\n")
+        .join("")
 }
 
 // If output type has a single field and is not an enum, we return its single
@@ -226,20 +228,20 @@ fn write_header(out: &mut impl Write) -> Result<()> {
     out.write_all(
         br#"/* Auto-generated from the .proto files in AnkiDroidBackend. */
 
-        @file:Suppress("NAME_SHADOWING", "UNUSED_VARIABLE")
+@file:Suppress("NAME_SHADOWING", "UNUSED_VARIABLE")
         
-        package anki.backend;
-        
-        import com.google.protobuf.InvalidProtocolBufferException;
-        
-        import net.ankiweb.rsdroid.BackendException;
-        
-        public abstract class GeneratedBackend {
-        
-        @Throws(BackendException::class)
-        protected abstract fun runMethodRaw(service: Int, method: Int, input: ByteArray): ByteArray;
-        
-        "#,
+package anki.backend;
+
+import com.google.protobuf.InvalidProtocolBufferException;
+
+import net.ankiweb.rsdroid.BackendException;
+
+public abstract class GeneratedBackend {
+
+    @Throws(BackendException::class)
+    protected abstract fun runMethodRaw(service: Int, method: Int, input: ByteArray): ByteArray;
+
+"#,
     )?;
     Ok(())
 }
