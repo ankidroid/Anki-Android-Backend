@@ -18,7 +18,7 @@ commonsExec = "1.4.0"
 espresso = "3.6.1"
 # https://github.com/JetBrains/kotlin/releases/
 gradle = "8.10.0"
-gradleMavenPublishPlugin = "0.31.0"
+gradleMavenPublishPlugin = "0.32.0"
 junitJupiter = "5.12.2"
 kotlin = '2.1.21'
 # https://github.com/protocolbuffers/protobuf/releases
