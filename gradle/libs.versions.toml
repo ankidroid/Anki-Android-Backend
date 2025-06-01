@@ -13,7 +13,7 @@ androidxCore = "1.6.1"
 # https://developer.android.com/jetpack/androidx/releases/sqlite
 androidxSqlite = "2.5.1"
 androidxTestJunit = "1.2.1"
-# https://commons.apache.org/proper/commons-exec/changes-report.html
+# https://commons.apache.org/proper/commons-exec/changes.html
 commonsExec = "1.5.0"
 espresso = "3.6.1"
 # https://github.com/JetBrains/kotlin/releases/
