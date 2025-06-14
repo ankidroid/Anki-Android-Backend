@@ -104,7 +104,7 @@ jobs:
           max_attempts: 3
           retry_wait_seconds: 0
           retry_on: error
-          command: cargo run -p build_rust
+          command: ./build.sh
 
       - name: Upload rsdroid AAR as artifact
         uses: actions/upload-artifact@v4
