@@ -33,7 +33,7 @@ dependencies {
 }
 
 jar {
-    dependsOn("buildRust")
+    mustRunAfter("buildRust")
     sourceSets {
         main {
             resources {
