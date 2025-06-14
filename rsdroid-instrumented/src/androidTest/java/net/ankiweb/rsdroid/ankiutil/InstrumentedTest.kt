@@ -20,6 +20,7 @@ import android.os.Build
 import android.util.Log
 import androidx.test.platform.app.InstrumentationRegistry
 import net.ankiweb.rsdroid.Backend
+import net.ankiweb.rsdroid.BackendException
 import net.ankiweb.rsdroid.BackendFactory.getBackend
 import net.ankiweb.rsdroid.exceptions.BackendInvalidInputException
 import org.hamcrest.MatcherAssert.assertThat
@@ -29,8 +30,13 @@ import org.junit.Before
 
 open class InstrumentedTest {
     private val backendList: MutableList<Backend> = ArrayList()
+
+    /** Whether it's expected that the backend will be in a panicked state */
+    protected var panicExpected: Boolean = false
+
     @Before
     fun before() {
+        panicExpected = false
         /*
         Timber added 1 minute to the stress test (1m18 -> 2m30). Didn't seem worth it.
         Timber.uprootAll();
@@ -50,6 +56,11 @@ open class InstrumentedTest {
                         Matchers.containsString("CollectionNotOpen")
                     )
                     continue
+                } catch (exc: BackendException.BackendFatalError) {
+                    if (panicExpected) {
+                        continue
+                    }
+                    throw IllegalStateException("backend panicked without `panicExpected`", exc)
                 }
                 assertThat(
                     "All database cursors should be closed",
