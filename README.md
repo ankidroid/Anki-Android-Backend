@@ -29,6 +29,16 @@ Install Xcode/Visual Studio if on macOS/Windows.
 
 Install rustup from <https://rustup.rs/>
 
+#### macOS / Rust / Android Studio interaction
+
+Note that Android Studio does a gradle sync when you open Anki-Android-Backend as a project,
+and this sync requires the `cargo` command to be in your environment `PATH` variable to succeed.
+
+If you get an exception related to `cargo` not found, you may need to alter your environment
+before starting Android Studio. On macOS at least, you may open `Terminal`, verify `cargo` is
+in the `PATH` with a `which cargo`, and open Android Studio directly with this environment setup
+via the command `open -a "Android Studio"`
+
 ### Ninja
 
 Anki can be built with Ninja or N2. N2 gives better status output and may be installed like so:
