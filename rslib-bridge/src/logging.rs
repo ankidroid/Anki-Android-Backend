@@ -62,6 +62,7 @@ pub(crate) fn setup_logging() {
             Config::default()
                 // exclude Trace logs
                 .with_max_level(LevelFilter::Debug)
+                .with_tag("rsdroid")
                 .with_filter(FilterBuilder::new().parse(&filter).build()),
         );
 
