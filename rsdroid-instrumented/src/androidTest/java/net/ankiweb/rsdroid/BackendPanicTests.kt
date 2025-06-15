@@ -22,6 +22,7 @@ import net.ankiweb.rsdroid.BackendException.BackendFatalError
 import net.ankiweb.rsdroid.ankiutil.InstrumentedTest
 import net.ankiweb.rsdroid.rules.LogcatRule
 import org.hamcrest.CoreMatchers.containsString
+import org.hamcrest.CoreMatchers.everyItem
 import org.hamcrest.CoreMatchers.not
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.empty
@@ -45,13 +46,13 @@ class BackendPanicTests : InstrumentedTest() {
 
         assertThat("logcat has errors", errors, not(empty()))
 
-        // line 1: Panic at anki/rslib/src/storage/note/mod.rs:73: assertion `left == right` failed
-        assertThat(errors[0].message, containsString("Panic at "))
+        assertThat("all tags are valid", logcat.errors.map { it.tag }, everyItem(equalTo("rsdroid")))
+        // line 1: ": rsdroid::logging: Panic at anki/rslib/src/storage/note/mod.rs:73: assertion `left == right` failed"
+        assertThat(errors[0].message, containsString(": rsdroid::logging: Panic at "))
         assertThat(errors[0].message, containsString("assertion `left == right` failed"))
 
-        assertThat(errors[1].message, equalTo("left: 1"))
-        assertThat(errors[2].message, equalTo("right: 0"))
-
+        assertThat(errors[1].message, equalTo(":   left: 1"))
+        assertThat(errors[2].message, equalTo(":  right: 0"))
         assertThat("logcat has no more errors", errors, hasSize(3))
     }
 
