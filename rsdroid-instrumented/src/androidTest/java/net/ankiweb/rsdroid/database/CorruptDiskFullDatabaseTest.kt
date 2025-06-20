@@ -17,6 +17,7 @@ package net.ankiweb.rsdroid.database
 
 import android.database.sqlite.SQLiteFullException
 import net.ankiweb.rsdroid.database.testutils.DatabaseCorruption
+import net.ankiweb.rsdroid.exceptions.BackendJsonException
 import org.hamcrest.MatcherAssert
 import org.hamcrest.Matchers
 import org.junit.runner.RunWith
@@ -26,18 +27,35 @@ import org.junit.runners.Parameterized
 @RunWith(Parameterized::class)
 class CorruptDiskFullDatabaseTest : DatabaseCorruption() {
     override fun assertCorruption(setupException: Exception) {
-        // error while compiling: "create table nums (id int)": DBError { info: "SqliteFailure(Error { code: DiskFull, extended_code: 13 }, Some(\"database or disk is full\"))", kind: Other }
-        MatcherAssert.assertThat(
-            setupException.javaClass, Matchers.typeCompatibleWith(
-                SQLiteFullException::class.java
-            )
-        )
-        // Java: "database or disk is full (code 13)"
-        MatcherAssert.assertThat(
-            setupException.localizedMessage,
-            Matchers.containsString("database or disk is full")
-        )
-        MatcherAssert.assertThat(setupException.localizedMessage, Matchers.containsString("13"))
+        when (schedVersion) {
+            DatabaseType.RUST -> {
+                // RUST is now a bit more tolerant, with newer sqlite, fails loading config JSON
+                MatcherAssert.assertThat(
+                    setupException.javaClass, Matchers.typeCompatibleWith(
+                        BackendJsonException::class.java
+                    )
+                )
+                MatcherAssert.assertThat(
+                    setupException.localizedMessage,
+                    Matchers.containsString("decoding deck config: expected value at line 1 column 1")
+                )
+            }
+            DatabaseType.FRAMEWORK -> {
+                // FRAMEWORK still complains about disk full corruption:
+                // error while compiling: "create table nums (id int)": DBError { info: "SqliteFailure(Error { code: DiskFull, extended_code: 13 }, Some(\"database or disk is full\"))", kind: Other }
+                MatcherAssert.assertThat(
+                    setupException.javaClass, Matchers.typeCompatibleWith(
+                        SQLiteFullException::class.java
+                    )
+                )
+                // Java: "database or disk is full (code 13)"
+                MatcherAssert.assertThat(
+                    setupException.localizedMessage,
+                    Matchers.containsString("database or disk is full")
+                )
+            }
+            else -> null
+        }
     }
 
     override val corruptDatabaseAssetName = "initial_version_2_12_1_corrupt_diskfull.anki2"
