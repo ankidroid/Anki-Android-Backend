@@ -23,7 +23,7 @@ junitJupiter = "5.13.1"
 kotlin = '2.1.21'
 # https://github.com/protocolbuffers/protobuf/releases
 protobuf = "4.31.1"
-robolectric = "4.14.1"
+robolectric = "4.15"
 timber = "5.0.1"
 
 [libraries]
