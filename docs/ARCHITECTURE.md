@@ -32,7 +32,7 @@ be found in `anki/proto/anki`.
 
 For example:
 
-```
+```proto
 service StatsService {
   rpc GetGraphPreferences(generic.Empty) returns (GraphPreferences);
 }
@@ -65,7 +65,7 @@ instead. `rslib-bridge/proto.rs` reads the Protobuf files (actually, a binary
 representation of them exported by the backend), and
 automatically generates methods for us into a GeneratedBackend.kt file. Eg:
 
-```
+```kotlin
     @Throws(BackendException::class)
     fun getGraphPreferencesRaw(input: ByteArray): ByteArray {
         return runMethodRaw(service=10, method=2, input);
@@ -112,7 +112,7 @@ with translations set to the language currently configured by the user.
 
 The API `rslib-bridge` exposes is defined in `rsdroid`'s NativeMethods.kt:
 
-```
+```kotlin
     external fun runMethodRaw(backendPointer: Long, service: Int, method: Int, args: ByteArray): Array<ByteArray?>?
     external fun openBackend(data: ByteArray): Array<ByteArray?>?
     external fun closeBackend(backendPointer: Long)
@@ -136,7 +136,7 @@ It contains changes to work with the new backend methods,
 such as requesting a list of decks from the backend instead of directly trying
 to query them via SQL, eg:
 
-```
+```kotlin
     override fun all_names_and_ids(skip_empty_default: Boolean, include_filtered: Boolean): List<DeckNameId> {
         return backend.getDeckNames(skip_empty_default, include_filtered).map {
                 entry ->
