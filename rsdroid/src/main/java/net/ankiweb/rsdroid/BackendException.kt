@@ -122,6 +122,45 @@ open class BackendException : RuntimeException {
         error: BackendError,
     ) : BackendException(error)
 
+    class BackendUndoEmptyException(
+        error: BackendError,
+    ) : BackendException(error)
+
+    class BackendCustomStudyException(
+        error: BackendError,
+    ) : BackendException(error)
+
+    /** @see BackendError.Kind.IMPORT_ERROR */
+    class BackendImportException(
+        error: BackendError,
+    ) : BackendException(error)
+
+    /** @see BackendError.Kind.DELETED */
+    class BackendItemDeletedException(
+        error: BackendError,
+    ) : BackendException(error)
+
+    class BackendCardTypeException(
+        error: BackendError,
+    ) : BackendException(error)
+
+    /** @see BackendError.Kind.UNRECOGNIZED */
+    class BackendUnrecognizedException(
+        error: BackendError,
+    ) : BackendException(error)
+
+    class BackendOsErrorException(
+        error: BackendError,
+    ) : BackendException(error)
+
+    class BackendSchedulerUpgradeRequiredException(
+        error: BackendError,
+    ) : BackendException(error)
+
+    class BackendInvalidCertificateFormatException(
+        error: BackendError,
+    ) : BackendException(error)
+
     class BackendFatalError(
         error: BackendError,
     ) : BackendException(error)
@@ -146,15 +185,15 @@ open class BackendException : RuntimeException {
                 BackendError.Kind.IO_ERROR -> return BackendIoException(error)
                 BackendError.Kind.SEARCH_ERROR -> return BackendSearchException(error)
 
-                BackendError.Kind.UNDO_EMPTY -> return BackendException(error)
-                BackendError.Kind.CUSTOM_STUDY_ERROR -> return BackendException(error)
-                BackendError.Kind.IMPORT_ERROR -> return BackendException(error)
-                BackendError.Kind.DELETED -> return BackendException(error)
-                BackendError.Kind.CARD_TYPE_ERROR -> return BackendException(error)
-                BackendError.Kind.UNRECOGNIZED -> return BackendException(error)
-                BackendError.Kind.OS_ERROR -> return BackendException(error)
-                BackendError.Kind.SCHEDULER_UPGRADE_REQUIRED -> return BackendException(error)
-                BackendError.Kind.INVALID_CERTIFICATE_FORMAT -> return BackendException(error)
+                BackendError.Kind.UNDO_EMPTY -> return BackendUndoEmptyException(error)
+                BackendError.Kind.CUSTOM_STUDY_ERROR -> return BackendCustomStudyException(error)
+                BackendError.Kind.IMPORT_ERROR -> return BackendImportException(error)
+                BackendError.Kind.DELETED -> return BackendItemDeletedException(error)
+                BackendError.Kind.CARD_TYPE_ERROR -> return BackendCardTypeException(error)
+                BackendError.Kind.UNRECOGNIZED -> return BackendUnrecognizedException(error)
+                BackendError.Kind.OS_ERROR -> return BackendOsErrorException(error)
+                BackendError.Kind.SCHEDULER_UPGRADE_REQUIRED -> return BackendSchedulerUpgradeRequiredException(error)
+                BackendError.Kind.INVALID_CERTIFICATE_FORMAT -> return BackendInvalidCertificateFormatException(error)
             }
         }
 
