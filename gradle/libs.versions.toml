@@ -20,7 +20,7 @@ espresso = "3.6.1"
 gradle = "8.10.1"
 gradleMavenPublishPlugin = "0.32.0"
 junitJupiter = "5.13.1"
-kotlin = '2.1.21'
+kotlin = '2.2.0'
 # https://github.com/protocolbuffers/protobuf/releases
 protobuf = "4.31.1"
 robolectric = "4.15"
