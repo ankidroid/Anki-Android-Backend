@@ -20,6 +20,7 @@ import android.database.sqlite.SQLiteDatabaseCorruptException
 import android.database.sqlite.SQLiteException
 import android.database.sqlite.SQLiteFullException
 import anki.backend.BackendError
+import anki.links.HelpPageLinkRequest.HelpPage
 import net.ankiweb.rsdroid.exceptions.*
 import net.ankiweb.rsdroid.exceptions.BackendSyncException.BackendSyncAuthFailedException
 import net.ankiweb.rsdroid.exceptions.BackendSyncException.BackendSyncServerMessageException
@@ -36,6 +37,17 @@ open class BackendException : RuntimeException {
     constructor(message: String?) : super(message) {
         error = null
     }
+
+    val helpPage: HelpPage?
+        get() = if (error?.hasHelpPage() == true) error.helpPage else null
+
+    /**
+     * Returns a link to the Anki Desktop help page for a given [BackendException]
+     *
+     * e.g. [HelpPage.CARD_TYPE_TEMPLATE_ERROR] => `https://docs.ankiweb.net/templates/errors.html#template-syntax-error`
+     */
+    @Suppress("unused")
+    fun getDesktopHelpPageLink(backend: Backend): String? = helpPage?.let { backend.helpPageLink(it) }
 
     open fun toSQLiteException(query: String): RuntimeException {
         val message = String.format(Locale.ROOT, "error while compiling: \"%s\": %s", query, this.localizedMessage)
