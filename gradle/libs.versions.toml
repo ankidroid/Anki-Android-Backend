@@ -16,10 +16,17 @@ androidxTestJunit = "1.2.1"
 # https://commons.apache.org/proper/commons-exec/changes.html
 commonsExec = "1.5.0"
 espresso = "3.6.1"
-# https://github.com/JetBrains/kotlin/releases/
-gradle = "8.10.1"
+# AGP is included in Android Studio and changelogs are not well maintained/at a stable URL
+# Open https://developer.android.com/build/releases/gradle-plugin#patch-releases
+# Maybe select a "bug fixes" link ->
+# https://developer.android.com/studio/releases/fixed-bugs/studio/2024.1.1
+#
+# Old changelogs - See 'Table of Contents' in sidebar
+# https://developer.android.com/build/releases/past-releases
+androidGradlePlugin = "8.10.1"
 gradleMavenPublishPlugin = "0.33.0"
 junitJupiter = "5.13.2"
+# https://github.com/JetBrains/kotlin/releases/
 kotlin = '2.2.0'
 # https://github.com/protocolbuffers/protobuf/releases
 protobuf = "4.31.1"
@@ -43,10 +50,12 @@ junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "jun
 robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
 
 # to be moved to plugins
-gradle = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
-gradle-maven-publish-plugin = { module = "com.vanniktech:gradle-maven-publish-plugin", version.ref = "gradleMavenPublishPlugin" }
 kotlin-android-extensions = { module = "org.jetbrains.kotlin:kotlin-android-extensions", version.ref = "kotlin" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 
 [plugins]
-
+android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
+android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
+#gradle = { id = "com.android.tools.build.gradle", version.ref = "gradle" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+gradle-maven-publish-plugin = { id = "com.vanniktech.maven.publish", version.ref = "gradleMavenPublishPlugin" }
