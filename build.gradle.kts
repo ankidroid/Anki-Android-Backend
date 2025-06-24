@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.android.library) apply false
     alias(libs.plugins.gradle.maven.publish.plugin) apply false
+    alias(libs.plugins.ktlint.gradle.plugin) apply false
 }
 
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
@@ -20,6 +21,17 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+    }
+}
+
+// can't be obtained inside 'subprojects'
+val ktlintVersion = libs.versions.ktlint.get()
+
+// Here we extract per-module "best practices" settings to a single top-level evaluation
+subprojects {
+    apply(plugin = "org.jlleitschuh.gradle.ktlint")
+    configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
+        version.set(ktlintVersion)
     }
 }
 
