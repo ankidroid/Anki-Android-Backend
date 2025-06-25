@@ -53,6 +53,7 @@ class ExceptionTest {
     @Parameterized.Parameter(value = 1)
     @JvmField
     var clazz: Class<out Exception?>? = null
+
     @Before
     fun errorProducesNamedException() {
         backend = BackendForTesting.create()
@@ -66,11 +67,15 @@ class ExceptionTest {
         assertThrows(errorType!!, clazz)
     }
 
-    private fun assertThrows(e: BackendForTesting.ErrorType, clazz: Class<out Exception?>?) {
+    private fun assertThrows(
+        e: BackendForTesting.ErrorType,
+        clazz: Class<out Exception?>?,
+    ) {
         try {
             backend!!.debugProduceError(e)
             Assert.fail()
-        } catch (ex: Throwable) { // we catch BackendFatalError here
+        } catch (ex: Throwable) {
+            // we catch BackendFatalError here
             if (ex.javaClass != clazz) {
                 Assert.fail("ex was not an instance of " + clazz!!.simpleName + ". Instead: " + ex.javaClass + ". message: " + ex.message)
             }
@@ -89,83 +94,83 @@ class ExceptionTest {
                 *arrayOf(
                     arrayOf(
                         BackendForTesting.ErrorType.CollectionAlreadyOpen,
-                        BackendCollectionAlreadyOpenException::class.java
+                        BackendCollectionAlreadyOpenException::class.java,
                     ),
                     arrayOf(
                         BackendForTesting.ErrorType.CollectionNotOpen,
-                        BackendCollectionNotOpenException::class.java
+                        BackendCollectionNotOpenException::class.java,
                     ),
                     arrayOf(BackendForTesting.ErrorType.SearchError, NOT_POSSIBLE),
                     arrayOf(
                         BackendForTesting.ErrorType.SyncErrorAuthFailed,
-                        BackendSyncAuthFailedException::class.java
+                        BackendSyncAuthFailedException::class.java,
                     ),
                     arrayOf(
                         BackendForTesting.ErrorType.SyncErrorOther,
-                        BackendSyncException::class.java
+                        BackendSyncException::class.java,
                     ),
                     arrayOf(
                         BackendForTesting.ErrorType.SyncErrorServerMessage,
-                        BackendSyncException.BackendSyncServerMessageException::class.java
+                        BackendSyncException.BackendSyncServerMessageException::class.java,
                     ),
                     arrayOf(BackendForTesting.ErrorType.DbErrorCorrupt, NOT_POSSIBLE),
                     arrayOf(
                         BackendForTesting.ErrorType.DbErrorFileTooNew,
-                        BackendDbFileTooNewException::class.java
+                        BackendDbFileTooNewException::class.java,
                     ),
                     arrayOf(
                         BackendForTesting.ErrorType.DbErrorFileTooOld,
-                        BackendDbFileTooOldException::class.java
+                        BackendDbFileTooOldException::class.java,
                     ),
                     arrayOf(
                         BackendForTesting.ErrorType.DbErrorLocked,
-                        BackendDbLockedException::class.java
+                        BackendDbLockedException::class.java,
                     ),
                     arrayOf(
                         BackendForTesting.ErrorType.DbErrorMissingEntity,
-                        BackendDbMissingEntityException::class.java
+                        BackendDbMissingEntityException::class.java,
                     ),
                     arrayOf(
                         BackendForTesting.ErrorType.DbErrorOther,
-                        BackendDbException::class.java
+                        BackendDbException::class.java,
                     ),
                     arrayOf(
                         BackendForTesting.ErrorType.NetworkError,
-                        BackendNetworkException::class.java
+                        BackendNetworkException::class.java,
                     ),
                     arrayOf(
                         BackendForTesting.ErrorType.FilteredDeckError,
-                        BackendDeckIsFilteredException::class.java
+                        BackendDeckIsFilteredException::class.java,
                     ),
                     arrayOf(
                         BackendForTesting.ErrorType.Existing,
-                        BackendExistingException::class.java
+                        BackendExistingException::class.java,
                     ),
                     arrayOf(
                         BackendForTesting.ErrorType.Interrupted,
-                        BackendInterruptedException::class.java
+                        BackendInterruptedException::class.java,
                     ),
                     arrayOf(
                         BackendForTesting.ErrorType.InvalidInput,
-                        BackendInvalidInputException::class.java
+                        BackendInvalidInputException::class.java,
                     ),
                     arrayOf(
                         BackendForTesting.ErrorType.JSONError,
-                        BackendJsonException::class.java
+                        BackendJsonException::class.java,
                     ),
                     arrayOf(
                         BackendForTesting.ErrorType.ProtoError,
-                        BackendProtoException::class.java
+                        BackendProtoException::class.java,
                     ),
                     arrayOf(
                         BackendForTesting.ErrorType.TemplateError,
-                        BackendTemplateException::class.java
+                        BackendTemplateException::class.java,
                     ),
                     arrayOf(
                         BackendForTesting.ErrorType.NotFound,
-                        BackendNotFoundException::class.java
-                    )
-                )
+                        BackendNotFoundException::class.java,
+                    ),
+                ),
             )
         }
     }

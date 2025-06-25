@@ -25,9 +25,17 @@ import net.ankiweb.rsdroid.BackendException
  * CollectionAlreadyOpen
  * SearchError
  */
-open class BackendInvalidInputException(error: BackendError?) : BackendException(error!!) {
-    class BackendCollectionAlreadyOpenException(error: BackendError?) : BackendInvalidInputException(error)
-    class BackendCollectionNotOpenException(error: BackendError?) : BackendInvalidInputException(error)
+open class BackendInvalidInputException(
+    error: BackendError?,
+) : BackendException(error!!) {
+    class BackendCollectionAlreadyOpenException(
+        error: BackendError?,
+    ) : BackendInvalidInputException(error)
+
+    class BackendCollectionNotOpenException(
+        error: BackendError?,
+    ) : BackendInvalidInputException(error)
+
     companion object {
         fun fromInvalidInputError(error: BackendError): BackendInvalidInputException {
             when (error.message) {

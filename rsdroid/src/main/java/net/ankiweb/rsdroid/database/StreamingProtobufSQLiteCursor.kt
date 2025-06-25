@@ -28,16 +28,19 @@ import net.ankiweb.rsdroid.utils.StringToLong
 import java.util.*
 
 open class StreamingProtobufSQLiteCursor(
-        /**
-         * Rust Implementation:
-         *
-         * When we request a query, rust calculates 2MB (default) of results and sends it to us
-         *
-         * We keep track of where we are with getSliceStartIndex: the index into the rust collection
-         *
-         * The next request should be for index: getSliceStartIndex() + getCurrentSliceRowCount()
-         */
-        private val backend: SQLHandler, private val query: String, bindArgs: Array<out Any?>) : AnkiDatabaseCursor() {
+    /**
+     * Rust Implementation:
+     *
+     * When we request a query, rust calculates 2MB (default) of results and sends it to us
+     *
+     * We keep track of where we are with getSliceStartIndex: the index into the rust collection
+     *
+     * The next request should be for index: getSliceStartIndex() + getCurrentSliceRowCount()
+     */
+    private val backend: SQLHandler,
+    private val query: String,
+    bindArgs: Array<out Any?>,
+) : AnkiDatabaseCursor() {
     private var results: DbResponse? = null
 
     /** The local position in the current slice  */
@@ -58,19 +61,17 @@ open class StreamingProtobufSQLiteCursor(
             val requestedIndex = if (startingAtIndex == -1L) 0 else startingAtIndex
             results = backend.getNextSlice(requestedIndex, sequenceNumber)
             positionInSlice = if (startingAtIndex == -1L) -1 else 0
-            check(results!!.sequenceNumber == sequenceNumber) { "rsdroid does not currently handle nested cursor-based queries. Please change the code to avoid holding a reference to the query, or implement the functionality in rsdroid" }
+            check(results!!.sequenceNumber == sequenceNumber) {
+                "rsdroid does not currently handle nested cursor-based queries. Please change the code to avoid holding a reference to the query, or implement the functionality in rsdroid"
+            }
         } catch (e: BackendException) {
             throw e.toSQLiteException(query)
         }
     }
 
-    override fun getCount(): Int {
-        return rowCount
-    }
+    override fun getCount(): Int = rowCount
 
-    override fun getPosition(): Int {
-        return sliceStartIndex + positionInSlice
-    }
+    override fun getPosition(): Int = sliceStartIndex + positionInSlice
 
     override fun moveToPosition(nextPositionGlobal: Int): Boolean {
         val nextPositionLocal = nextPositionGlobal - sliceStartIndex
@@ -114,13 +115,9 @@ open class StreamingProtobufSQLiteCursor(
         throw IllegalArgumentException(String.format("Could not find column '%s'", columnName))
     }
 
-    override fun getColumnName(columnIndex: Int): String {
-        return columnNamesInternal[columnIndex]
-    }
+    override fun getColumnName(columnIndex: Int): String = columnNamesInternal[columnIndex]
 
-    override fun getColumnNames(): Array<String> {
-        return columnNamesInternal
-    }
+    override fun getColumnNames(): Array<String> = columnNamesInternal
 
     private val columnNamesInternal: Array<String>
         get() {
@@ -131,13 +128,12 @@ open class StreamingProtobufSQLiteCursor(
             return columnMapping!!
         }
 
-    override fun getColumnCount(): Int {
-        return if (currentSliceRowCount == 0) {
+    override fun getColumnCount(): Int =
+        if (currentSliceRowCount == 0) {
             0
         } else {
             results!!.result.getRows(0).fieldsCount
         }
-    }
 
     override fun getString(columnIndex: Int): String? {
         val field = getFieldAtIndex(columnIndex)
@@ -175,21 +171,13 @@ open class StreamingProtobufSQLiteCursor(
         }
     }
 
-    override fun getShort(columnIndex: Int): Short {
-        return getLong(columnIndex).toShort()
-    }
+    override fun getShort(columnIndex: Int): Short = getLong(columnIndex).toShort()
 
-    override fun getInt(columnIndex: Int): Int {
-        return getLong(columnIndex).toInt()
-    }
+    override fun getInt(columnIndex: Int): Int = getLong(columnIndex).toInt()
 
-    override fun getFloat(columnIndex: Int): Float {
-        return getDouble(columnIndex).toFloat()
-    }
+    override fun getFloat(columnIndex: Int): Float = getDouble(columnIndex).toFloat()
 
-    private fun isNull(field: SqlValue): Boolean {
-        return field.dataCase == DataCase.DATA_NOT_SET
-    }
+    private fun isNull(field: SqlValue): Boolean = field.dataCase == DataCase.DATA_NOT_SET
 
     override fun isNull(columnIndex: Int): Boolean {
         val field = getFieldAtIndex(columnIndex)
@@ -201,9 +189,7 @@ open class StreamingProtobufSQLiteCursor(
         backend.cancelCurrentProtoQuery(sequenceNumber)
     }
 
-    override fun isClosed(): Boolean {
-        return isClosed
-    }
+    override fun isClosed(): Boolean = isClosed
 
     override fun getType(columnIndex: Int): Int {
         val field = getFieldAtIndex(columnIndex)
@@ -222,33 +208,31 @@ open class StreamingProtobufSQLiteCursor(
             val result = results!!.result
             val rowCount = currentSliceRowCount
             if (positionInSlice < 0 || positionInSlice >= rowCount) {
-                throw CursorIndexOutOfBoundsException(String.format(Locale.ROOT, "Index %d requested, with a size of %d", positionInSlice, rowCount))
+                throw CursorIndexOutOfBoundsException(
+                    String.format(Locale.ROOT, "Index %d requested, with a size of %d", positionInSlice, rowCount),
+                )
             }
             return result.getRows(positionInSlice)
         }
 
-    private fun getFieldAtIndex(columnIndex: Int): SqlValue {
-        return rowAtCurrentPosition.getFields(columnIndex)
-    }
+    private fun getFieldAtIndex(columnIndex: Int): SqlValue = rowAtCurrentPosition.getFields(columnIndex)
 
     val currentSliceRowCount: Int
         get() = results!!.result.rowsCount
 
-    private fun strtoll(stringValue: String): Long {
-        return try {
+    private fun strtoll(stringValue: String): Long =
+        try {
             StringToLong.strtol(stringValue)
         } catch (exception: NumberFormatException) {
             0
         }
-    }
 
-    private fun strtod(stringValue: String): Double {
-        return try {
+    private fun strtod(stringValue: String): Double =
+        try {
             StringToDouble.strtod(stringValue)
         } catch (exception: NumberFormatException) {
             0.0
         }
-    }
 
     init {
         try {

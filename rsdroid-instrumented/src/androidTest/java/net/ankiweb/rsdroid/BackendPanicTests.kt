@@ -59,10 +59,11 @@ class BackendPanicTests : InstrumentedTest() {
     /** Causes future backend operations to throw a `PoisonError` */
     private fun panic(backend: Backend): BackendFatalError {
         panicExpected = true
-        val validNote = note {
-            fields.addAll(listOf("Hello", "World"))
-            notetypeId = backend.getNotetypeIdByName("Basic")
-        }
+        val validNote =
+            note {
+                fields.addAll(listOf("Hello", "World"))
+                notetypeId = backend.getNotetypeIdByName("Basic")
+            }
 
         val invalidNote = validNote.copy { id = 1 }
         try {

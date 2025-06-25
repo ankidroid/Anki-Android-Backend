@@ -31,6 +31,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+@file:Suppress("ktlint")
 /*
  *	Source code for the "strtod" library procedure.
  *
@@ -58,17 +59,18 @@ object StringToDouble {
      * produce underflow or overflow, so there's
      * no need to worry about additional digits.
      */
-    val powersOf10 = doubleArrayOf( /* Table giving binary powers of 10.  Entry */
-        10.0,  /* is 10^2^i.  Used to convert decimal */
-        100.0,  /* exponents into floating-point numbers. */
-        1.0e4,
-        1.0e8,
-        1.0e16,
-        1.0e32,
-        1.0e64,
-        1.0e128,
-        1.0e256
-    )
+    val powersOf10 =
+        doubleArrayOf( // Table giving binary powers of 10.  Entry
+            10.0, // is 10^2^i.  Used to convert decimal
+            100.0, // exponents into floating-point numbers.
+            1.0e4,
+            1.0e8,
+            1.0e16,
+            1.0e32,
+            1.0e64,
+            1.0e128,
+            1.0e256,
+        )
 
     /*
      * Only for testing
@@ -78,7 +80,11 @@ object StringToDouble {
         return strtod(utf8, 0, utf8.size)
     }
 
-    fun strtod(utf8: ByteArray, offset: Int, length: Int): Double {
+    fun strtod(
+        utf8: ByteArray,
+        offset: Int,
+        length: Int,
+    ): Double {
         if (length == 0) {
             throw NumberFormatException()
         }
@@ -89,7 +95,7 @@ object StringToDouble {
         var p = offset
         var end = offset + length
         var c: Int
-        var exp = 0 /* Exponent read from "EX" field. */
+        var exp = 0 // Exponent read from "EX" field.
         var fracExp: Int /* Exponent that derives from the fractional
          * part.  Under normal circumstatnces, it is
          * the negative of the number of digits in F.
@@ -99,7 +105,7 @@ object StringToDouble {
          * unnecessary overflow on I alone).  In this
          * case, fracExp is incremented one for each
          * dropped digit. */
-        var mantSize: Int /* Number of digits in mantissa. */
+        var mantSize: Int // Number of digits in mantissa.
         var decPt: Int /* Number of mantissa digits BEFORE decimal
          * point. */
         val pExp: Int /* Temporarily holds location of exponent
@@ -107,7 +113,8 @@ object StringToDouble {
 
         /*
          * Strip off leading blanks and check for a sign.
-         */while (p < end && Character.isWhitespace(utf8[p].toInt())) {
+         */
+        while (p < end && Character.isWhitespace(utf8[p].toInt())) {
             p++
         }
         while (end > p && Character.isWhitespace(utf8[end - 1].toInt())) {
@@ -129,7 +136,8 @@ object StringToDouble {
         /*
          * Count the number of digits in the mantissa (including the decimal
          * point), and also locate the decimal point.
-         */decPt = -1
+         */
+        decPt = -1
         val mantEnd = end - p
         mantSize = 0
         while (mantSize < mantEnd) {
@@ -149,12 +157,13 @@ object StringToDouble {
          * collect 9 digits each (this is faster than using floating-point).
          * If the mantissa has more than 18 digits, ignore the extras, since
          * they can't affect the value anyway.
-         */pExp = p
+         */
+        pExp = p
         p -= mantSize
         if (decPt < 0) {
             decPt = mantSize
         } else {
-            mantSize -= 1 /* One of the digits was the point. */
+            mantSize -= 1 // One of the digits was the point.
         }
         if (mantSize > 18) {
             fracExp = decPt - 18
@@ -165,7 +174,9 @@ object StringToDouble {
         if (mantSize == 0) {
             return if (signIsNegative) {
                 -0.0
-            } else 0.0
+            } else {
+                0.0
+            }
         } else {
             var frac1: Double
             var frac2: Double
@@ -196,7 +207,8 @@ object StringToDouble {
 
         /*
          * Skim off the exponent.
-         */p = pExp
+         */
+        p = pExp
         if (p < end) {
             if (utf8[p] == 'E'.code.toByte() || utf8[p] == 'e'.code.toByte()) {
                 p += 1
@@ -217,18 +229,20 @@ object StringToDouble {
                 }
             }
         }
-        exp = if (expSignIsNegative) {
-            fracExp - exp
-        } else {
-            fracExp + exp
-        }
+        exp =
+            if (expSignIsNegative) {
+                fracExp - exp
+            } else {
+                fracExp + exp
+            }
 
         /*
          * Generate a floating-point number that represents the exponent.
          * Do this by processing the exponent one bit at a time to combine
          * many powers of 2 of 10. Then combine the exponent with the
          * fraction.
-         */if (exp < 0) {
+         */
+        if (exp < 0) {
             expSignIsNegative = true
             exp = -exp
         } else {
@@ -253,10 +267,16 @@ object StringToDouble {
         }
         return if (signIsNegative) {
             -fraction
-        } else fraction
+        } else {
+            fraction
+        }
     }
 
-    private fun testSimpleDecimal(utf8: ByteArray, off: Int, len: Int): Boolean {
+    private fun testSimpleDecimal(
+        utf8: ByteArray,
+        off: Int,
+        len: Int,
+    ): Boolean {
         if (len > 18) {
             return false
         }
@@ -281,7 +301,5 @@ object StringToDouble {
         return decimalPts <= 1 && signs <= 1 && nondigits == 0 && digits < 16
     }
 
-    private fun isdigit(c: Int): Boolean {
-        return '0'.code <= c && c <= '9'.code
-    }
+    private fun isdigit(c: Int): Boolean = '0'.code <= c && c <= '9'.code
 }

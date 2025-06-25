@@ -19,4 +19,6 @@ import anki.backend.BackendError
 import net.ankiweb.rsdroid.BackendException
 
 /** An item was not found (example: a deck from backend.get_deck_legacy)  */
-class BackendNotFoundException(error: BackendError?) : BackendException(error!!)
+class BackendNotFoundException(
+    error: BackendError?,
+) : BackendException(error!!)

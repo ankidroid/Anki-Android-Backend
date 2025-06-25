@@ -34,7 +34,11 @@ import timber.log.Timber
 import java.io.Closeable
 import java.io.File
 
-open class Backend(langs: Iterable<String> = listOf("en")) : GeneratedBackend(), SQLHandler, Closeable {
+open class Backend(
+    langs: Iterable<String> = listOf("en"),
+) : GeneratedBackend(),
+    SQLHandler,
+    Closeable {
     // Set on init; unset on .close(). Access via withBackend()
     private var backendPointer: Long? = null
 
@@ -42,17 +46,18 @@ open class Backend(langs: Iterable<String> = listOf("en")) : GeneratedBackend(),
         Translations(this)
     }
 
-    fun isOpen(): Boolean {
-        return backendPointer != null
-    }
+    fun isOpen(): Boolean = backendPointer != null
 
     fun openCollection(collectionPath: String) {
-        val (mediaFolder, mediaDb) = if (collectionPath == ":memory:") {
-            listOf("", "")
-        } else {
-            listOf(collectionPath.replace(".anki2", ".media"),
-                    collectionPath.replace(".anki2", ".media.db"))
-        }
+        val (mediaFolder, mediaDb) =
+            if (collectionPath == ":memory:") {
+                listOf("", "")
+            } else {
+                listOf(
+                    collectionPath.replace(".anki2", ".media"),
+                    collectionPath.replace(".anki2", ".media.db"),
+                )
+            }
         checkMainThreadOp()
         openCollection(collectionPath, mediaFolder, mediaDb)
     }
@@ -72,7 +77,9 @@ open class Backend(langs: Iterable<String> = listOf("en")) : GeneratedBackend(),
     init {
         checkMainThreadOp()
         Timber.d("Opening rust backend with lang=$langs")
-        val input = BackendInit.newBuilder()
+        val input =
+            BackendInit
+                .newBuilder()
                 .addAllPreferredLangs(langs)
                 .build()
                 .toByteArray()
@@ -93,7 +100,11 @@ open class Backend(langs: Iterable<String> = listOf("en")) : GeneratedBackend(),
     /**
      * Open a collection. There must not already be an open collection.
      */
-    override fun openCollection(collectionPath: String, mediaFolderPath: String, mediaDbPath: String) {
+    override fun openCollection(
+        collectionPath: String,
+        mediaFolderPath: String,
+        mediaDbPath: String,
+    ) {
         try {
             super.openCollection(collectionPath, mediaFolderPath, mediaDbPath)
         } catch (exc: BackendException.BackendDbException) {
@@ -112,13 +123,16 @@ open class Backend(langs: Iterable<String> = listOf("en")) : GeneratedBackend(),
     /**
      * All backend methods (except for backend init/close) flow through this.
      */
-    override fun runMethodRaw(service: Int, method: Int, input: ByteArray): ByteArray {
+    override fun runMethodRaw(
+        service: Int,
+        method: Int,
+        input: ByteArray,
+    ): ByteArray {
         checkMainThreadOp()
         return withBackend {
             unpackResult(NativeMethods.runMethodRaw(it, service, method, input))
         }
     }
-
 
     /**
      * Run the provided closure with access to the backend.
@@ -133,49 +147,60 @@ open class Backend(langs: Iterable<String> = listOf("en")) : GeneratedBackend(),
 
     // other DB methods
 
-    override fun closeDatabase() {
-        throw NotImplementedException("should close collection, not db")
-    }
+    override fun closeDatabase(): Unit = throw NotImplementedException("should close collection, not db")
 
-    override fun getPath(): String? {
-        throw NotImplementedException()
-    }
+    override fun getPath(): String? = throw NotImplementedException()
 
     @CheckResult
-    override fun fullQuery(query: String, bindArgs: Array<Any?>?): JSONArray {
-        return try {
+    override fun fullQuery(
+        query: String,
+        bindArgs: Array<Any?>?,
+    ): JSONArray =
+        try {
             fullQueryInternal(query, bindArgs ?: emptyArray())
         } catch (e: JSONException) {
             throw RuntimeException(e)
         }
-    }
 
     @Throws(JSONException::class)
-    private fun fullQueryInternal(sql: String, bindArgs: Array<Any?>): JSONArray {
+    private fun fullQueryInternal(
+        sql: String,
+        bindArgs: Array<Any?>,
+    ): JSONArray {
         checkMainThreadSQL(sql)
         val output = runDbCommand(dbRequestJson(sql, bindArgs)).toStringUtf8()
         return JSONArray(output)
     }
 
-    override fun insertForId(sql: String, bindArgs: Array<Any?>?): Long {
+    override fun insertForId(
+        sql: String,
+        bindArgs: Array<Any?>?,
+    ): Long {
         checkMainThreadSQL(sql)
         return super.insertForId(dbRequestJson(sql, bindArgs ?: emptyArray()))
     }
 
-    override fun executeGetRowsAffected(sql: String, bindArgs: Array<Any?>?): Int {
+    override fun executeGetRowsAffected(
+        sql: String,
+        bindArgs: Array<Any?>?,
+    ): Int {
         checkMainThreadSQL(sql)
         return runDbCommandForRowCount(dbRequestJson(sql, bindArgs ?: emptyArray())).toInt()
     }
 
-    /* Begin Protobuf-based database streaming methods (#6) */
-    override fun fullQueryProto(query: String, bindArgs: Array<out Any?>): DbResponse {
+    // Begin Protobuf-based database streaming methods (#6)
+    override fun fullQueryProto(
+        query: String,
+        bindArgs: Array<out Any?>,
+    ): DbResponse {
         checkMainThreadSQL(query)
         return runDbCommandProto(dbRequestJson(query, bindArgs))
     }
 
-    override fun getNextSlice(startIndex: Long, sequenceNumber: Int): DbResponse {
-        return getNextResultPage(sequenceNumber, startIndex)
-    }
+    override fun getNextSlice(
+        startIndex: Long,
+        sequenceNumber: Int,
+    ): DbResponse = getNextResultPage(sequenceNumber, startIndex)
 
     override fun cancelCurrentProtoQuery(sequenceNumber: Int) {
         flushQuery(sequenceNumber)
@@ -191,31 +216,36 @@ open class Backend(langs: Iterable<String> = listOf("en")) : GeneratedBackend(),
         super.setPageSize(pageSizeBytes)
     }
 
-    override fun getColumnNames(sql: String): Array<String> {
-        return getColumnNamesFromQuery(sql).toTypedArray()
-    }
+    override fun getColumnNames(sql: String): Array<String> = getColumnNamesFromQuery(sql).toTypedArray()
 
     private fun checkMainThreadOp(sql: String? = null) {
         if (!checkOperationsRunOnMainThread) return
         runIfOnMainThread {
             val stackTraceElements = Thread.currentThread().stackTrace
-            val firstElem = stackTraceElements.filter {
-                val klass = it.className
-                for (text in listOf("rsdroid", "libanki", "java.lang", "dalvik", "anki.backend",
-                        "DatabaseChangeDecorator")) {
-                    if (text in klass) {
-                        return@filter false
-                    }
-                }
-                true
-            }.first()
+            val firstElem =
+                stackTraceElements
+                    .filter {
+                        val klass = it.className
+                        for (text in listOf(
+                            "rsdroid",
+                            "libanki",
+                            "java.lang",
+                            "dalvik",
+                            "anki.backend",
+                            "DatabaseChangeDecorator",
+                        )) {
+                            if (text in klass) {
+                                return@filter false
+                            }
+                        }
+                        true
+                    }.first()
             Timber.w("Op on UI thread: %s", firstElem)
             sql?.let {
                 Timber.w("%s", sql)
             }
         }
     }
-
 
     private fun checkMainThreadSQL(query: String) {
         checkMainThreadOp(query)
@@ -253,13 +283,18 @@ open class Backend(langs: Iterable<String> = listOf("en")) : GeneratedBackend(),
 /**
  * Build a JSON DB request
  */
-private fun dbRequestJson(sql: String = "", bindArgs: Array<out Any?> = emptyArray(), firstRowOnly: Boolean = false): ByteString {
-    val o = JSONObject().apply {
-        put("kind", "query")
-        put("sql", sql)
-        put("args", JSONArray(bindArgs.toList()))
-        put("first_row_only", firstRowOnly)
-    }
+private fun dbRequestJson(
+    sql: String = "",
+    bindArgs: Array<out Any?> = emptyArray(),
+    firstRowOnly: Boolean = false,
+): ByteString {
+    val o =
+        JSONObject().apply {
+            put("kind", "query")
+            put("sql", sql)
+            put("args", JSONArray(bindArgs.toList()))
+            put("first_row_only", firstRowOnly)
+        }
     return ByteString.copyFromUtf8(o.toString())
 }
 
@@ -273,11 +308,12 @@ private fun unpackResult(result: Array<ByteArray?>?): ByteArray {
     val (successBytes, errorBytes) = result
     if (errorBytes != null) {
         // convert the error to an exception
-        val pbError: BackendError = try {
-            BackendError.parseFrom(errorBytes)
-        } catch (invalidProtocolBufferException: InvalidProtocolBufferException) {
-            throw BackendException.fromException(invalidProtocolBufferException)
-        }
+        val pbError: BackendError =
+            try {
+                BackendError.parseFrom(errorBytes)
+            } catch (invalidProtocolBufferException: InvalidProtocolBufferException) {
+                throw BackendException.fromException(invalidProtocolBufferException)
+            }
         throw BackendException.fromError(pbError)
     } else if (successBytes != null) {
         return successBytes

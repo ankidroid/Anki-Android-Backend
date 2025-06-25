@@ -30,7 +30,10 @@ object Shared {
      * Throws the exception, so we can report it in syncing log
      */
     @Throws(IOException::class)
-    private fun writeToFileImpl(source: InputStream, destination: String) {
+    private fun writeToFileImpl(
+        source: InputStream,
+        destination: String,
+    ) {
         val f = File(destination)
         try {
             f.createNewFile()
@@ -46,7 +49,10 @@ object Shared {
      * @throws IOException Rethrows exception after a set number of retries
      */
     @Throws(IOException::class)
-    fun writeToFile(source: InputStream, destination: String) {
+    fun writeToFile(
+        source: InputStream,
+        destination: String,
+    ) {
         // sometimes this fails and works on retries (hardware issue?)
         val retries = 5
         var retryCnt = 0
@@ -73,7 +79,10 @@ object Shared {
      * @param name An additional suffix to ensure the test directory is only used by a particular resource.
      * @return See getTestDir.
      */
-    private fun getTestDir(context: Context, name: String): File {
+    private fun getTestDir(
+        context: Context,
+        name: String,
+    ): File {
         var suffix = ""
         if (!TextUtils.isEmpty(name)) {
             suffix = "-$name"
@@ -82,12 +91,13 @@ object Shared {
         if (!dir.exists()) {
             Assert.assertTrue(dir.mkdir())
         }
-        val files = dir.listFiles()
-            ?: // Had this problem on an API 16 emulator after a stress test - directory existed
+        val files =
+            dir.listFiles()
+                ?: // Had this problem on an API 16 emulator after a stress test - directory existed
 // but listFiles() returned null due to EMFILE (Too many open files)
 // Don't throw here - later file accesses will provide a better exception.
 // and the directory exists, even if it's unusable.
-            return dir
+                return dir
         for (f in files) {
             Assert.assertTrue(f.delete())
         }
@@ -104,9 +114,13 @@ object Shared {
     @JvmStatic
     @CheckResult
     @Throws(IOException::class)
-    fun getTestFilePath(context: Context, name: String): String {
-        val `is` = context.classLoader.getResourceAsStream("assets/$name")
-            ?: throw FileNotFoundException("Could not find test file: assets/$name")
+    fun getTestFilePath(
+        context: Context,
+        name: String,
+    ): String {
+        val `is` =
+            context.classLoader.getResourceAsStream("assets/$name")
+                ?: throw FileNotFoundException("Could not find test file: assets/$name")
         val dst = File(getTestDir(context, name), name).absolutePath
         writeToFile(`is`, dst)
         return dst

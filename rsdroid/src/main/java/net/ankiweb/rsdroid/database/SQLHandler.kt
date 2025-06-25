@@ -21,25 +21,44 @@ import org.json.JSONArray
 
 interface SQLHandler {
     @CheckResult
-    fun fullQuery(query: String, bindArgs: Array<Any?>?): JSONArray
-    fun fullQuery(query: String): JSONArray {
-        return fullQuery(query, null)
-    }
+    fun fullQuery(
+        query: String,
+        bindArgs: Array<Any?>?,
+    ): JSONArray
 
-    fun executeGetRowsAffected(sql: String, bindArgs: Array<Any?>?): Int
-    fun insertForId(sql: String, bindArgs: Array<Any?>?): Long
+    fun fullQuery(query: String): JSONArray = fullQuery(query, null)
+
+    fun executeGetRowsAffected(
+        sql: String,
+        bindArgs: Array<Any?>?,
+    ): Int
+
+    fun insertForId(
+        sql: String,
+        bindArgs: Array<Any?>?,
+    ): Long
 
     @CheckResult
     fun getColumnNames(sql: String): Array<String>
+
     fun closeDatabase()
 
     @CheckResult
     fun getPath(): String?
 
-    /* Protobuf-related (#6) */
-    fun getNextSlice(startIndex: Long, sequenceNumber: Int): DbResponse
-    fun fullQueryProto(query: String, bindArgs: Array<out Any?>): DbResponse
+    // Protobuf-related (#6)
+    fun getNextSlice(
+        startIndex: Long,
+        sequenceNumber: Int,
+    ): DbResponse
+
+    fun fullQueryProto(
+        query: String,
+        bindArgs: Array<out Any?>,
+    ): DbResponse
+
     fun cancelCurrentProtoQuery(sequenceNumber: Int)
+
     fun cancelAllProtoQueries()
 
     /**

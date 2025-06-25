@@ -33,7 +33,6 @@ class BackendSlowTests : InstrumentedTest() {
         // Presently the Rust loads all the data at once - from the exceptions below,
         // we also need to work around this.
 
-
         // Testing was done on an API 21 emulator - 1536 RAM, 256MB VM Heap
         // using JSON, these parameters crashed the app, this does not happen with protobuf
         val numberOfElements = 10000
@@ -50,7 +49,7 @@ class BackendSlowTests : InstrumentedTest() {
                 // add a suffix so the string can't be interned
                 db.execSQL(
                     "insert into tmp (id) values (?)",
-                    arrayOf<Any>(longString.toString() + i)
+                    arrayOf<Any>(longString.toString() + i),
                 )
             }
             var count = 0

@@ -32,40 +32,51 @@ import timber.log.Timber
  * implementation, and many of the methods are not relevant.
  */
 abstract class AnkiDatabaseCursor : Cursor {
-    override fun isFirst(): Boolean {
-        return position == 0
-    }
+    override fun isFirst(): Boolean = position == 0
 
-    override fun isBeforeFirst(): Boolean {
-        return position < 0
-    }
+    override fun isBeforeFirst(): Boolean = position < 0
 
     abstract override fun getCount(): Int
+
     abstract override fun getPosition(): Int
+
     abstract override fun getColumnIndex(columnName: String): Int
 
     @Throws(IllegalArgumentException::class)
     abstract override fun getColumnIndexOrThrow(columnName: String): Int
-    abstract override fun getColumnName(columnIndex: Int): String
-    abstract override fun getColumnNames(): Array<String>
-    abstract override fun getColumnCount(): Int
-    abstract override fun getString(columnIndex: Int): String?
-    abstract override fun getShort(columnIndex: Int): Short
-    abstract override fun getInt(columnIndex: Int): Int
-    abstract override fun getLong(columnIndex: Int): Long
-    abstract override fun getFloat(columnIndex: Int): Float
-    abstract override fun getDouble(columnIndex: Int): Double
-    abstract override fun isNull(columnIndex: Int): Boolean
-    abstract override fun close()
-    abstract override fun isClosed(): Boolean
-    abstract override fun getType(columnIndex: Int): Int
-    override fun getBlob(columnIndex: Int): ByteArray {
-        throw NotImplementedException()
-    }
 
-    override fun setNotificationUri(cr: ContentResolver, uri: Uri) {
-        throw NotImplementedException()
-    }
+    abstract override fun getColumnName(columnIndex: Int): String
+
+    abstract override fun getColumnNames(): Array<String>
+
+    abstract override fun getColumnCount(): Int
+
+    abstract override fun getString(columnIndex: Int): String?
+
+    abstract override fun getShort(columnIndex: Int): Short
+
+    abstract override fun getInt(columnIndex: Int): Int
+
+    abstract override fun getLong(columnIndex: Int): Long
+
+    abstract override fun getFloat(columnIndex: Int): Float
+
+    abstract override fun getDouble(columnIndex: Int): Double
+
+    abstract override fun isNull(columnIndex: Int): Boolean
+
+    abstract override fun close()
+
+    abstract override fun isClosed(): Boolean
+
+    abstract override fun getType(columnIndex: Int): Int
+
+    override fun getBlob(columnIndex: Int): ByteArray = throw NotImplementedException()
+
+    override fun setNotificationUri(
+        cr: ContentResolver,
+        uri: Uri,
+    ): Unit = throw NotImplementedException()
 
     @Deprecated("Deprecated in Java")
     override fun deactivate() {
@@ -73,9 +84,10 @@ abstract class AnkiDatabaseCursor : Cursor {
         throw NotImplementedException()
     }
 
-    override fun copyStringToBuffer(columnIndex: Int, buffer: CharArrayBuffer) {
-        throw NotImplementedException()
-    }
+    override fun copyStringToBuffer(
+        columnIndex: Int,
+        buffer: CharArrayBuffer,
+    ): Unit = throw NotImplementedException()
 
     @Deprecated("Deprecated in Java")
     override fun requery(): Boolean {
@@ -83,27 +95,18 @@ abstract class AnkiDatabaseCursor : Cursor {
         throw NotImplementedException()
     }
 
-    override fun getNotificationUri(): Uri {
-        throw NotImplementedException()
-    }
+    override fun getNotificationUri(): Uri = throw NotImplementedException()
 
-    override fun getWantsAllOnMoveCalls(): Boolean {
-        return false
-    }
+    override fun getWantsAllOnMoveCalls(): Boolean = false
 
-    override fun setExtras(extras: Bundle) {
-        throw NotImplementedException()
-    }
+    override fun setExtras(extras: Bundle): Unit = throw NotImplementedException()
 
-    override fun getExtras(): Bundle {
-        throw NotImplementedException()
-    }
+    override fun getExtras(): Bundle = throw NotImplementedException()
 
-    override fun respond(extras: Bundle): Bundle {
-        throw NotImplementedException()
-    }
+    override fun respond(extras: Bundle): Bundle = throw NotImplementedException()
 
     abstract override fun moveToPosition(nextPositionGlobal: Int): Boolean
+
     override fun registerContentObserver(observer: ContentObserver) {
         Timber.w("Not implemented: registerContentObserver - shouldn't matter unless requery() is called")
     }
@@ -120,26 +123,18 @@ abstract class AnkiDatabaseCursor : Cursor {
         Timber.w("Not implemented: unregisterDataSetObserver - shouldn't matter unless requery() is called")
     }
 
-    override fun isLast(): Boolean {
-        return position == lastPosition
-    }
+    override fun isLast(): Boolean = position == lastPosition
 
-    override fun isAfterLast(): Boolean {
-        return position >= count
-    }
+    override fun isAfterLast(): Boolean = position >= count
 
-    override fun move(offset: Int): Boolean {
-        return moveToPosition(position + offset)
-    }
+    override fun move(offset: Int): Boolean = moveToPosition(position + offset)
 
     override fun moveToLast(): Boolean {
         val toMoveTo = lastPosition
         return moveToPosition(toMoveTo)
     }
 
-    override fun moveToFirst(): Boolean {
-        return moveToPosition(0)
-    }
+    override fun moveToFirst(): Boolean = moveToPosition(0)
 
     override fun moveToNext(): Boolean {
         val toMoveTo = position + 1

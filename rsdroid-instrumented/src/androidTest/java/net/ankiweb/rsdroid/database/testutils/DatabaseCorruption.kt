@@ -24,22 +24,27 @@ import java.io.IOException
 abstract class DatabaseCorruption : DatabaseComparison() {
     private var mDatabasePath: String? = null
     private var mException: Exception? = null
+
     override fun handleSetupException(e: Exception?): Boolean {
         mException = e
         return true
     }
 
     override val databasePath: String
-        get() = if (mDatabasePath != null) {
-            mDatabasePath!!
-        } else try {
-            val testFilePath = getTestFilePath(context, corruptDatabaseAssetName!!)
-            mDatabasePath = testFilePath
-            testFilePath
-        } catch (e: IOException) {
-            throw RuntimeException(e)
-        }
+        get() =
+            if (mDatabasePath != null) {
+                mDatabasePath!!
+            } else {
+                try {
+                    val testFilePath = getTestFilePath(context, corruptDatabaseAssetName!!)
+                    mDatabasePath = testFilePath
+                    testFilePath
+                } catch (e: IOException) {
+                    throw RuntimeException(e)
+                }
+            }
     protected abstract val corruptDatabaseAssetName: String?
+
     @Test
     fun testCorruption() {
         MatcherAssert.assertThat(mException, Matchers.notNullValue())

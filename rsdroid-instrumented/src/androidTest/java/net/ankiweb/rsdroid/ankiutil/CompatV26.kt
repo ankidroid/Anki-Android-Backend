@@ -24,17 +24,22 @@ import java.nio.file.StandardCopyOption
 
 class CompatV26 : CompatV16() {
     @Throws(IOException::class)
-    override fun copyFile(source: String, target: String) {
+    override fun copyFile(
+        source: String,
+        target: String,
+    ) {
         Files.copy(Paths.get(source), Paths.get(target), StandardCopyOption.REPLACE_EXISTING)
     }
 
     @Throws(IOException::class)
-    override fun copyFile(source: String, target: OutputStream): Long {
-        return Files.copy(Paths.get(source), target)
-    }
+    override fun copyFile(
+        source: String,
+        target: OutputStream,
+    ): Long = Files.copy(Paths.get(source), target)
 
     @Throws(IOException::class)
-    override fun copyFile(source: InputStream, target: String): Long {
-        return Files.copy(source, Paths.get(target), StandardCopyOption.REPLACE_EXISTING)
-    }
+    override fun copyFile(
+        source: InputStream,
+        target: String,
+    ): Long = Files.copy(source, Paths.get(target), StandardCopyOption.REPLACE_EXISTING)
 }

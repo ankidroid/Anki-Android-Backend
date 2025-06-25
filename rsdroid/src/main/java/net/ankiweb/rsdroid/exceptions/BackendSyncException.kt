@@ -18,7 +18,14 @@ package net.ankiweb.rsdroid.exceptions
 import anki.backend.BackendError
 import net.ankiweb.rsdroid.BackendException
 
-open class BackendSyncException(error: BackendError?) : BackendException(error!!) {
-    class BackendSyncAuthFailedException(error: BackendError?) : BackendSyncException(error)
-    class BackendSyncServerMessageException(error: BackendError?) : BackendSyncException(error)
+open class BackendSyncException(
+    error: BackendError?,
+) : BackendException(error!!) {
+    class BackendSyncAuthFailedException(
+        error: BackendError?,
+    ) : BackendSyncException(error)
+
+    class BackendSyncServerMessageException(
+        error: BackendError?,
+    ) : BackendSyncException(error)
 }

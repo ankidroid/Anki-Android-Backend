@@ -32,9 +32,7 @@ abstract class AnkiSupportSQLiteDatabase {
          * Caller is responsible for opening&closing the database.
          */
         @JvmStatic
-        fun withRustBackend(backend: Backend): SupportSQLiteDatabase {
-            return RustSupportSQLiteDatabase(backend)
-        }
+        fun withRustBackend(backend: Backend): SupportSQLiteDatabase = RustSupportSQLiteDatabase(backend)
 
         /**
          * Open a connection using the Android framework.
@@ -42,8 +40,14 @@ abstract class AnkiSupportSQLiteDatabase {
          */
         @JvmStatic
         @JvmOverloads
-        fun withFramework(context: Context, path: String?, dbCallback: SupportSQLiteOpenHelper.Callback? = null): SupportSQLiteDatabase {
-            val configuration = SupportSQLiteOpenHelper.Configuration.builder(context)
+        fun withFramework(
+            context: Context,
+            path: String?,
+            dbCallback: SupportSQLiteOpenHelper.Callback? = null,
+        ): SupportSQLiteDatabase {
+            val configuration =
+                SupportSQLiteOpenHelper.Configuration
+                    .builder(context)
                     .name(path)
                     .callback(dbCallback ?: DefaultDbCallback(1))
                     .build()
@@ -51,9 +55,17 @@ abstract class AnkiSupportSQLiteDatabase {
         }
     }
 
-    open class DefaultDbCallback(version: Int) : SupportSQLiteOpenHelper.Callback(version) {
+    open class DefaultDbCallback(
+        version: Int,
+    ) : SupportSQLiteOpenHelper.Callback(version) {
         override fun onCreate(db: SupportSQLiteDatabase) {}
-        override fun onUpgrade(db: SupportSQLiteDatabase, oldVersion: Int, newVersion: Int) {}
+
+        override fun onUpgrade(
+            db: SupportSQLiteDatabase,
+            oldVersion: Int,
+            newVersion: Int,
+        ) {}
+
         override fun onCorruption(db: SupportSQLiteDatabase) {}
     }
 }

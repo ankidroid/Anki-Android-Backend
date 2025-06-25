@@ -29,6 +29,7 @@ open class DatabaseComparison : InstrumentedTest() {
     @JvmField
     var schedVersion: DatabaseType? = null
     protected lateinit var mDatabase: SupportSQLiteDatabase
+
     @Before
     fun setUp() {
         try {
@@ -42,9 +43,7 @@ open class DatabaseComparison : InstrumentedTest() {
         }
     }
 
-    protected open fun handleSetupException(e: Exception?): Boolean {
-        return false
-    }
+    protected open fun handleSetupException(e: Exception?): Boolean = false
 
     protected val database: SupportSQLiteDatabase
         get() {
@@ -61,7 +60,7 @@ open class DatabaseComparison : InstrumentedTest() {
             throw IllegalStateException()
         }
     protected open val databasePath: String?
-        get() =// TODO: look into this - null should work
+        get() = // TODO: look into this - null should work
             try {
                 when (schedVersion) {
                     DatabaseType.RUST -> ":memory:"
@@ -71,24 +70,24 @@ open class DatabaseComparison : InstrumentedTest() {
             } catch (ex: NullPointerException) {
                 throw IllegalStateException(
                     "Class is not annotated with @RunWith(Parameterized.class)",
-                    ex
+                    ex,
                 )
             }
 
     enum class DatabaseType {
-        FRAMEWORK, RUST
+        FRAMEWORK,
+        RUST,
     }
 
     companion object {
         @Parameterized.Parameters(name = "{0}")
         @JvmStatic
-        fun initParameters(): Collection<Array<Any>> {
-            return Arrays.asList(
+        fun initParameters(): Collection<Array<Any>> =
+            Arrays.asList(
                 *arrayOf(
                     arrayOf(DatabaseType.FRAMEWORK),
-                    arrayOf(DatabaseType.RUST)
-                )
+                    arrayOf(DatabaseType.RUST),
+                ),
             )
-        }
     }
 }

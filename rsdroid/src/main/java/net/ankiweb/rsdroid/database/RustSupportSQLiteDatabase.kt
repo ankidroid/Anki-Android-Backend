@@ -55,9 +55,10 @@ import java.util.*
  * - .close() is a no-op - you should call .close() on the collection (or
  *   backend directly in testing) instead
  * - isOpen and getPath return dummy data
- */ 
-class RustSupportSQLiteDatabase(private val backend: Backend) : SupportSQLiteDatabase {
-
+ */
+class RustSupportSQLiteDatabase(
+    private val backend: Backend,
+) : SupportSQLiteDatabase {
     override var isReadOnly: Boolean
         @Suppress("UNUSED_PARAMETER")
         set(readOnly) {
@@ -76,25 +77,15 @@ class RustSupportSQLiteDatabase(private val backend: Backend) : SupportSQLiteDat
             return true
         }
 
-    override fun compileStatement(sql: String): SupportSQLiteStatement {
-        return RustSQLiteStatement(this, sql)
-    }
+    override fun compileStatement(sql: String): SupportSQLiteStatement = RustSQLiteStatement(this, sql)
 
-    override fun beginTransaction() {
-        throw NotImplementedException()
-    }
+    override fun beginTransaction(): Unit = throw NotImplementedException()
 
-    override fun endTransaction() {
-        throw NotImplementedException()
-    }
+    override fun endTransaction(): Unit = throw NotImplementedException()
 
-    override fun setTransactionSuccessful() {
-        throw NotImplementedException()
-    }
+    override fun setTransactionSuccessful(): Unit = throw NotImplementedException()
 
-    override fun inTransaction(): Boolean {
-        return false
-    }
+    override fun inTransaction(): Boolean = false
 
     override var version: Int
         @Suppress("UNUSED_PARAMETER")
@@ -105,24 +96,26 @@ class RustSupportSQLiteDatabase(private val backend: Backend) : SupportSQLiteDat
             throw NotImplementedException.todo()
         }
 
-    override fun query(query: String): Cursor {
-        return query(query, emptyArray())
-    }
+    override fun query(query: String): Cursor = query(query, emptyArray())
 
-    override fun query(query: String, bindArgs: Array<out Any?>): Cursor {
-        return StreamingProtobufSQLiteCursor(backend, query, bindArgs)
-    }
+    override fun query(
+        query: String,
+        bindArgs: Array<out Any?>,
+    ): Cursor = StreamingProtobufSQLiteCursor(backend, query, bindArgs)
 
-    override fun query(query: SupportSQLiteQuery): Cursor {
-        throw NotImplementedException.todo()
-    }
+    override fun query(query: SupportSQLiteQuery): Cursor = throw NotImplementedException.todo()
 
-    override fun query(query: SupportSQLiteQuery, cancellationSignal: CancellationSignal?): Cursor {
-        throw NotImplementedException.todo()
-    }
+    override fun query(
+        query: SupportSQLiteQuery,
+        cancellationSignal: CancellationSignal?,
+    ): Cursor = throw NotImplementedException.todo()
 
     @Throws(SQLException::class)
-    override fun insert(table: String, conflictAlgorithm: Int, values: ContentValues): Long {
+    override fun insert(
+        table: String,
+        conflictAlgorithm: Int,
+        values: ContentValues,
+    ): Long {
         val sql = StringBuilder()
         sql.append("INSERT")
         sql.append(CONFLICT_VALUES[conflictAlgorithm])
@@ -154,7 +147,13 @@ class RustSupportSQLiteDatabase(private val backend: Backend) : SupportSQLiteDat
         return 0
     }
 
-    override fun update(table: String, conflictAlgorithm: Int, values: ContentValues, whereClause: String?, whereArgs: Array<out Any?>?): Int {
+    override fun update(
+        table: String,
+        conflictAlgorithm: Int,
+        values: ContentValues,
+        whereClause: String?,
+        whereArgs: Array<out Any?>?,
+    ): Int {
         // taken from SQLiteDatabase class.
         require(values.size() > 0) { "Empty values" }
         val sql = StringBuilder(120)
@@ -194,7 +193,10 @@ class RustSupportSQLiteDatabase(private val backend: Backend) : SupportSQLiteDat
     }
 
     @Throws(SQLException::class)
-    override fun execSQL(sql: String, bindArgs: Array<out Any?>) {
+    override fun execSQL(
+        sql: String,
+        bindArgs: Array<out Any?>,
+    ) {
         query(sql, bindArgs).close()
     }
 
@@ -243,25 +245,33 @@ class RustSupportSQLiteDatabase(private val backend: Backend) : SupportSQLiteDat
         // no-op
     }
 
-    /* Not part of interface */
-    fun executeGetRowsAffected(sql: String, bindArgs: Array<Any?>?): Int {
-        return try {
+    // Not part of interface
+    fun executeGetRowsAffected(
+        sql: String,
+        bindArgs: Array<Any?>?,
+    ): Int =
+        try {
             backend.executeGetRowsAffected(sql, bindArgs)
         } catch (e: Exception) {
             throw RuntimeException(e)
         }
-    }
 
-    fun insertForForId(sql: String, bindArgs: Array<Any?>?): Long {
-        return try {
+    fun insertForForId(
+        sql: String,
+        bindArgs: Array<Any?>?,
+    ): Long =
+        try {
             backend.insertForId(sql, bindArgs)
         } catch (e: Exception) {
             throw RuntimeException(e)
         }
-    }
 
     /** Confirmed that the below are not used for our code  */
-    override fun delete(table: String, whereClause: String?, whereArgs: Array<out Any?>?): Int {
+    override fun delete(
+        table: String,
+        whereClause: String?,
+        whereArgs: Array<out Any?>?,
+    ): Int {
         // Complex to implement and not required
         throw NotImplementedException()
     }
@@ -275,25 +285,16 @@ class RustSupportSQLiteDatabase(private val backend: Backend) : SupportSQLiteDat
             throw NotImplementedException()
         }
 
-    override fun yieldIfContendedSafely(): Boolean {
-        throw NotImplementedException()
-    }
+    override fun yieldIfContendedSafely(): Boolean = throw NotImplementedException()
 
-    override fun yieldIfContendedSafely(sleepAfterYieldDelayMillis: Long): Boolean {
-        throw NotImplementedException()
-    }
+    override fun yieldIfContendedSafely(sleepAfterYieldDelayMillis: Long): Boolean = throw NotImplementedException()
 
-    override fun setLocale(locale: Locale) {
-        throw NotImplementedException()
-    }
+    override fun setLocale(locale: Locale): Unit = throw NotImplementedException()
 
-    override fun setMaxSqlCacheSize(cacheSize: Int) {
-        throw NotImplementedException()
-    }
+    override fun setMaxSqlCacheSize(cacheSize: Int): Unit = throw NotImplementedException()
 
-    override fun setMaximumSize(numBytes: Long): Long {
-        throw NotImplementedException()
-    }
+    override fun setMaximumSize(numBytes: Long): Long = throw NotImplementedException()
+
     override val maximumSize: Long
         get() {
             throw NotImplementedException()
@@ -308,13 +309,9 @@ class RustSupportSQLiteDatabase(private val backend: Backend) : SupportSQLiteDat
             throw NotImplementedException()
         }
 
-    override fun setForeignKeyConstraintsEnabled(enabled: Boolean) {
-        throw NotImplementedException()
-    }
+    override fun setForeignKeyConstraintsEnabled(enabled: Boolean): Unit = throw NotImplementedException()
 
-    override fun enableWriteAheadLogging(): Boolean {
-        throw NotImplementedException()
-    }
+    override fun enableWriteAheadLogging(): Boolean = throw NotImplementedException()
 
     override var attachedDbs: List<Pair<String, String>>
         @Suppress("UNUSED_PARAMETER")
@@ -325,17 +322,12 @@ class RustSupportSQLiteDatabase(private val backend: Backend) : SupportSQLiteDat
             throw NotImplementedException()
         }
 
-    override fun beginTransactionNonExclusive() {
-        throw NotImplementedException()
-    }
+    override fun beginTransactionNonExclusive(): Unit = throw NotImplementedException()
 
-    override fun beginTransactionWithListener(transactionListener: SQLiteTransactionListener) {
-        throw NotImplementedException()
-    }
+    override fun beginTransactionWithListener(transactionListener: SQLiteTransactionListener): Unit = throw NotImplementedException()
 
-    override fun beginTransactionWithListenerNonExclusive(transactionListener: SQLiteTransactionListener) {
+    override fun beginTransactionWithListenerNonExclusive(transactionListener: SQLiteTransactionListener): Unit =
         throw NotImplementedException()
-    }
 
     companion object {
         private val CONFLICT_VALUES = arrayOf("", " OR ROLLBACK ", " OR ABORT ", " OR FAIL ", " OR IGNORE ", " OR REPLACE ")

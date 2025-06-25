@@ -37,7 +37,7 @@ object BackendFactory {
     fun getBackend(languages: Iterable<String>? = null): Backend {
         val langs = languages ?: defaultLanguages
         return backendForTesting?.invoke(langs) ?: Backend(
-                langs,
+            langs,
         )
     }
 

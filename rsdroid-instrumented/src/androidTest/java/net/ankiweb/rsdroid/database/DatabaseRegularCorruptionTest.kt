@@ -31,15 +31,16 @@ class DatabaseRegularCorruptionTest : DatabaseCorruption() {
 
 //        assertThat(setupException.getClass(), typeCompatibleWith(BackendException.BackendDbException.class));
         MatcherAssert.assertThat(
-            setupException.javaClass, Matchers.typeCompatibleWith(
-                SQLiteDatabaseCorruptException::class.java
-            )
+            setupException.javaClass,
+            Matchers.typeCompatibleWith(
+                SQLiteDatabaseCorruptException::class.java,
+            ),
         )
 
         // this mapping to an unrelated exception should be done at a higher level
         MatcherAssert.assertThat(
             setupException.localizedMessage,
-            Matchers.containsString("database disk image is malformed")
+            Matchers.containsString("database disk image is malformed"),
         )
         MatcherAssert.assertThat(setupException.localizedMessage, Matchers.containsString("11"))
     }
