@@ -23,7 +23,7 @@ espresso = "3.6.1"
 #
 # Old changelogs - See 'Table of Contents' in sidebar
 # https://developer.android.com/build/releases/past-releases
-androidGradlePlugin = "8.10.1"
+androidGradlePlugin = "8.11.0"
 gradleMavenPublishPlugin = "0.33.0"
 junitJupiter = "5.13.2"
 # https://github.com/JetBrains/kotlin/releases/
