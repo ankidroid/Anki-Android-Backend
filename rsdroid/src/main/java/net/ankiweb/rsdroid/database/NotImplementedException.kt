@@ -21,8 +21,6 @@ class NotImplementedException : RuntimeException {
 
     companion object {
         /** A method which we should implement  */
-        fun todo(): NotImplementedException {
-            return NotImplementedException()
-        }
+        fun todo(): NotImplementedException = NotImplementedException()
     }
 }

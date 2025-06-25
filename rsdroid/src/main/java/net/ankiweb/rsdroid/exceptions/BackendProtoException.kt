@@ -18,4 +18,6 @@ package net.ankiweb.rsdroid.exceptions
 import anki.backend.BackendError
 import net.ankiweb.rsdroid.BackendException
 
-class BackendProtoException(error: BackendError?) : BackendException(error!!)
+class BackendProtoException(
+    error: BackendError?,
+) : BackendException(error!!)

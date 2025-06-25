@@ -25,12 +25,15 @@ import java.io.OutputStream
 open class CompatV16 : Compat {
     // Until API 26 do the copy using streams
     @Throws(IOException::class)
-    override fun copyFile(source: String, target: String) {
+    override fun copyFile(
+        source: String,
+        target: String,
+    ) {
         try {
             FileInputStream(File(source)).use { fileInputStream ->
                 copyFile(
                     fileInputStream,
-                    target
+                    target,
                 )
             }
         } catch (e: IOException) {
@@ -40,7 +43,10 @@ open class CompatV16 : Compat {
 
     // Until API 26 do the copy using streams
     @Throws(IOException::class)
-    override fun copyFile(source: String, target: OutputStream): Long {
+    override fun copyFile(
+        source: String,
+        target: OutputStream,
+    ): Long {
         var count: Long
         try {
             FileInputStream(File(source)).use { fileInputStream ->
@@ -54,7 +60,10 @@ open class CompatV16 : Compat {
 
     // Until API 26 do the copy using streams
     @Throws(IOException::class)
-    override fun copyFile(source: InputStream, target: String): Long {
+    override fun copyFile(
+        source: InputStream,
+        target: String,
+    ): Long {
         var bytesCopied: Long
         try {
             FileOutputStream(target).use { targetStream ->
@@ -67,7 +76,10 @@ open class CompatV16 : Compat {
     }
 
     @Throws(IOException::class)
-    private fun copyFile(source: InputStream, target: OutputStream): Long {
+    private fun copyFile(
+        source: InputStream,
+        target: OutputStream,
+    ): Long {
         // balance memory and performance, it appears 32k is the best trade-off
         // https://stackoverflow.com/questions/10143731/android-optimal-buffer-size
         val buffer = ByteArray(1024 * 32)

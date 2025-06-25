@@ -33,6 +33,7 @@ class BackendIntegrationTests : InstrumentedTest() {
     /** Ensure that the database can't be locked  */
     @get:Rule
     var timeout = Timeout(60, TimeUnit.SECONDS)
+
     @Before
     fun test() {
         require(isEmulator) { "do not run on real device yet" }
@@ -81,9 +82,9 @@ class BackendIntegrationTests : InstrumentedTest() {
                     "models",
                     "decks",
                     "dconf",
-                    "tags"
-                )
-            )
+                    "tags",
+                ),
+            ),
         )
     }
 }

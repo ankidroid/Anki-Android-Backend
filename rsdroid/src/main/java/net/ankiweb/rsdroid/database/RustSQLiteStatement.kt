@@ -18,19 +18,19 @@ package net.ankiweb.rsdroid.database
 import android.database.sqlite.SQLiteDoneException
 import androidx.sqlite.db.SupportSQLiteStatement
 
-class RustSQLiteStatement(private val database: RustSupportSQLiteDatabase, private val sql: String) : SupportSQLiteStatement {
+class RustSQLiteStatement(
+    private val database: RustSupportSQLiteDatabase,
+    private val sql: String,
+) : SupportSQLiteStatement {
     private val mBindings = HashMap<Int, Any?>()
+
     override fun execute() {
         database.query(sql, bindings).close()
     }
 
-    override fun executeUpdateDelete(): Int {
-        return database.executeGetRowsAffected(sql, bindings)
-    }
+    override fun executeUpdateDelete(): Int = database.executeGetRowsAffected(sql, bindings)
 
-    override fun executeInsert(): Long {
-        return database.insertForForId(sql, bindings)
-    }
+    override fun executeInsert(): Long = database.insertForForId(sql, bindings)
 
     override fun simpleQueryForLong(): Long {
         database.query(sql, bindings).use { query ->
@@ -54,19 +54,31 @@ class RustSQLiteStatement(private val database: RustSupportSQLiteDatabase, priva
         bind(index, null)
     }
 
-    override fun bindLong(index: Int, value: Long) {
+    override fun bindLong(
+        index: Int,
+        value: Long,
+    ) {
         bind(index, value)
     }
 
-    override fun bindDouble(index: Int, value: Double) {
+    override fun bindDouble(
+        index: Int,
+        value: Double,
+    ) {
         bind(index, value)
     }
 
-    override fun bindString(index: Int, value: String) {
+    override fun bindString(
+        index: Int,
+        value: String,
+    ) {
         bind(index, value)
     }
 
-    override fun bindBlob(index: Int, value: ByteArray) {
+    override fun bindBlob(
+        index: Int,
+        value: ByteArray,
+    ) {
         bind(index, value)
     }
 
@@ -75,7 +87,11 @@ class RustSQLiteStatement(private val database: RustSupportSQLiteDatabase, priva
     }
 
     override fun close() {}
-    private fun bind(index: Int, value: Any?) {
+
+    private fun bind(
+        index: Int,
+        value: Any?,
+    ) {
         mBindings[index] = value
     }
 

@@ -48,20 +48,27 @@ import java.io.OutputStream
  */
 interface Compat {
     @Throws(IOException::class)
-    fun copyFile(source: String, target: String)
+    fun copyFile(
+        source: String,
+        target: String,
+    )
 
     @Throws(IOException::class)
-    fun copyFile(source: String, target: OutputStream): Long
+    fun copyFile(
+        source: String,
+        target: OutputStream,
+    ): Long
 
     @Throws(IOException::class)
-    fun copyFile(source: InputStream, target: String): Long
+    fun copyFile(
+        source: InputStream,
+        target: String,
+    ): Long
 }
 
-
-fun getCompat(): Compat {
-    return if (Build.VERSION.SDK_INT >= 26) {
+fun getCompat(): Compat =
+    if (Build.VERSION.SDK_INT >= 26) {
         CompatV26()
     } else {
         CompatV16()
     }
-}

@@ -21,4 +21,6 @@ import net.ankiweb.rsdroid.BackendException
 /**
  * TODO: Document this
  */
-class BackendExistingException(error: BackendError?) : BackendException(error!!)
+class BackendExistingException(
+    error: BackendError?,
+) : BackendException(error!!)

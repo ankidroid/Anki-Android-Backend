@@ -23,5 +23,6 @@ package net.ankiweb.rsdroid
 @JvmRepeatable(RustCleanupCollection::class)
 @kotlin.annotation.Retention(AnnotationRetention.SOURCE)
 annotation class RustCleanup(
-        /** Context and rationale for the cleanup, and the action which will be taken  */
-        val value: String)
+    /** Context and rationale for the cleanup, and the action which will be taken  */
+    val value: String,
+)

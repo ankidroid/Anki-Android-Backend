@@ -17,7 +17,9 @@ package net.ankiweb.rsdroid
 
 import androidx.annotation.VisibleForTesting
 
-class BackendForTesting(langs: Iterable<String>) : Backend(langs) {
+class BackendForTesting(
+    langs: Iterable<String>,
+) : Backend(langs) {
     // Debug methods
     /**
      * Throws a given error, generated from the Rust
@@ -30,7 +32,28 @@ class BackendForTesting(langs: Iterable<String>) : Backend(langs) {
     }
 
     enum class ErrorType {
-        InvalidInput, TemplateError, DbErrorFileTooNew, DbErrorFileTooOld, DbErrorMissingEntity, DbErrorCorrupt, DbErrorLocked, DbErrorOther, NetworkError, SyncErrorAuthFailed, SyncErrorOther, SyncErrorServerMessage, JSONError, ProtoError, Interrupted, CollectionNotOpen, CollectionAlreadyOpen, NotFound, Existing, FilteredDeckError, SearchError, FatalError
+        InvalidInput,
+        TemplateError,
+        DbErrorFileTooNew,
+        DbErrorFileTooOld,
+        DbErrorMissingEntity,
+        DbErrorCorrupt,
+        DbErrorLocked,
+        DbErrorOther,
+        NetworkError,
+        SyncErrorAuthFailed,
+        SyncErrorOther,
+        SyncErrorServerMessage,
+        JSONError,
+        ProtoError,
+        Interrupted,
+        CollectionNotOpen,
+        CollectionAlreadyOpen,
+        NotFound,
+        Existing,
+        FilteredDeckError,
+        SearchError,
+        FatalError,
     }
 
     companion object {

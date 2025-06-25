@@ -73,12 +73,13 @@ class RustDatabaseIntegrationTests : InstrumentedTest() {
 
     @get:CheckResult
     private val database: RustSupportSQLiteDatabase
-        get() = try {
-            val backendV1 = getBackend(fileName)
-            RustSupportSQLiteDatabase(backendV1)
-        } catch (e: Exception) {
-            throw RuntimeException(e)
-        }
+        get() =
+            try {
+                val backendV1 = getBackend(fileName)
+                RustSupportSQLiteDatabase(backendV1)
+            } catch (e: Exception) {
+                throw RuntimeException(e)
+            }
 
     companion object {
         const val fileName = "initial_version_2_12_1.anki2"

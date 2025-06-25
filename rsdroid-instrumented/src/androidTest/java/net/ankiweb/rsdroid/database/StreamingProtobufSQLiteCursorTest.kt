@@ -44,9 +44,7 @@ class StreamingProtobufSQLiteCursorTest : InstrumentedTest() {
         }
     }
 
-    private fun getWritableDatabase(backend: Backend): SupportSQLiteDatabase {
-        return withRustBackend(backend)
-    }
+    private fun getWritableDatabase(backend: Backend): SupportSQLiteDatabase = withRustBackend(backend)
 
     @Test
     @Throws(IOException::class)
@@ -96,7 +94,7 @@ class StreamingProtobufSQLiteCursorTest : InstrumentedTest() {
             MatcherAssert.assertThat(
                 "values haven't changed",
                 c.getLong(0),
-                Matchers.`is`(firstValue)
+                Matchers.`is`(firstValue),
             )
         }
     }
@@ -197,8 +195,13 @@ class StreamingProtobufSQLiteCursorTest : InstrumentedTest() {
         }
     }
 
-    private class TestCursor(backend: SQLHandler?, query: String?, bindArgs: Array<Any?>) :
-        StreamingProtobufSQLiteCursor(
-            backend!!, query!!, bindArgs
+    private class TestCursor(
+        backend: SQLHandler?,
+        query: String?,
+        bindArgs: Array<Any?>,
+    ) : StreamingProtobufSQLiteCursor(
+            backend!!,
+            query!!,
+            bindArgs,
         )
 }

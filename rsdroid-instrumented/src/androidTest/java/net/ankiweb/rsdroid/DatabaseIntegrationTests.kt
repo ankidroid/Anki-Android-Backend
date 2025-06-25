@@ -49,7 +49,7 @@ class DatabaseIntegrationTests : DatabaseComparison() {
         } catch (ex: IllegalArgumentException) {
             MatcherAssert.assertThat(
                 ex.message,
-                Matchers.`is`("Cannot bind argument at index 1 because the index is out of range.  The statement has 0 parameters.")
+                Matchers.`is`("Cannot bind argument at index 1 because the index is out of range.  The statement has 0 parameters."),
             )
         }
     }
@@ -88,7 +88,7 @@ class DatabaseIntegrationTests : DatabaseComparison() {
             } catch (e: CursorIndexOutOfBoundsException) {
                 MatcherAssert.assertThat(
                     e.message,
-                    Matchers.`is`("Index -1 requested, with a size of 1")
+                    Matchers.`is`("Index -1 requested, with a size of 1"),
                 )
             }
         }
@@ -108,10 +108,11 @@ class DatabaseIntegrationTests : DatabaseComparison() {
             testStringConversion(SQLOutput.asBlob(), "unused")
         } catch (e: SQLiteException) {
             MatcherAssert.assertThat(
-                e.message, Matchers.isOneOf(
+                e.message,
+                Matchers.isOneOf(
                     "unknown error (code 0): Unable to convert BLOB to string",
-                    "unknown error (code 0 SQLITE_OK): Unable to convert BLOB to string"
-                )
+                    "unknown error (code 0 SQLITE_OK): Unable to convert BLOB to string",
+                ),
             )
         }
     }
@@ -132,10 +133,11 @@ class DatabaseIntegrationTests : DatabaseComparison() {
             testIntConversion(SQLOutput.asBlob(), 42)
         } catch (e: SQLiteException) {
             MatcherAssert.assertThat(
-                e.message, Matchers.isOneOf(
+                e.message,
+                Matchers.isOneOf(
                     "unknown error (code 0): Unable to convert BLOB to long",
-                    "unknown error (code 0 SQLITE_OK): Unable to convert BLOB to long"
-                )
+                    "unknown error (code 0 SQLITE_OK): Unable to convert BLOB to long",
+                ),
             )
         }
     }
@@ -157,10 +159,11 @@ class DatabaseIntegrationTests : DatabaseComparison() {
             testLongConversion(SQLOutput.asBlob(), 42L)
         } catch (e: SQLiteException) {
             MatcherAssert.assertThat(
-                e.message, Matchers.isOneOf(
+                e.message,
+                Matchers.isOneOf(
                     "unknown error (code 0): Unable to convert BLOB to long",
-                    "unknown error (code 0 SQLITE_OK): Unable to convert BLOB to long"
-                )
+                    "unknown error (code 0 SQLITE_OK): Unable to convert BLOB to long",
+                ),
             )
         }
     }
@@ -181,10 +184,11 @@ class DatabaseIntegrationTests : DatabaseComparison() {
             testFloatConversion(SQLOutput.asBlob(), 42f)
         } catch (e: SQLiteException) {
             MatcherAssert.assertThat(
-                e.message, Matchers.isOneOf(
+                e.message,
+                Matchers.isOneOf(
                     "unknown error (code 0): Unable to convert BLOB to double",
-                    "unknown error (code 0 SQLITE_OK): Unable to convert BLOB to double"
-                )
+                    "unknown error (code 0 SQLITE_OK): Unable to convert BLOB to double",
+                ),
             )
         }
     }
@@ -205,10 +209,11 @@ class DatabaseIntegrationTests : DatabaseComparison() {
             testDoubleConversion(SQLOutput.asBlob(), 42.0)
         } catch (e: SQLiteException) {
             MatcherAssert.assertThat(
-                e.message, Matchers.isOneOf(
+                e.message,
+                Matchers.isOneOf(
                     "unknown error (code 0): Unable to convert BLOB to double",
-                    "unknown error (code 0 SQLITE_OK): Unable to convert BLOB to double"
-                )
+                    "unknown error (code 0 SQLITE_OK): Unable to convert BLOB to double",
+                ),
             )
         }
     }
@@ -217,7 +222,8 @@ class DatabaseIntegrationTests : DatabaseComparison() {
     fun testRowCountEmpty() {
         val db = mDatabase
         db.execSQL("create table test (id int)")
-        db.query("select * from test")
+        db
+            .query("select * from test")
             .use { c -> MatcherAssert.assertThat(c.count, Matchers.`is`(0)) }
     }
 
@@ -226,7 +232,8 @@ class DatabaseIntegrationTests : DatabaseComparison() {
         val db = mDatabase
         db.execSQL("create table test (id int)")
         db.execSQL("insert into test VALUES (1)")
-        db.query("select * from test")
+        db
+            .query("select * from test")
             .use { c -> MatcherAssert.assertThat(c.count, Matchers.`is`(1)) }
     }
 
@@ -239,9 +246,10 @@ class DatabaseIntegrationTests : DatabaseComparison() {
         }
         db.query("select * from test").use { c ->
             MatcherAssert.assertThat(
-                c.count, Matchers.`is`(
-                    DB_PAGE_NUM_INT_ELEMENTS
-                )
+                c.count,
+                Matchers.`is`(
+                    DB_PAGE_NUM_INT_ELEMENTS,
+                ),
             )
         }
     }
@@ -255,9 +263,10 @@ class DatabaseIntegrationTests : DatabaseComparison() {
         }
         db.query("select * from test").use { c ->
             MatcherAssert.assertThat(
-                c.count, Matchers.`is`(
-                    DB_PAGE_NUM_INT_ELEMENTS + 1
-                )
+                c.count,
+                Matchers.`is`(
+                    DB_PAGE_NUM_INT_ELEMENTS + 1,
+                ),
             )
         }
     }
@@ -292,7 +301,7 @@ class DatabaseIntegrationTests : DatabaseComparison() {
             // despite returning false, it works
             Assert.assertFalse(
                 "moveToPosition(-1) should return false, but should work",
-                c.moveToPosition(-1)
+                c.moveToPosition(-1),
             )
             MatcherAssert.assertThat(c.position, Matchers.`is`(-1))
         }
@@ -302,20 +311,24 @@ class DatabaseIntegrationTests : DatabaseComparison() {
     fun testRealConversionIssue() {
         val db = mDatabase
         db.execSQL(
-            "create table if not exists revlog (" + "   id              integer primary key,"
-                    + "   cid             integer not null," + "   usn             integer not null,"
-                    + "   ease            integer not null," + "   ivl             integer not null,"
-                    + "   lastIvl         integer not null," + "   factor          integer not null,"
-                    + "   time            integer not null," + "   type            integer not null)"
+            "create table if not exists revlog (" + "   id              integer primary key," +
+                "   cid             integer not null," + "   usn             integer not null," +
+                "   ease            integer not null," + "   ivl             integer not null," +
+                "   lastIvl         integer not null," + "   factor          integer not null," +
+                "   time            integer not null," + "   type            integer not null)",
         )
-
 
         // one in ms: 1622631861000 (Wednesday, 2 June 2021 11:04:21)
         // two in ms: 1622691861001 ( Thursday, 3 June 2021 03:44:21.001)
-        db.execSQL("insert into revlog (id, cid, usn, ease, ivl, lastIvl, factor, time, type) VALUES (1, 1, 0, 1, 10, 5, 250, 1622631861000, 1)")
-        db.execSQL("insert into revlog (id, cid, usn, ease, ivl, lastIvl, factor, time, type) VALUES (2, 1, 0, 1, 10, 5, 250, 1622691861001, 1)")
+        db.execSQL(
+            "insert into revlog (id, cid, usn, ease, ivl, lastIvl, factor, time, type) VALUES (1, 1, 0, 1, 10, 5, 250, 1622631861000, 1)",
+        )
+        db.execSQL(
+            "insert into revlog (id, cid, usn, ease, ivl, lastIvl, factor, time, type) VALUES (2, 1, 0, 1, 10, 5, 250, 1622691861001, 1)",
+        )
         val list = ArrayList<DoubleArray>(7) // one by day of the week
-        val query = "SELECT strftime('%w',datetime( cast(id/ 1000  -" + 3600 +
+        val query =
+            "SELECT strftime('%w',datetime( cast(id/ 1000  -" + 3600 +
                 " as int), 'unixepoch')) as wd, " +
                 "sum(case when ease = 1 then 0 else 1 end) / " +
                 "cast(count() as float) * 100, " +
@@ -331,33 +344,53 @@ class DatabaseIntegrationTests : DatabaseComparison() {
         val expected = ArrayList<DoubleArray>()
         expected.add(doubleArrayOf(3.0, 0.0, 2.0))
         MatcherAssert.assertThat(
-            list[0], Matchers.`is`(
-                expected[0]
-            )
+            list[0],
+            Matchers.`is`(
+                expected[0],
+            ),
         )
     }
 
-    fun testLongConversion(output: SQLOutput, expected: Long) {
+    fun testLongConversion(
+        output: SQLOutput,
+        expected: Long,
+    ) {
         testConversion(output, { c: Cursor -> c.getLong(0) }, expected)
     }
 
-    fun testStringConversion(output: SQLOutput, expected: String?) {
+    fun testStringConversion(
+        output: SQLOutput,
+        expected: String?,
+    ) {
         testConversion(output, { c: Cursor -> c.getString(0) }, expected)
     }
 
-    fun testIntConversion(output: SQLOutput, expected: Int) {
+    fun testIntConversion(
+        output: SQLOutput,
+        expected: Int,
+    ) {
         testConversion(output, { c: Cursor -> c.getInt(0) }, expected)
     }
 
-    fun testFloatConversion(output: SQLOutput, expected: Float) {
+    fun testFloatConversion(
+        output: SQLOutput,
+        expected: Float,
+    ) {
         testConversion(output, { c: Cursor -> c.getFloat(0) }, expected)
     }
 
-    fun testDoubleConversion(output: SQLOutput, expected: Double) {
+    fun testDoubleConversion(
+        output: SQLOutput,
+        expected: Double,
+    ) {
         testConversion(output, { c: Cursor -> c.getDouble(0) }, expected)
     }
 
-    fun testConversion(output: SQLOutput, f: (Cursor) -> Any?, expected: Any?) {
+    fun testConversion(
+        output: SQLOutput,
+        f: (Cursor) -> Any?,
+        expected: Any?,
+    ) {
         mDatabase.query("select cast(" + output.value + " as " + output.sqlType + " )").use { c ->
             c.moveToFirst()
             MatcherAssert.assertThat(f(c), Matchers.`is`(expected))
@@ -365,37 +398,38 @@ class DatabaseIntegrationTests : DatabaseComparison() {
     }
 
     enum class SQLiteType {
-        NULL, INTEGER, FLOAT, STRING, BLOB;
+        NULL,
+        INTEGER,
+        FLOAT,
+        STRING,
+        BLOB,
+        ;
 
         val sqlType: String
-            get() = when (this) {
-                INTEGER -> "INTEGER"
-                FLOAT -> "REAL"
-                NULL, STRING -> "TEXT"
-                BLOB -> "BLOB"
-            }
+            get() =
+                when (this) {
+                    INTEGER -> "INTEGER"
+                    FLOAT -> "REAL"
+                    NULL, STRING -> "TEXT"
+                    BLOB -> "BLOB"
+                }
     }
 
-    class SQLOutput(var type: SQLiteType, var value: String?) {
+    class SQLOutput(
+        var type: SQLiteType,
+        var value: String?,
+    ) {
         val sqlType: String
             get() = type.sqlType
 
         companion object {
-            fun asText(value: String): SQLOutput {
-                return SQLOutput(SQLiteType.STRING, "\"" + value + "\"")
-            }
+            fun asText(value: String): SQLOutput = SQLOutput(SQLiteType.STRING, "\"" + value + "\"")
 
-            fun asFloat(value: String): SQLOutput {
-                return SQLOutput(SQLiteType.FLOAT, value)
-            }
+            fun asFloat(value: String): SQLOutput = SQLOutput(SQLiteType.FLOAT, value)
 
-            fun asInt(value: String): SQLOutput {
-                return SQLOutput(SQLiteType.INTEGER, value)
-            }
+            fun asInt(value: String): SQLOutput = SQLOutput(SQLiteType.INTEGER, value)
 
-            fun asNull(): SQLOutput {
-                return SQLOutput(SQLiteType.NULL, null)
-            }
+            fun asNull(): SQLOutput = SQLOutput(SQLiteType.NULL, null)
 
             fun asBlob(): SQLOutput {
                 return SQLOutput(SQLiteType.BLOB, "\"aa\"") // Unsure about this

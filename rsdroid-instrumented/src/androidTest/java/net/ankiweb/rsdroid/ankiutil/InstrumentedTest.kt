@@ -41,44 +41,44 @@ open class InstrumentedTest {
         Timber added 1 minute to the stress test (1m18 -> 2m30). Didn't seem worth it.
         Timber.uprootAll();
         Timber.plant(new Timber.DebugTree());
-        */
+         */
     }
 
     @After
     fun after() {
         for (b in backendList) {
             if (b.isOpen()) {
-                val numbers: List<Int> = try {
-                    b.getActiveSequenceNumbers()
-                } catch (exc: BackendInvalidInputException) {
-                    assertThat(
-                        exc.localizedMessage,
-                        Matchers.containsString("CollectionNotOpen")
-                    )
-                    continue
-                } catch (exc: BackendException.BackendFatalError) {
-                    if (panicExpected) {
+                val numbers: List<Int> =
+                    try {
+                        b.getActiveSequenceNumbers()
+                    } catch (exc: BackendInvalidInputException) {
+                        assertThat(
+                            exc.localizedMessage,
+                            Matchers.containsString("CollectionNotOpen"),
+                        )
                         continue
+                    } catch (exc: BackendException.BackendFatalError) {
+                        if (panicExpected) {
+                            continue
+                        }
+                        throw IllegalStateException("backend panicked without `panicExpected`", exc)
                     }
-                    throw IllegalStateException("backend panicked without `panicExpected`", exc)
-                }
                 assertThat(
                     "All database cursors should be closed",
                     numbers,
-                    Matchers.empty()
+                    Matchers.empty(),
                 )
             }
         }
         backendList.clear()
     }
 
-    protected fun getAssetFilePath(fileName: String): String {
-        return try {
+    protected fun getAssetFilePath(fileName: String): String =
+        try {
             Shared.getTestFilePath(context, fileName)
         } catch (e: Exception) {
             throw RuntimeException(e)
         }
-    }
 
     protected val context: Context
         get() = InstrumentationRegistry.getInstrumentation().targetContext
@@ -118,21 +118,24 @@ open class InstrumentedTest {
              * https://github.com/react-native-community/react-native-device-info/blob/bb505716ff50e5900214fcbcc6e6434198010d95/android/src/main/java/com/learnium/RNDeviceInfo/RNDeviceModule.java#L185
              * @return boolean true if the execution environment is most likely an emulator
              */
-            get() = (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic")
-                    || Build.FINGERPRINT.startsWith("generic")
-                    || Build.FINGERPRINT.startsWith("unknown")
-                    || Build.HARDWARE.contains("goldfish")
-                    || Build.HARDWARE.contains("ranchu")
-                    || Build.MODEL.contains("google_sdk")
-                    || Build.MODEL.contains("Emulator")
-                    || Build.MODEL.contains("Android SDK built for x86")
-                    || Build.MANUFACTURER.contains("Genymotion")
-                    || Build.PRODUCT.contains("sdk_google")
-                    || Build.PRODUCT.contains("google_sdk")
-                    || Build.PRODUCT.contains("sdk")
-                    || Build.PRODUCT.contains("sdk_x86")
-                    || Build.PRODUCT.contains("vbox86p")
-                    || Build.PRODUCT.contains("emulator")
-                    || Build.PRODUCT.contains("simulator"))
+            get() = (
+                Build.BRAND.startsWith("generic") &&
+                    Build.DEVICE.startsWith("generic") ||
+                    Build.FINGERPRINT.startsWith("generic") ||
+                    Build.FINGERPRINT.startsWith("unknown") ||
+                    Build.HARDWARE.contains("goldfish") ||
+                    Build.HARDWARE.contains("ranchu") ||
+                    Build.MODEL.contains("google_sdk") ||
+                    Build.MODEL.contains("Emulator") ||
+                    Build.MODEL.contains("Android SDK built for x86") ||
+                    Build.MANUFACTURER.contains("Genymotion") ||
+                    Build.PRODUCT.contains("sdk_google") ||
+                    Build.PRODUCT.contains("google_sdk") ||
+                    Build.PRODUCT.contains("sdk") ||
+                    Build.PRODUCT.contains("sdk_x86") ||
+                    Build.PRODUCT.contains("vbox86p") ||
+                    Build.PRODUCT.contains("emulator") ||
+                    Build.PRODUCT.contains("simulator")
+            )
     }
 }

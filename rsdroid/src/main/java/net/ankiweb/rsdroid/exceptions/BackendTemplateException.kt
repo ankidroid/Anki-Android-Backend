@@ -18,8 +18,13 @@ package net.ankiweb.rsdroid.exceptions
 import anki.backend.BackendError
 import net.ankiweb.rsdroid.BackendException
 
-open class BackendTemplateException(error: BackendError?) : BackendException(error!!) {
-    class BackendTemplateSaveException(error: BackendError?) : BackendTemplateException(error)
+open class BackendTemplateException(
+    error: BackendError?,
+) : BackendException(error!!) {
+    class BackendTemplateSaveException(
+        error: BackendError?,
+    ) : BackendTemplateException(error)
+
     companion object {
         fun fromTemplateError(error: BackendError): BackendTemplateException {
             if (error.message == null) {
@@ -27,7 +32,9 @@ open class BackendTemplateException(error: BackendError?) : BackendException(err
             }
             return if (error.message.contains("has a problem")) {
                 BackendTemplateSaveException(error)
-            } else BackendTemplateException(error)
+            } else {
+                BackendTemplateException(error)
+            }
         }
     }
 }

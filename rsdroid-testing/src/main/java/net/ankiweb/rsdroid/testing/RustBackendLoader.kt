@@ -47,7 +47,7 @@ object RustBackendLoader {
     @Synchronized
     fun ensureSetup() {
         if (hasSetUp) {
-            return;
+            return
         }
         // This should help diagnose some issues,
         print("loading rsdroid-testing for: " + System.getProperty("os.name"))
@@ -79,7 +79,10 @@ object RustBackendLoader {
      * @throws UnsatisfiedLinkError The library could not be loaded
      * @throws RuntimeException Failure when extracting library to load
      */
-    private fun load(fileName: String, extension: String) {
+    private fun load(
+        fileName: String,
+        extension: String,
+    ) {
         val path = getPathFromResourceStream(fileName, extension)
         loadPath(path)
     }
@@ -98,7 +101,8 @@ object RustBackendLoader {
             Runtime.getRuntime().load(path)
         } catch (e: UnsatisfiedLinkError) {
             if (!File(path).exists()) {
-                val exception = FileNotFoundException("Extracted file was not found. Maybe the temp folder was deleted. Please try again: '$path'")
+                val exception =
+                    FileNotFoundException("Extracted file was not found. Maybe the temp folder was deleted. Please try again: '$path'")
                 throw RuntimeException(exception)
             }
             if (e.message == null || !e.message!!.contains("already loaded in another classloader")) {
@@ -119,7 +123,10 @@ object RustBackendLoader {
      * @throws IOException Error copying the file to the filesystem
      */
     @Throws(IOException::class)
-    private fun getPathFromResourceStream(fileName: String, extension: String): String {
+    private fun getPathFromResourceStream(
+        fileName: String,
+        extension: String,
+    ): String {
         // TODO: Ensure that this is reasonably handled without too much copying.
         // Note: this will leave some data in the temp folder.
         val fullFilename = fileName + extension
@@ -130,14 +137,15 @@ object RustBackendLoader {
         }
 
         val buffer = ByteArray(8 * 1024)
-        val checksum = withStream(fullFilename) { stream ->
-            val digest = MessageDigest.getInstance("SHA-1")
-            var bytesRead: Int
-            while (stream.read(buffer).also { bytesRead = it } != -1) {
-                digest.update(buffer, 0, bytesRead)
+        val checksum =
+            withStream(fullFilename) { stream ->
+                val digest = MessageDigest.getInstance("SHA-1")
+                var bytesRead: Int
+                while (stream.read(buffer).also { bytesRead = it } != -1) {
+                    digest.update(buffer, 0, bytesRead)
+                }
+                digest.digest().joinToString("") { "%02x".format(it) }
             }
-            digest.digest().joinToString("") { "%02x".format(it) }
-        }
         val expectedFile = File(System.getProperty("java.io.tmpdir"), "$fileName-$checksum$extension")
         if (!expectedFile.exists()) {
             val tempFile = File.createTempFile(fileName, extension)
@@ -157,7 +165,8 @@ object RustBackendLoader {
         return expectedFile.absolutePath
     }
 
-    private fun <T> withStream(fullFilename: String, func: (InputStream) -> T): T {
-        return func(RustBackendLoader::class.java.classLoader!!.getResourceAsStream(fullFilename))
-    }
+    private fun <T> withStream(
+        fullFilename: String,
+        func: (InputStream) -> T,
+    ): T = func(RustBackendLoader::class.java.classLoader!!.getResourceAsStream(fullFilename))
 }

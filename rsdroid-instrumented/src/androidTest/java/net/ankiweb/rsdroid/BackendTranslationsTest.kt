@@ -11,29 +11,27 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class BackendTranslationsTest : InstrumentedTest() {
-    private fun withoutIsolation(s: String): String {
-        return s.replace("\u2068", "").replace("\u2069", "")
-    }
+    private fun withoutIsolation(s: String): String = s.replace("\u2068", "").replace("\u2069", "")
 
     @Test
     fun ensureI18nWorks() {
         var b = memoryBackend
         assertThat(
             withoutIsolation(b.tr.mediaCheckTrashCount(5, 10)),
-            CoreMatchers.equalTo("Trash folder: 5 files, 10MB")
+            CoreMatchers.equalTo("Trash folder: 5 files, 10MB"),
         )
         assertThat(
             withoutIsolation(b.tr.mediaCheckTrashCount(5, 10.0)),
-            CoreMatchers.equalTo("Trash folder: 5 files, 10MB")
+            CoreMatchers.equalTo("Trash folder: 5 files, 10MB"),
         )
         assertThat(
             withoutIsolation(b.tr.mediaCheckTrashCount(5, "foo")),
-            CoreMatchers.equalTo("Trash folder: 5 files, fooMB")
+            CoreMatchers.equalTo("Trash folder: 5 files, fooMB"),
         )
         b = BackendFactory.getBackend(mutableListOf("fr"))
         assertThat(
             withoutIsolation(b.tr.mediaCheckTrashCount(5, 10)),
-            CoreMatchers.equalTo("Corbeille : 5 fichiers, 10 Mo")
+            CoreMatchers.equalTo("Corbeille : 5 fichiers, 10 Mo"),
         )
     }
 }

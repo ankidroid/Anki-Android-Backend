@@ -59,8 +59,8 @@ class DatabaseExceptionTest : DatabaseComparison() {
                 ex.message,
                 Matchers.anyOf(
                     CoreMatchers.containsString("unique"),
-                    CoreMatchers.containsString("UNIQUE")
-                )
+                    CoreMatchers.containsString("UNIQUE"),
+                ),
             )
         }
     }
@@ -72,7 +72,6 @@ class DatabaseExceptionTest : DatabaseComparison() {
 
         // For this test, we need to lock in rsdroid before opening the collection,
         // which is quite a lot of effort due to JNI being harder to write
-
 
         // This is broken in-app, but only slightly on an error case.
         // Using the in-app lock, this causes a hang rather than corruption.

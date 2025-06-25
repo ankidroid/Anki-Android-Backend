@@ -42,7 +42,9 @@ open class BackendException : RuntimeException {
         return SQLiteException(message, this)
     }
 
-    class BackendDbException(error: BackendError) : BackendException(error) {
+    class BackendDbException(
+        error: BackendError,
+    ) : BackendException(error) {
         override fun toSQLiteException(query: String): RuntimeException {
             val message = this.localizedMessage
             if (message == null) {
@@ -54,7 +56,13 @@ open class BackendException : RuntimeException {
                 if (p.find()) {
                     val givenParams = p.group(1)!!.toInt()
                     val expectedParams = p.group(2)!!.toInt()
-                    val errorMessage = String.format(Locale.ROOT, "Cannot bind argument at index %d because the index is out of range.  The statement has %d parameters.", givenParams, expectedParams)
+                    val errorMessage =
+                        String.format(
+                            Locale.ROOT,
+                            "Cannot bind argument at index %d because the index is out of range.  The statement has %d parameters.",
+                            givenParams,
+                            expectedParams,
+                        )
                     return IllegalArgumentException(errorMessage, this)
                 }
             } else if (message.contains("ConstraintViolation")) {
@@ -69,10 +77,22 @@ open class BackendException : RuntimeException {
             return SQLiteException(outMessage, this)
         }
 
-        class BackendDbFileTooNewException(error: BackendError) : BackendException(error)
-        class BackendDbFileTooOldException(error: BackendError) : BackendException(error)
-        class BackendDbLockedException(error: BackendError) : BackendException(error)
-        class BackendDbMissingEntityException(error: BackendError) : BackendException(error)
+        class BackendDbFileTooNewException(
+            error: BackendError,
+        ) : BackendException(error)
+
+        class BackendDbFileTooOldException(
+            error: BackendError,
+        ) : BackendException(error)
+
+        class BackendDbLockedException(
+            error: BackendError,
+        ) : BackendException(error)
+
+        class BackendDbMissingEntityException(
+            error: BackendError,
+        ) : BackendException(error)
+
         companion object {
             fun fromDbError(error: BackendError): BackendException {
                 val localised = error.message ?: return BackendDbException(error)
@@ -91,13 +111,20 @@ open class BackendException : RuntimeException {
                 // Anki already open, or media currently syncing.
                 return if (localised.startsWith("Anki already open")) {
                     BackendDbLockedException(error)
-                } else BackendDbException(error)
+                } else {
+                    BackendDbException(error)
+                }
             }
         }
     }
 
-    class BackendSearchException(error: BackendError) : BackendException(error)
-    class BackendFatalError(error: BackendError) : BackendException(error)
+    class BackendSearchException(
+        error: BackendError,
+    ) : BackendException(error)
+
+    class BackendFatalError(
+        error: BackendError,
+    ) : BackendException(error)
 
     companion object {
         fun fromError(error: BackendError): BackendException {
@@ -131,8 +158,6 @@ open class BackendException : RuntimeException {
             }
         }
 
-        fun fromException(ex: Exception?): RuntimeException {
-            return RuntimeException(ex)
-        }
+        fun fromException(ex: Exception?): RuntimeException = RuntimeException(ex)
     }
 }

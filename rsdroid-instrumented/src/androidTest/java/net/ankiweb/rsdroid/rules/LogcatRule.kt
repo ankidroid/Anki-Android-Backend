@@ -5,23 +5,22 @@ import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 
 class LogcatRule : TestWatcher() {
-    val logs : List<LogEntry> get() = Logcat.dump()
-            .mapNotNull {
-                line -> logPattern.find(line)
-            }
-            .map { match ->
+    val logs: List<LogEntry> get() =
+        Logcat
+            .dump()
+            .mapNotNull { line ->
+                logPattern.find(line)
+            }.map { match ->
                 val (levelString, tag, message) = match.destructured
                 LogEntry(
                     level = LogLevel.fromString(levelString),
                     tag = tag,
                     message = message,
-                    rawLine = match.value
+                    rawLine = match.value,
                 )
-            }
-            .toList()
+            }.toList()
 
     val errors get() = logs.filter { it.level == LogLevel.ERROR }
-
 
     override fun starting(description: Description) {
         Logcat.clear()
@@ -31,16 +30,18 @@ class LogcatRule : TestWatcher() {
         val level: LogLevel,
         val tag: String,
         val message: String,
-        val rawLine: String
+        val rawLine: String,
     ) {
-
         enum class LogLevel {
             TRACE,
             DEBUG,
             INFO,
             WARN,
+
             // error and WTF
-            ERROR;
+            ERROR,
+
+            ;
 
             companion object {
                 fun fromString(string: String) =
@@ -50,13 +51,10 @@ class LogcatRule : TestWatcher() {
                         "I" -> INFO
                         "W" -> WARN
                         "E" -> ERROR
-                        else -> throw IllegalArgumentException("unexpected level: ${string}")
+                        else -> throw IllegalArgumentException("unexpected level: $string")
                     }
-
             }
-
         }
-
     }
 
     companion object {
@@ -71,10 +69,11 @@ private object Logcat {
         Runtime.getRuntime().exec("logcat -c")
     }
 
-    fun dump() = sequence<String> {
-        val process = Runtime.getRuntime().exec("logcat -d")
-        process.inputStream.bufferedReader().use { reader ->
-            yieldAll(reader.lineSequence())
+    fun dump() =
+        sequence<String> {
+            val process = Runtime.getRuntime().exec("logcat -d")
+            process.inputStream.bufferedReader().use { reader ->
+                yieldAll(reader.lineSequence())
+            }
         }
-    }
 }

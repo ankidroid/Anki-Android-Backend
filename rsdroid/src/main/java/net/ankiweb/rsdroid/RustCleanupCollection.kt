@@ -20,4 +20,6 @@ package net.ankiweb.rsdroid
  * See [java.lang.annotation.Repeatable].
  */
 @kotlin.annotation.Retention(AnnotationRetention.SOURCE)
-annotation class RustCleanupCollection(vararg val value: RustCleanup)
+annotation class RustCleanupCollection(
+    vararg val value: RustCleanup,
+)

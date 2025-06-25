@@ -50,5 +50,4 @@ class BackendDisposalTests : InstrumentedTest() {
             getAssetFilePath("initial_version_2_12_1.anki2")
         }
     }
-
 }
