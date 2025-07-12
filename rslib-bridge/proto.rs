@@ -189,7 +189,7 @@ fn kotlin_type(field: &FieldDescriptor) -> String {
         Kind::Enum(en) => full_name_to_kotlin_class(en.full_name()),
     };
     if field.is_list() {
-        format!("List<{}>", kind)
+        format!("List<{kind}>")
     } else if field.is_map() {
         let map_kind = field.kind();
         let map_kind = map_kind.as_message().unwrap();
