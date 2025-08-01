@@ -9,7 +9,7 @@ ndk = "28.2.13676358"
 # https://developer.android.com/jetpack/androidx/releases/appcompat
 androidxAppCompat = "1.7.1"
 # https://developer.android.com/jetpack/androidx/releases/core
-androidxCore = "1.6.1"
+androidxCore = "1.7.0"
 # https://developer.android.com/jetpack/androidx/releases/sqlite
 androidxSqlite = "2.5.2"
 androidxTestJunit = "1.2.1"
