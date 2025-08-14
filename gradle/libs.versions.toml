@@ -27,7 +27,7 @@ androidGradlePlugin = "8.12.1"
 gradleMavenPublishPlugin = "0.34.0"
 junitJupiter = "5.13.4"
 # https://github.com/JetBrains/kotlin/releases/
-kotlin = '2.2.0'
+kotlin = '2.2.10'
 # https://github.com/protocolbuffers/protobuf/releases
 protobuf = "4.32.0"
 robolectric = "4.15.1"
