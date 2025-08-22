@@ -134,7 +134,7 @@ jobs:
           Add-Content -Path $env:GITHUB_ENV -Value ANDROID_NDK_ROOT=$env:ANDROID_NDK_LATEST_HOME
 
       - name: Configure JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: "temurin"
           java-version: "21" # matches Anki-Android
