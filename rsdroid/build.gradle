@@ -1,4 +1,5 @@
 import com.android.build.gradle.tasks.BundleAar
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 import java.util.zip.ZipFile
@@ -128,8 +129,10 @@ android {
         }
     }
 
-    kotlinOptions {
-        jvmTarget = '11'
+    kotlin {
+        compilerOptions {
+            jvmTarget = JvmTarget.JVM_11
+        }
     }
 }
 
