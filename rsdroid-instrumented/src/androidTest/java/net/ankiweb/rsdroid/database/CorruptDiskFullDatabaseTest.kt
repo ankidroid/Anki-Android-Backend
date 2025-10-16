@@ -15,7 +15,9 @@
  */
 package net.ankiweb.rsdroid.database
 
+import android.database.sqlite.SQLiteDiskIOException
 import android.database.sqlite.SQLiteFullException
+import android.os.Build
 import net.ankiweb.rsdroid.database.testutils.DatabaseCorruption
 import net.ankiweb.rsdroid.exceptions.BackendJsonException
 import org.hamcrest.MatcherAssert
@@ -42,19 +44,35 @@ class CorruptDiskFullDatabaseTest : DatabaseCorruption() {
                 )
             }
             DatabaseType.FRAMEWORK -> {
-                // FRAMEWORK still complains about disk full corruption:
+                // FRAMEWORK still complains about disk full corruption for API < 36:
                 // error while compiling: "create table nums (id int)": DBError { info: "SqliteFailure(Error { code: DiskFull, extended_code: 13 }, Some(\"database or disk is full\"))", kind: Other }
-                MatcherAssert.assertThat(
-                    setupException.javaClass,
-                    Matchers.typeCompatibleWith(
-                        SQLiteFullException::class.java,
-                    ),
-                )
-                // Java: "database or disk is full (code 13)"
-                MatcherAssert.assertThat(
-                    setupException.localizedMessage,
-                    Matchers.containsString("database or disk is full"),
-                )
+                if (Build.VERSION.SDK_INT_FULL < Build.VERSION_CODES_FULL.BAKLAVA) {
+                    MatcherAssert.assertThat(
+                        setupException.javaClass,
+                        Matchers.typeCompatibleWith(
+                            SQLiteFullException::class.java,
+                        ),
+                    )
+                    // Java: "database or disk is full (code 13)"
+                    MatcherAssert.assertThat(
+                        setupException.localizedMessage,
+                        Matchers.containsString("database or disk is full"),
+                    )
+                    // On API >= 36 we get a disk I/O exception
+                } else {
+                    MatcherAssert.assertThat(
+                        setupException.javaClass,
+                        Matchers.typeCompatibleWith(
+                            SQLiteDiskIOException::class.java,
+                        ),
+                    )
+
+                    // Java: "database or disk is full (code 13)"
+                    MatcherAssert.assertThat(
+                        setupException.localizedMessage,
+                        Matchers.containsString("disk I/O error"),
+                    )
+                }
             }
             else -> null
         }
