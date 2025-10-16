@@ -1,4 +1,6 @@
 import org.gradle.internal.jvm.Jvm
+import org.jlleitschuh.gradle.ktlint.KtlintExtension
+import kotlin.system.exitProcess
 
 plugins {
     alias(libs.plugins.kotlin.jvm) apply false
@@ -25,12 +27,12 @@ allprojects {
 }
 
 // can't be obtained inside 'subprojects'
-val ktlintVersion = libs.versions.ktlint.get()
+val ktlintVersion: String = libs.versions.ktlint.get()
 
 // Here we extract per-module "best practices" settings to a single top-level evaluation
 subprojects {
     apply(plugin = "org.jlleitschuh.gradle.ktlint")
-    configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
+    configure<KtlintExtension> {
         version.set(ktlintVersion)
     }
 }
@@ -57,7 +59,7 @@ ext {
         println("\n\n\n")
         println("**************************************************************************************************************")
         println("\n\n\n")
-        System.exit(1)
+        exitProcess(1)
     }
 }
 
