@@ -71,6 +71,7 @@ jobs:
           x86_64-unknown-linux-gnu-gcc -v
 
       - name: Restore Rust Cache
+        id: rust-cache
         uses: actions/cache/restore@v4
         with:
           path: |
@@ -80,7 +81,7 @@ jobs:
             anki/out/rust
             anki/out/extracted
             anki/out/node_modules
-          key: ${{ runner.os }}-rust-release-${{ hashFiles('Cargo.lock') }}-${{ hashFiles('anki/yarn.lock') }}
+          key: ${{ runner.os }}-rust-release-${{ hashFiles('Cargo.lock', 'anki/Cargo.lock', 'anki/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-rust-release
 
@@ -159,4 +160,4 @@ jobs:
             anki/out/rust
             anki/out/download
             anki/out/node_modules
-          key: ${{ runner.os }}-rust-release-${{ hashFiles('Cargo.lock') }}-${{ hashFiles('anki/yarn.lock') }}
+          key: ${{ steps.rust-cache.outputs.cache-primary-key }}
