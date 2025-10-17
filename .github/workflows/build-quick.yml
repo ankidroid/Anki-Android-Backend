@@ -150,6 +150,7 @@ jobs:
             target
             anki/out/rust
             anki/out/download
+            anki/out/extracted
             # no node_modules, as it doesn't unpack properly
           key: ${{ runner.os }}-rust-debug-${{ hashFiles('Cargo.lock', 'anki/Cargo.lock', 'anki/yarn.lock') }}
           restore-keys: |
@@ -166,6 +167,7 @@ jobs:
             target
             anki/out/rust
             anki/out/download
+            anki/out/extracted
             anki/out/node_modules
           key: ${{ runner.os }}-rust-debug-${{ hashFiles('Cargo.lock', 'anki/Cargo.lock', 'anki/yarn.lock') }}
           restore-keys: |
@@ -253,6 +255,7 @@ jobs:
             target
             anki/out/rust
             anki/out/download
+            anki/out/extracted
             # no node_modules, as it doesn't unpack properly
           key: ${{ steps.rust-cache-windows.outputs.cache-primary-key }}
 
@@ -266,5 +269,6 @@ jobs:
             target
             anki/out/rust
             anki/out/download
+            anki/out/extracted
             anki/out/node_modules
           key: ${{ steps.rust-cache-unix.outputs.cache-primary-key }}
