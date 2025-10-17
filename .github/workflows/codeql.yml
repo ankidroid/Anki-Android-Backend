@@ -122,7 +122,7 @@ jobs:
           anki/out/rust
           anki/out/download
           anki/out/node_modules
-        key: ${{ runner.os }}-rust-debug-${{ hashFiles('Cargo.lock') }}-${{ hashFiles('anki/yarn.lock') }}
+        key: ${{ runner.os }}-rust-debug-${{ hashFiles('Cargo.lock', 'anki/Cargo.lock', 'anki/yarn.lock') }}
         restore-keys: |
           ${{ runner.os }}-rust-debug
 
