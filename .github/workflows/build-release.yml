@@ -44,7 +44,7 @@ jobs:
           organization: "ankidroid"
           # self-hosted runner label is configured in Tartelet app on runner host
           primary-runner: "macos-selfhosted"
-          fallback-runner: "macos-15"
+          fallback-runner: "macos-26"
           github-token: ${{ secrets.MIKE_HARDY_ORG_ADMIN_KEY }}
 
   build:
