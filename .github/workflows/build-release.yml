@@ -85,6 +85,7 @@ jobs:
           key: ${{ runner.os }}-rust-release-${{ hashFiles('Cargo.lock', 'anki/Cargo.lock', 'anki/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-rust-release
+            ${{ runner.os }}-rust
 
       - name: Setup N2
         run: ./anki/tools/install-n2
