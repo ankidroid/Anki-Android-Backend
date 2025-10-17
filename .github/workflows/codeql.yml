@@ -121,6 +121,7 @@ jobs:
           target
           anki/out/rust
           anki/out/download
+          anki/out/extracted
           anki/out/node_modules
         key: ${{ runner.os }}-rust-debug-${{ hashFiles('Cargo.lock', 'anki/Cargo.lock', 'anki/yarn.lock') }}
         restore-keys: |
