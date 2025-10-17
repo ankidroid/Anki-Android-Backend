@@ -155,6 +155,7 @@ jobs:
           key: ${{ runner.os }}-rust-debug-${{ hashFiles('Cargo.lock', 'anki/Cargo.lock', 'anki/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-rust-debug
+            ${{ runner.os }}-rust
 
       - name: Restore Rust Cache (Unix)
         id: rust-cache-unix
@@ -172,6 +173,7 @@ jobs:
           key: ${{ runner.os }}-rust-debug-${{ hashFiles('Cargo.lock', 'anki/Cargo.lock', 'anki/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-rust-debug
+            ${{ runner.os }}-rust
 
       - name: Setup N2
         run: bash ./anki/tools/install-n2

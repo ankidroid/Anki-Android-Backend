@@ -126,6 +126,7 @@ jobs:
         key: ${{ runner.os }}-rust-debug-${{ hashFiles('Cargo.lock', 'anki/Cargo.lock', 'anki/yarn.lock') }}
         restore-keys: |
           ${{ runner.os }}-rust-debug
+          ${{ runner.os }}-rust
 
     - name: Setup N2
       if: matrix.build-mode == 'manual'
