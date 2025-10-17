@@ -63,6 +63,23 @@ jobs:
         run: |
           curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain none
 
+      - name: Restore Rust Cache
+        id: rust-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+            anki/out/rust
+            anki/out/download
+            anki/out/extracted
+            anki/out/node_modules
+          key: ${{ runner.os }}-rust-release-${{ hashFiles('Cargo.lock', 'anki/Cargo.lock', 'anki/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-rust-release
+            ${{ runner.os }}-rust
+
       - name: Read configured NDK version
         run: |
           cargo install toml-cli
@@ -94,23 +111,6 @@ jobs:
         run: |
           brew install MaterializeInc/crosstools/x86_64-unknown-linux-gnu
           x86_64-unknown-linux-gnu-gcc -v
-
-      - name: Restore Rust Cache
-        id: rust-cache
-        uses: actions/cache/restore@v4
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-            anki/out/rust
-            anki/out/download
-            anki/out/extracted
-            anki/out/node_modules
-          key: ${{ runner.os }}-rust-release-${{ hashFiles('Cargo.lock', 'anki/Cargo.lock', 'anki/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-rust-release
-            ${{ runner.os }}-rust
 
       - name: Setup N2
         run: ./anki/tools/install-n2
