@@ -36,7 +36,7 @@ jobs:
           # 2- self-hosted runner label is configured in Tartelet app on runner host
           #    It is in format 'macos-*' to work with our label splitter below
           primary-runner: "macos-selfhosted"
-          fallback-runner: "macos-15"
+          fallback-runner: "macos-26"
           github-token: ${{ secrets.MIKE_HARDY_ORG_ADMIN_KEY }}
 
   # We want to generate our matrix dynamically
