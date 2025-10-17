@@ -44,13 +44,13 @@ tasks.register<Delete>("clean") {
 ext {
     val jvmVersion = Jvm.current().javaVersion?.majorVersion
     val minSdk = libs.versions.compileSdk.get()
-    if (jvmVersion != "17" && jvmVersion != "21" && jvmVersion != "24") {
+    if (jvmVersion != "17" && jvmVersion != "21" && jvmVersion != "25") {
         println("\n\n\n")
         println("**************************************************************************************************************")
         println("\n\n\n")
-        println("ERROR: Anki-Android-Backend builds with JVM version 17, 21 and 24.")
+        println("ERROR: Anki-Android-Backend builds with JVM version 17, 21 and 25.")
         println("  Incompatible major version detected: '$jvmVersion'")
-        if (jvmVersion.parseIntOrDefault(defaultValue = 0) > 24) {
+        if (jvmVersion.parseIntOrDefault(defaultValue = 0) > 25) {
             println("\n\n\n")
             println("  If you receive this error because you want to use a newer JDK, we may accept PRs to support new versions.")
             println("  Edit the main build file, find this message in the file, and add support for the new version.")
