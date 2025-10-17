@@ -86,7 +86,9 @@ jobs:
           java-version: "21" # matches Anki-Android
 
       - name: Install Windows cross compiler
-        run: brew install mingw-w64 && x86_64-w64-mingw32-gcc -v
+        run: |
+          brew install mingw-w64
+          x86_64-w64-mingw32-gcc -v
 
       - name: Install Linux cross compiler
         run: |
