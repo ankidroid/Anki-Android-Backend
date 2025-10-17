@@ -21,9 +21,30 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # We may have a self-hosted runner available for macOS. Use it if so.
+  determine-macos-runner:
+    runs-on: ubuntu-latest
+    outputs:
+      runner: ${{ steps.determine-macos-runner.outputs.use-runner }}
+    steps:
+      - name: Use self-hosted runner if online, otherwise public runner
+        id: determine-macos-runner
+        uses: mikehardy/runner-fallback-action@feat/orgsandents
+        with:
+          organization: "ankidroid"
+          # 1- Choices are single labels, emitted array element 0 is used directly below
+          # 2- self-hosted runner label is configured in Tartelet app on runner host
+          #    It is in format 'macos-*' to work with our label splitter below
+          primary-runner: "macos-selfhosted"
+          fallback-runner: "macos-15"
+          github-token: ${{ secrets.MIKE_HARDY_ORG_ADMIN_KEY }}
+
   # We want to generate our matrix dynamically
   # Initial job generates the matrix as a JSON, and following job will use deserialize and use the result
   matrix_prep:
+    needs: determine-macos-runner
+    env:
+      MACOS_RUNNER: ${{ needs.determine-macos-runner.outputs.runner }}
     # Do not run the scheduled jobs on forks
     if: (github.event_name == 'schedule' && github.repository == 'ankidroid/Anki-Android-Backend') || (github.event_name != 'schedule')
     runs-on: ubuntu-latest
@@ -34,9 +55,13 @@ jobs:
         uses: actions/github-script@v8
         with:
           script: |
+            // The determine-macos-runner step emits a JSON array of labels, but we need a single label
+            // We configured it above to emit a single label, for either runner choice, parse it out
+            const macosRunner = JSON.parse(process.env.MACOS_RUNNER)[0]            
+            
             // by default, we will include all 3 platforms we test on
             // "latest" would be easy everywhere, but "macos-15" isn't "latest" so we are specific there
-            let osArray = ["ubuntu-latest", "macos-15", "windows-latest"]
+            let osArray = ["ubuntu-latest", "windows-latest", macosRunner]
 
             let includeArray = [];
             for(const os of osArray) {
@@ -93,6 +118,13 @@ jobs:
           Add-Content $env:GITHUB_PATH "C:\msys64\usr\bin"
           c:\msys64\usr\bin\pacman.exe -S --noconfirm git rsync
           rm -force c:\msys64\usr\bin\zstd.exe
+
+      - name: Install macos self-hosted pre-requisites
+        # All platforms require cargo to build correctly, but our self-hosted tartelet
+        # image doesn't have cargo (or rustup) installed by default. Easily fixed
+        if: contains(matrix.os, 'macos-tartelet')
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain none
 
       - name: Ubuntu setup
         # We get KVM set up on Ubuntu as we run the emulator there (only platform with nested virt)
