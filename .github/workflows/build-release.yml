@@ -37,14 +37,15 @@ jobs:
     outputs:
       runner: ${{ steps.determine-macos-runner.outputs.use-runner }}
     steps:
-      - name: Use self-hosted runner if online, otherwise public runner
+      - name: Use self-hosted runner if online and not busy, otherwise public runner
         id: determine-macos-runner
-        uses: mikehardy/runner-fallback-action@feat/orgsandents
+        uses: mikehardy/runner-fallback-action@extra-merges
         with:
           organization: "ankidroid"
           # self-hosted runner label is configured in Tartelet app on runner host
           primary-runner: "macos-selfhosted"
           fallback-runner: "macos-26"
+          primaries-required: 1
           github-token: ${{ secrets.MIKE_HARDY_ORG_ADMIN_KEY }}
 
   build:

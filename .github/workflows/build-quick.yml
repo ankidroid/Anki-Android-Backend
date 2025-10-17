@@ -27,9 +27,9 @@ jobs:
     outputs:
       runner: ${{ steps.determine-macos-runner.outputs.use-runner }}
     steps:
-      - name: Use self-hosted runner if online, otherwise public runner
+      - name: Use self-hosted runner if online and not busy, otherwise public runner
         id: determine-macos-runner
-        uses: mikehardy/runner-fallback-action@feat/orgsandents
+        uses: mikehardy/runner-fallback-action@extra-merges
         with:
           organization: "ankidroid"
           # 1- Choices are single labels, emitted array element 0 is used directly below
@@ -37,6 +37,7 @@ jobs:
           #    It is in format 'macos-*' to work with our label splitter below
           primary-runner: "macos-selfhosted"
           fallback-runner: "macos-26"
+          primaries-required: 1
           github-token: ${{ secrets.MIKE_HARDY_ORG_ADMIN_KEY }}
 
   # We want to generate our matrix dynamically
