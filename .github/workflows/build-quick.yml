@@ -38,6 +38,7 @@ jobs:
           primary-runner: "macos-selfhosted"
           fallback-runner: "macos-26"
           primaries-required: 1
+          fallback-on-error: true
           github-token: ${{ secrets.MIKE_HARDY_ORG_ADMIN_KEY }}
 
   # We want to generate our matrix dynamically
