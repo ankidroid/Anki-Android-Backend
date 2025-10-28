@@ -39,6 +39,9 @@ jobs:
           fallback-runner: "macos-26"
           primaries-required: 1
           fallback-on-error: true
+          # Actions secrets and Dependabot secrets are separate, and this is at org level::
+          # https://github.com/organizations/ankidroid/settings/secrets/dependabot
+          # https://github.com/organizations/ankidroid/settings/secrets/actions
           github-token: ${{ secrets.MIKE_HARDY_ORG_ADMIN_KEY }}
 
   # We want to generate our matrix dynamically
