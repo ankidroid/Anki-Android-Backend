@@ -29,7 +29,7 @@ jobs:
     steps:
       - name: Use self-hosted runner if online and not busy, otherwise public runner
         id: determine-macos-runner
-        uses: mikehardy/runner-fallback-action@extra-merges
+        uses: mikehardy/runner-fallback-action@v1
         with:
           organization: "ankidroid"
           # 1- Choices are single labels, emitted array element 0 is used directly below
