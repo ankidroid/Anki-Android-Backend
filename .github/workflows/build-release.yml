@@ -39,7 +39,7 @@ jobs:
     steps:
       - name: Use self-hosted runner if online and not busy, otherwise public runner
         id: determine-macos-runner
-        uses: mikehardy/runner-fallback-action@extra-merges
+        uses: mikehardy/runner-fallback-action@v1
         with:
           organization: "ankidroid"
           # self-hosted runner label is configured in Tartelet app on runner host
