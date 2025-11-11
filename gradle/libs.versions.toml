@@ -33,7 +33,7 @@ protobuf = "4.33.0"
 robolectric = "4.16"
 timber = "5.0.1"
 ktlint = '1.5.0'
-ktlintGradlePlugin = "13.1.0"
+ktlintGradlePlugin = "14.0.1"
 
 [libraries]
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidxAppCompat" }
