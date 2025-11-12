@@ -24,7 +24,7 @@ espresso = "3.7.0"
 # Old changelogs - See 'Table of Contents' in sidebar
 # https://developer.android.com/build/releases/past-releases
 androidGradlePlugin = "8.13.1"
-gradleMavenPublishPlugin = "0.34.0"
+gradleMavenPublishPlugin = "0.35.0"
 junit = "6.0.1"
 # https://github.com/JetBrains/kotlin/releases/
 kotlin = '2.2.10'
