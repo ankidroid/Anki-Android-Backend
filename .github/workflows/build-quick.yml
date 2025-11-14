@@ -24,6 +24,9 @@ jobs:
   # We may have a self-hosted runner available for macOS. Use it if so.
   determine-macos-runner:
     runs-on: ubuntu-latest
+    concurrency:
+      group: runner-determination
+      cancel-in-progress: false
     outputs:
       runner: ${{ steps.determine-macos-runner.outputs.use-runner }}
     steps:
