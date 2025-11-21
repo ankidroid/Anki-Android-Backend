@@ -116,7 +116,7 @@ jobs:
           docker-images: true
           swap-storage: false
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Install windows pre-requisites
         # Windows requires git and rsync to build correctly, and specifies them from msys2
