@@ -14,7 +14,7 @@ androidxCore = "1.7.0"
 androidxSqlite = "2.6.2"
 androidxTestJunit = "1.3.0"
 # https://commons.apache.org/proper/commons-exec/changes.html
-commonsExec = "1.5.0"
+commonsExec = "1.6.0"
 espresso = "3.7.0"
 # AGP is included in Android Studio and changelogs are not well maintained/at a stable URL
 # Open https://developer.android.com/build/releases/gradle-plugin#patch-releases
