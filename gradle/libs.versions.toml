@@ -29,7 +29,7 @@ junit = "6.0.1"
 # https://github.com/JetBrains/kotlin/releases/
 kotlin = '2.2.10'
 # https://github.com/protocolbuffers/protobuf/releases
-protobuf = "4.33.1"
+protobuf = "4.33.2"
 robolectric = "4.16"
 timber = "5.0.1"
 ktlint = '1.5.0'
