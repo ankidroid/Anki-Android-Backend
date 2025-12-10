@@ -105,8 +105,8 @@ eg on Linux:
 ```
 cargo install toml-cli
 ANDROID_NDK_VERSION=$(toml get gradle/libs.versions.toml versions.ndk --raw)
-export ANDROID_SDK_ROOT=$HOME/Android/Sdk
-export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION
+export ANDROID_HOME=$HOME/Android/Sdk
+export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/$ANDROID_NDK_VERSION
 ```
 
 Or macOS:
@@ -114,8 +114,8 @@ Or macOS:
 ```
 cargo install toml-cli
 ANDROID_NDK_VERSION=$(toml get gradle/libs.versions.toml versions.ndk --raw)
-export ANDROID_SDK_ROOT=$HOME/Library/Android/sdk
-export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION
+export ANDROID_HOME=$HOME/Library/Android/sdk
+export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/$ANDROID_NDK_VERSION
 ```
 
 Or Windows using Powershell:
@@ -123,7 +123,7 @@ Or Windows using Powershell:
 ```
 cargo install toml-cli
 $env:ANDROID_NDK_VERSION=toml get gradle/libs.versions.toml versions.ndk --raw
-$env:ANDROID_NDK_HOME="$env:ANDROID_SDK_ROOT\ndk\$env:ANDROID_NDK_VERSION"
+$env:ANDROID_NDK_HOME="$env:ANDROID_HOME\ndk\$env:ANDROID_NDK_VERSION"
 ```
 
 If you don't have Java installed, you may be able to use the version bundled
