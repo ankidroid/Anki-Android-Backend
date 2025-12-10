@@ -172,6 +172,7 @@ fn build_android_jni() -> Result<()> {
     let ndk_targets = add_android_rust_targets(all_archs)?;
     let (is_release, _release_dir) = check_release(false);
 
+    // Also listed in Cargo.toml for dependabot tracking
     Command::run("cargo install cargo-ndk@3.5.4")?;
 
     let mut command = Command::new("cargo");
