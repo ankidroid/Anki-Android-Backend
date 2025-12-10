@@ -33,7 +33,7 @@ jobs:
       - name: Wait for possible parallel workflow run job startup lag
         # After runner choice, the job that will use it has unavoidable job startup lag
         # Wait for that job start / runner state change before we choose the runner for this run
-        run: sleep 15
+        run: sleep 30
       - name: Use self-hosted runner if online and not busy, otherwise public runner
         id: determine-macos-runner
         uses: mikehardy/runner-fallback-action@v1
