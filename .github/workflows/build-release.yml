@@ -77,7 +77,7 @@ jobs:
 
       - name: Restore Rust Cache
         id: rust-cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: |
             ~/.cargo/registry
@@ -189,7 +189,7 @@ jobs:
           ./gradlew rsdroid-testing:publishAllPublicationsToMavenCentral -Dorg.gradle.project.macCC=$ANKIDROID_MACOS_CC -DtestBuildType=debug -Dorg.gradle.daemon=false -Dorg.gradle.console=plain
 
       - name: Save Rust Cache
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         if: github.ref == 'refs/heads/main'
         with:
           path: |

@@ -122,7 +122,7 @@ jobs:
 
     - name: Restore Rust Cache (Unix)
       if: matrix.build-mode == 'manual'
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: |
           ~/.cargo/registry
