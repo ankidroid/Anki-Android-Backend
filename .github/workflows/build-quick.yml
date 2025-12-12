@@ -154,7 +154,7 @@ jobs:
 
       - name: Restore Rust Cache (Windows)
         id: rust-cache-windows
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         if: contains(matrix.os, 'windows')
         with:
           path: |
@@ -172,7 +172,7 @@ jobs:
 
       - name: Restore Rust Cache (Unix)
         id: rust-cache-unix
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         if: contains(matrix.os, 'windows') == false
         with:
           path: |
@@ -292,7 +292,7 @@ jobs:
           path: video.webm
 
       - name: Save Rust Cache (Windows)
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         if: contains(matrix.os, 'windows') && github.ref == 'refs/heads/main'
         with:
           path: |
@@ -306,7 +306,7 @@ jobs:
           key: ${{ steps.rust-cache-windows.outputs.cache-primary-key }}
 
       - name: Save Rust Cache (Unix)
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         if: contains(matrix.os, 'windows') == false && github.ref == 'refs/heads/main'
         with:
           path: |
