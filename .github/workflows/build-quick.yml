@@ -174,7 +174,7 @@ jobs:
       - name: Restore Rust Cache (Unix)
         id: rust-cache-unix
         uses: actions/cache/restore@v5
-        if: contains(matrix.os, 'windows') == false
+        if: contains(matrix.os, 'windows') == false && contains(runner.environment, 'self-hosted') == false
         with:
           path: |
             ~/.cargo/registry

@@ -78,6 +78,7 @@ jobs:
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH
 
       - name: Restore Rust Cache
+        if: contains(runner.environment, 'self-hosted') == false
         id: rust-cache
         uses: actions/cache/restore@v5
         with:
