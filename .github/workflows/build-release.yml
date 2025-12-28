@@ -72,6 +72,7 @@ jobs:
       - name: Install macos self-hosted pre-requisites
         # All platforms require cargo to build correctly, but our self-hosted tartelet
         # image doesn't have cargo (or rustup) installed by default. Easily fixed
+        if: contains(runner.environment, 'self-hosted') && contains(runner.os, 'macOS')
         run: |
           curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain none
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH
