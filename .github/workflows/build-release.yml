@@ -30,6 +30,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}-${{ github.event.inputs.mavenPublish }}-release
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   # We may have a self-hosted runner available for macOS. Use it if so.
   determine-macos-runner:
