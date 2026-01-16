@@ -277,6 +277,9 @@ open class Backend(
         // This is false by default: translate() ais an extremely fast operation
         // which does not require execution on a worker thread
         var checkOperationsRunOnMainThread: Boolean = false
+        const val MAX_MEDIA_FILENAME_LENGTH = 120
+
+        const val MAX_MEDIA_FILENAME_LENGTH_SERVER = 255
 
         const val MAX_INDIVIDUAL_MEDIA_FILE_SIZE = 100 * 1024 * 1024L
     }

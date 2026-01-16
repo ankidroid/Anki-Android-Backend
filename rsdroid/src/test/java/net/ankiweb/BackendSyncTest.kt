@@ -4,14 +4,14 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.File
 
-class BackendSyncTest{
+class BackendSyncTest {
     @Test
-    fun verifyMediaFileSizeSync(){
+    fun verifyMediaFileSizeSync() {
         val file = File("../anki/rslib/src/sync/media/mod.rs")
 
         assertTrue(
             "File does not exist at ${file.absolutePath}",
-            file.exists()
+            file.exists(),
         )
 
         val content = file.readText()
@@ -20,7 +20,7 @@ class BackendSyncTest{
 
         assertTrue(
             "MAX_INDIVIDUAL_MEDIA_FILE_SIZE in Backend.kt is out of sync with anki",
-            content.contains(expectedContent)
+            content.contains(expectedContent),
         )
     }
 }
