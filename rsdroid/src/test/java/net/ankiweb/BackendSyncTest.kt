@@ -16,11 +16,25 @@ class BackendSyncTest {
 
         val content = file.readText()
 
-        val expectedContent = "pub static MAX_INDIVIDUAL_MEDIA_FILE_SIZE: usize = 100 * 1024 * 1024"
+        val expected_MAX_MEDIA_FILENAME_LENGTH = "pub static MAX_MEDIA_FILENAME_LENGTH: usize = 120"
+
+        val expected_MAX_MEDIA_FILENAME_LENGTH_SERVER = "pub const MAX_MEDIA_FILENAME_LENGTH_SERVER: usize = 255"
+
+        val expected_MAX_INDIVIDUAL_MEDIA_FILE_SIZE = "pub static MAX_INDIVIDUAL_MEDIA_FILE_SIZE: usize = 100 * 1024 * 1024"
+
+        assertTrue(
+            "MAX_MEDIA_FILENAME_LENGTH in Backend.kt is out of sync with anki",
+            content.contains(expected_MAX_MEDIA_FILENAME_LENGTH),
+        )
+
+        assertTrue(
+            "MAX_MEDIA_FILENAME_LENGTH_SERVER in Backend.kt is out of sync with anki",
+            content.contains(expected_MAX_MEDIA_FILENAME_LENGTH_SERVER),
+        )
 
         assertTrue(
             "MAX_INDIVIDUAL_MEDIA_FILE_SIZE in Backend.kt is out of sync with anki",
-            content.contains(expectedContent),
+            content.contains(expected_MAX_INDIVIDUAL_MEDIA_FILE_SIZE),
         )
     }
 }
