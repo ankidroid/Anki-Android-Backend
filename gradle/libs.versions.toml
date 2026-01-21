@@ -30,7 +30,7 @@ junit = "6.0.2"
 kotlin = '2.2.10'
 # https://github.com/protocolbuffers/protobuf/releases
 protobuf = "4.33.4"
-robolectric = "4.16"
+robolectric = "4.16.1"
 timber = "5.0.1"
 ktlint = '1.5.0'
 ktlintGradlePlugin = "14.0.1"
