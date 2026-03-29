@@ -78,6 +78,22 @@ static def getBackendGitCommitHash() {
     "git rev-parse HEAD".execute().text.trim()
 }
 
+publishing {
+    publications {
+        release(MavenPublication) {
+            groupId = 'io.github.david-allison'
+            artifactId = 'rsdroid'
+            version = '1.0.0'
+            artifact("$buildDir/outputs/aar/rsdroid-release.aar")
+        }
+    }
+    repositories {
+        maven {
+            url = uri("${rootProject.buildDir}/localMaven")
+        }
+    }
+}
+
 android {
     namespace = 'net.ankiweb.rsdroid'
     compileSdk = libs.versions.compileSdk.get().toInteger()
@@ -186,6 +202,14 @@ tasks.register('installGitHook', Copy) {
 }
 // to run manually: `./gradlew installGitHook`
 tasks.named('preBuild').configure { dependsOn('installGitHook') }
+
+// don't require signing when publishing to a local maven folder
+tasks.withType(Sign) {
+    onlyIf {
+        def url = project.publishing.repositories.find { it.name == 'maven' }?.url?.toString()
+        !url?.contains('localMaven')
+    }
+}
 
 mavenPublishing {
     // Use https://central.sonatype.com/account with david-allison's GitHub login, not Google

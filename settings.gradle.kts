@@ -1,3 +1,11 @@
+dependencyResolutionManagement {
+    repositories {
+        maven {
+            url = uri("${rootProject.projectDir}/build/localMaven")
+        }
+    }
+}
+
 pluginManagement {
     repositories {
         google()

@@ -146,6 +146,8 @@ var RELEASE=1 defined, to build a faster version.
 
 ## Modify AnkiDroid to use built library
 
+Install the .aar to a local maven repo with `./gradlew :rsdroid:publishReleasePublicationToMavenRepository`
+
 Now open the AnkiDroid project in AndroidStudio. To tell gradle to load the
 compiled .aar and .jar files from disk, edit `local.properties`
 in the AnkiDroid repo, and add the following line:
