@@ -28,7 +28,7 @@ jobs:
         java-version: "21"
 
     - name: Install Android Command Line Tools
-      uses: android-actions/setup-android@v3
+      uses: android-actions/setup-android@v4
 
     - name: Read configured NDK version
       run: |
