@@ -67,7 +67,7 @@ jobs:
       matrix: ${{ steps.build-matrix.outputs.result }}
     steps:
       - id: build-matrix
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             // The determine-macos-runner step emits a JSON array of labels, but we need a single label
