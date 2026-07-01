@@ -126,6 +126,7 @@ dependencies {
     // Protobuf is part of the ABI, so include it as a compile/api dependency.
     api libs.protobuf.kotlin.lite
 
+    implementation libs.androidx.annotation
     implementation libs.androidx.sqlite.ktx
     implementation libs.androidx.sqlite.framework
     implementation libs.jakewharton.timber
