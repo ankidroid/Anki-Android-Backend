@@ -22,7 +22,9 @@ import android.database.Cursor
 import android.database.DataSetObserver
 import android.net.Uri
 import android.os.Bundle
-import timber.log.Timber
+import org.slf4j.LoggerFactory
+
+private val logger = LoggerFactory.getLogger(AnkiDatabaseCursor::class.java)
 
 /**
  * Base class for all database cursors, abstracting database methods to a common interface
@@ -80,7 +82,7 @@ abstract class AnkiDatabaseCursor : Cursor {
 
     @Deprecated("Deprecated in Java")
     override fun deactivate() {
-        Timber.w("deactivate - not implemented - throwing")
+        logger.warn("deactivate - not implemented - throwing")
         throw NotImplementedException()
     }
 
@@ -91,7 +93,7 @@ abstract class AnkiDatabaseCursor : Cursor {
 
     @Deprecated("Deprecated in Java")
     override fun requery(): Boolean {
-        Timber.w("requery - not implemented - throwing")
+        logger.warn("requery - not implemented - throwing")
         throw NotImplementedException()
     }
 
@@ -108,19 +110,19 @@ abstract class AnkiDatabaseCursor : Cursor {
     abstract override fun moveToPosition(nextPositionGlobal: Int): Boolean
 
     override fun registerContentObserver(observer: ContentObserver) {
-        Timber.w("Not implemented: registerContentObserver - shouldn't matter unless requery() is called")
+        logger.warn("Not implemented: registerContentObserver - shouldn't matter unless requery() is called")
     }
 
     override fun unregisterContentObserver(observer: ContentObserver) {
-        Timber.w("Not implemented: unregisterContentObserver - shouldn't matter unless requery() is called")
+        logger.warn("Not implemented: unregisterContentObserver - shouldn't matter unless requery() is called")
     }
 
     override fun registerDataSetObserver(observer: DataSetObserver) {
-        Timber.w("Not implemented: registerDataSetObserver - shouldn't matter unless requery() is called")
+        logger.warn("Not implemented: registerDataSetObserver - shouldn't matter unless requery() is called")
     }
 
     override fun unregisterDataSetObserver(observer: DataSetObserver) {
-        Timber.w("Not implemented: unregisterDataSetObserver - shouldn't matter unless requery() is called")
+        logger.warn("Not implemented: unregisterDataSetObserver - shouldn't matter unless requery() is called")
     }
 
     override fun isLast(): Boolean = position == lastPosition

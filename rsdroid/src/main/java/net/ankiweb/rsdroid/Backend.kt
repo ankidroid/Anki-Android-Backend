@@ -30,12 +30,14 @@ import net.ankiweb.rsdroid.database.SQLHandler
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
-import timber.log.Timber
+import org.slf4j.LoggerFactory
 import java.io.Closeable
 import java.io.File
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.read
 import kotlin.concurrent.write
+
+private val logger = LoggerFactory.getLogger(Backend::class.java)
 
 open class Backend(
     langs: Iterable<String> = listOf("en"),
@@ -84,7 +86,7 @@ open class Backend(
      */
     init {
         checkMainThreadOp()
-        Timber.d("Opening rust backend with lang=$langs")
+        logger.debug("Opening rust backend with lang={}", langs)
         val input =
             BackendInit
                 .newBuilder()
@@ -100,7 +102,7 @@ open class Backend(
      */
     override fun close() {
         checkMainThreadOp()
-        Timber.d("Closing rust backend")
+        logger.debug("Closing rust backend")
         backendLock.write {
             NativeMethods.closeBackend(backendPointer!!)
             backendPointer = null
@@ -249,9 +251,9 @@ open class Backend(
                         }
                         true
                     }.first()
-            Timber.w("Op on UI thread: %s", firstElem)
+            logger.warn("Op on UI thread: {}", firstElem)
             sql?.let {
-                Timber.w("%s", sql)
+                logger.warn("{}", sql)
             }
         }
     }
