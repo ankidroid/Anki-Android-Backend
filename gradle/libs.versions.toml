@@ -33,6 +33,9 @@ kotlin = '2.4.10'
 # https://github.com/protocolbuffers/protobuf/releases
 protobuf = "4.36.1"
 robolectric = "4.16.1"
+# https://www.slf4j.org/news.html
+# must stay on 1.7.x for AnkiDroid's slf4j-timber bridge: see Slf4jBindingTest
+slf4j = "1.7.36"
 timber = "5.0.1"
 ktlint = '1.5.0'
 ktlintGradlePlugin = "14.2.0"
@@ -46,6 +49,7 @@ androidx-sqlite-ktx = { module = "androidx.sqlite:sqlite-ktx", version.ref = "an
 commons-exec = { module = "org.apache.commons:commons-exec", version.ref = "commonsExec" }
 kotlin-stdlib-jdk8 = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8", version.ref = "kotlin" }
 protobuf-kotlin-lite = { module = "com.google.protobuf:protobuf-kotlin-lite", version.ref = "protobuf" }
+slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
 
 # testing libs
 androidx-test-junit = { module = "androidx.test.ext:junit", version.ref = "androidxTestJunit" }
