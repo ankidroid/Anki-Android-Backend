@@ -54,7 +54,7 @@ open class BackendException : RuntimeException {
         return SQLiteException(message, this)
     }
 
-    class BackendDbException(
+    open class BackendDbException(
         error: BackendError,
     ) : BackendException(error) {
         override fun toSQLiteException(query: String): RuntimeException {
@@ -79,11 +79,6 @@ open class BackendException : RuntimeException {
                 }
             } else if (message.contains("ConstraintViolation")) {
                 return SQLiteConstraintException(message)
-            } else if (message.contains("DiskFull")) {
-                return SQLiteFullException(message)
-            } else if (message.contains("DatabaseCorrupt")) {
-                val outMessage = String.format(Locale.ROOT, "error while compiling: \"%s\": %s", query, message)
-                return SQLiteDatabaseCorruptException(outMessage)
             }
             val outMessage = String.format(Locale.ROOT, "error while compiling: \"%s\": %s", query, message)
             return SQLiteException(outMessage, this)
@@ -105,6 +100,21 @@ open class BackendException : RuntimeException {
             error: BackendError,
         ) : BackendException(error)
 
+        /** The disk is full: analogue of android's SQLiteFullException */
+        class BackendDbFullException(
+            error: BackendError,
+        ) : BackendDbException(error) {
+            override fun toSQLiteException(query: String): RuntimeException = SQLiteFullException(localizedMessage)
+        }
+
+        /** The collection database is corrupt: analogue of android's SQLiteDatabaseCorruptException */
+        class BackendDbCorruptException(
+            error: BackendError,
+        ) : BackendDbException(error) {
+            override fun toSQLiteException(query: String): RuntimeException =
+                SQLiteDatabaseCorruptException(String.format(Locale.ROOT, "error while compiling: \"%s\": %s", query, localizedMessage))
+        }
+
         companion object {
             fun fromDbError(error: BackendError): BackendException {
                 val localised = error.message ?: return BackendDbException(error)
@@ -116,6 +126,13 @@ open class BackendException : RuntimeException {
                 }
                 if (localised.contains("kind: MissingEntity")) {
                     return BackendDbMissingEntityException(error)
+                }
+                // checked before "kind: Other": these messages may contain both markers
+                if (localised.contains("DiskFull")) {
+                    return BackendDbFullException(error)
+                }
+                if (localised.contains("DatabaseCorrupt")) {
+                    return BackendDbCorruptException(error)
                 }
                 if (localised.contains("kind: Other")) {
                     return BackendDbException(error)
