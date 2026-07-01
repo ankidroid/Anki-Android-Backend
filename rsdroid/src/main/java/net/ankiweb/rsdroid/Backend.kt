@@ -57,6 +57,16 @@ open class Backend(
 
     fun isOpen(): Boolean = backendPointer != null
 
+    /**
+     * Open a collection. There must not already be an open collection.
+     *
+     * @throws BackendException.BackendDbException
+     * @throws BackendException.BackendDbException.BackendDbLockedException
+     * @throws BackendException.BackendDbException.BackendDbFileTooNewException
+     * @throws BackendException.BackendDbException.BackendDbFileTooOldException
+     * @throws BackendException.BackendDbException.BackendDbFullException
+     * @throws BackendException.BackendDbException.BackendDbCorruptException
+     */
     fun openCollection(collectionPath: String) {
         val (mediaFolder, mediaDb) =
             if (collectionPath == ":memory:") {
@@ -102,21 +112,6 @@ open class Backend(
         backendLock.write {
             NativeMethods.closeBackend(backendPointer!!)
             backendPointer = null
-        }
-    }
-
-    /**
-     * Open a collection. There must not already be an open collection.
-     */
-    override fun openCollection(
-        collectionPath: String,
-        mediaFolderPath: String,
-        mediaDbPath: String,
-    ) {
-        try {
-            super.openCollection(collectionPath, mediaFolderPath, mediaDbPath)
-        } catch (exc: BackendException.BackendDbException) {
-            throw exc.toSQLiteException("db open")
         }
     }
 
