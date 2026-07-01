@@ -11,52 +11,29 @@ plugins {
 apply from: "$rootDir/build-rust.gradle"
 preBuild.dependsOn "buildRust"
 
-def getAnkiCommitHash = { ->
-    def commit = providers.exec {
-        commandLine "git", "-C", new File("${project.rootDir}", "anki"), "rev-parse", "HEAD"
-    }.standardOutput.asText.get().trim()
-    println("Anki commit: ${commit}")
-    return commit
+def gitHead = { File repo ->
+    providers.exec {
+        commandLine "git", "-C", repo.absolutePath, "rev-parse", "HEAD"
+    }.standardOutput.asText.map { it.trim() }
 }
 
-def getFsrsVersion = { ->
-    // the compiled fsrs version is resolved by the root Cargo.lock, not anki/Cargo.lock:
-    // rslib-bridge consumes anki as a path dependency, whose lockfile cargo ignores
-    //  name = "fsrs"
-    //  version = "A.B.C"
-    def lockText = rootProject.file("Cargo.lock").getText("UTF-8")
-    def matcher = lockText =~ /(?m)^name = "fsrs"\r?\nversion = "([^"]+)"/
-    if (!matcher.find()) {
-        throw new GradleException("Could not find the fsrs version in Cargo.lock")
+// Generate BuildConfig
+androidComponents {
+    onVariants(selector().all()) { variant ->
+        def generateBuildConfig = tasks.register("generate${variant.name.capitalize()}BuildConfig", GenerateBuildConfigTask) {
+            ankiCommitHash = gitHead(new File(rootDir, "anki"))
+            backendGitCommitHash = gitHead(rootDir)
+            ankiDesktopVersion = providers.gradleProperty("VERSION_NAME").map { it.replaceFirst(/.*anki/, "") }
+            cargoLock = rootProject.file("Cargo.lock")
+        }
+        variant.sources.kotlin.addGeneratedSourceDirectory(generateBuildConfig) { it.outputDir }
     }
-    def version = matcher.group(1)
-    println("FSRS version: ${version}")
-    return version
-}
-
-def getAnkiDesktopVersion() {
-    Properties properties = new Properties()
-    properties.load(project.rootProject.file('gradle.properties').newDataInputStream())
-    def versionName = properties.getProperty('VERSION_NAME')
-    return versionName.substring(versionName.indexOf("anki") + "anki".length())
-}
-
-/**
- * @return the current git hash
- * @example edf739d95bad7b370a6ed4398d46723f8219b3cd
- */
-static def getBackendGitCommitHash() {
-    "git rev-parse HEAD".execute().text.trim()
 }
 
 android {
     namespace = 'net.ankiweb.rsdroid'
     compileSdk = libs.versions.compileSdk.get().toInteger()
     ndkVersion = libs.versions.ndk.get()
-
-    buildFeatures {
-        buildConfig = true // expose 'ANKI_DESKTOP_VERSION'
-    }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -67,13 +44,6 @@ android {
         minSdk = libs.versions.minSdk.get().toInteger()
 
         consumerProguardFiles "consumer-rules.pro"
-
-        buildConfigField "String", "ANKI_COMMIT_HASH", "\"${getAnkiCommitHash()}\""
-        buildConfigField "String", "ANKI_DESKTOP_VERSION", "\"${getAnkiDesktopVersion()}\""
-        buildConfigField "String", "FSRS_VERSION", "\"${getFsrsVersion()}\""
-
-        buildConfigField "String", "BACKEND_GIT_COMMIT_HASH", "\"${getBackendGitCommitHash()}\""
-        buildConfigField "long", "BACKEND_BUILD_TIME", System.currentTimeMillis().toString()
     }
 
     buildTypes {
