@@ -16,6 +16,7 @@
 package net.ankiweb.rsdroid.database
 
 import android.database.sqlite.SQLiteDatabaseCorruptException
+import net.ankiweb.rsdroid.BackendException.BackendDbException.BackendDbCorruptException
 import net.ankiweb.rsdroid.database.testutils.DatabaseCorruption
 import org.hamcrest.MatcherAssert
 import org.hamcrest.Matchers
@@ -26,18 +27,19 @@ import org.junit.runners.Parameterized
 class DatabaseRegularCorruptionTest : DatabaseCorruption() {
     // In both cases, openCollection fails with the exception.
     override fun assertCorruption(setupException: Exception) {
-        // Rust: net.ankiweb.rsdroid.BackendException$BackendDbException: DBError { info: "SqliteFailure(Error { code: DatabaseCorrupt, extended_code: 11 }, Some(\"database disk image is malformed\"))", kind: Other }
-        // Java: database disk image is malformed (code 11): , while compiling: PRAGMA journal_mode
-
-//        assertThat(setupException.getClass(), typeCompatibleWith(BackendException.BackendDbException.class));
+        val expectedType =
+            when (schedVersion) {
+                // Rust: BackendDbCorruptException: DBError { info: "SqliteFailure(Error { code: DatabaseCorrupt, extended_code: 11 }, Some(\"database disk image is malformed\"))", kind: Other }
+                DatabaseType.RUST -> BackendDbCorruptException::class.java
+                // Java: database disk image is malformed (code 11): , while compiling: PRAGMA journal_mode
+                DatabaseType.FRAMEWORK -> SQLiteDatabaseCorruptException::class.java
+                else -> throw IllegalStateException("unknown DatabaseType")
+            }
         MatcherAssert.assertThat(
             setupException.javaClass,
-            Matchers.typeCompatibleWith(
-                SQLiteDatabaseCorruptException::class.java,
-            ),
+            Matchers.typeCompatibleWith(expectedType),
         )
 
-        // this mapping to an unrelated exception should be done at a higher level
         MatcherAssert.assertThat(
             setupException.localizedMessage,
             Matchers.containsString("database disk image is malformed"),
