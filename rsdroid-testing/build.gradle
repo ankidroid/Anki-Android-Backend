@@ -28,9 +28,6 @@ plugins {
 apply from: "$rootDir/build-rust.gradle"
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    // obtaining the OS
-    implementation libs.commons.exec
     implementation libs.kotlin.stdlib.jdk8
 }
 
