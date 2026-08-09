@@ -1,12 +1,10 @@
 import com.android.build.gradle.tasks.BundleAar
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 import java.util.zip.ZipFile
 import org.gradle.internal.os.OperatingSystem
 
 plugins {
     alias(libs.plugins.android.library) // required for aar generation to link to from AnkiDroid
-    alias(libs.plugins.kotlin.android)
     id 'signing'
     alias(libs.plugins.gradle.maven.publish.plugin)
 }
@@ -132,12 +130,6 @@ android {
             assets {
                 srcDirs "build/generated/anki_artifacts"
             }
-        }
-    }
-
-    kotlin {
-        compilerOptions {
-            jvmTarget = JvmTarget.JVM_11
         }
     }
 }
