@@ -143,7 +143,8 @@ android {
 }
 
 afterEvaluate {
-    tasks.withType(BundleAar).configureEach { bundleAarTask ->
+    // only the publishable AARs: AGP 9's bundle<Variant>LocalLintAar tasks omit jniLibs
+    tasks.withType(BundleAar).matching { it.name ==~ /bundle(Debug|Release)Aar/ }.configureEach { bundleAarTask ->
         bundleAarTask.doLast {
             def aarFile = bundleAarTask.outputs.files.singleFile
             def zipFile = new ZipFile(aarFile)
