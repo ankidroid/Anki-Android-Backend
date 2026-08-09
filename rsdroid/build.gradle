@@ -1,6 +1,5 @@
 import com.android.build.gradle.tasks.BundleAar
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 import java.util.zip.ZipFile
 import org.gradle.internal.os.OperatingSystem
@@ -167,13 +166,6 @@ dependencies {
     testImplementation libs.androidx.test.junit
     testImplementation project(path: ':rsdroid-testing')
 }
-
-tasks.withType(KotlinCompile).configureEach {
-    compilerOptions {
-        freeCompilerArgs = ["-opt-in=kotlin.RequiresOptIn"]
-    }
-}
-
 
 
 // Install Git pre-commit hook for format-rust
