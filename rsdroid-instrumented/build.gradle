@@ -16,8 +16,10 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-apply plugin: 'com.android.application'
-apply plugin: "kotlin-android"
+plugins {
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+}
 
 android {
     namespace = 'net.ankiweb.rsdroid.instrumented'
