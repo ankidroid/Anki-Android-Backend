@@ -211,23 +211,6 @@ the repository.
 shows up in
 https://repo1.maven.org/maven2/io/github/david-allison/anki-android-backend/
 
-## test library copies
-
-> [!WARNING] Up to 10 copies of the test library are persisted on disk
-> **per version of the test library**. It is the responsibility of the 
-> calling project to warn about these files. They are not automatically 
-> cleaned up.
-
-`rsdroid-testing` extracts the backend library to `java.io.tmpdir`.
-Copies are kept alongside the original:
-
-```
-librsdroid-<sha1>.dylib      the extracted library
-librsdroid-<sha1>-1.dylib    a copy of the library, created if a second classloader requires it 
-```
-
-See [ClassLoaderLibraryCopy.kt](rsdroid-testing/src/main/java/net/ankiweb/rsdroid/testing/ClassLoaderLibraryCopy.kt) for details.
-
 ## Architecture
 
 See [ARCHITECTURE.md](./docs/ARCHITECTURE.md)

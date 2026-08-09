@@ -32,20 +32,6 @@ object RustBackendLoader {
     var PRINT_DEBUG = false
 
     /**
-     * How many copies of the backend library may be kept on disk. Each classloader using the
-     * backend uses a distinct copy (~60MB as-of writing).
-     *
-     * Set this before [ensureSetup] if a suite uses more classloaders than the default allows. It
-     * applies to the whole process, not only to the classloader which sets it.
-     */
-    @JvmStatic
-    var maxOnDiskLibraryCopies: Int
-        get() = maxCopies
-        set(value) {
-            maxCopies = value
-        }
-
-    /**
      * Allows unit testing rsdroid under Robolectric <br></br>
      * Loads (via [Runtime.load]) a librsdroid.so alternative compiled for the current operating system.<br></br><br></br>
      *
@@ -108,7 +94,7 @@ object RustBackendLoader {
      * (eg some do not use Robolectric's classloader at all, and other tests like BindingAndroidTest
      * will use multiple classloader instances due to the use of @Config). This means this code
      * is not guaranteed to execute only once, and after the first invocation, an "already loaded"
-     * error will be thrown by Java, which we handle by loading a private copy of the library.
+     * error will be thrown by Java, which we have to swallow.
      */
     private fun loadPath(path: String) {
         try {
@@ -119,15 +105,11 @@ object RustBackendLoader {
                     FileNotFoundException("Extracted file was not found. Maybe the temp folder was deleted. Please try again: '$path'")
                 throw RuntimeException(exception)
             }
-            if (!e.isOwnedByAnotherClassLoader) {
+            if (e.message == null || !e.message!!.contains("already loaded in another classloader")) {
                 throw e
+            } else {
+                // native library loaded by a different classloader in the same process
             }
-            // A JVM allows one classloader to own a library file, and a native method only binds to
-            // a library loaded by its own class's classloader.
-
-            // Each Robolectric sandbox has a separate classloader, so we can use a separate
-            // library path to fix 'already loaded in another classloader'
-            loadCopyForCurrentClassLoader(path)
         }
     }
 
