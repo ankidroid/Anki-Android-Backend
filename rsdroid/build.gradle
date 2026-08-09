@@ -5,10 +5,12 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.util.zip.ZipFile
 import org.gradle.internal.os.OperatingSystem
 
-apply plugin: 'com.android.library' // required for aar generation to link to from AnkiDroid
-apply plugin: "kotlin-android"
-apply plugin: 'signing'
-apply plugin: 'com.vanniktech.maven.publish'
+plugins {
+    alias(libs.plugins.android.library) // required for aar generation to link to from AnkiDroid
+    alias(libs.plugins.kotlin.android)
+    id 'signing'
+    alias(libs.plugins.gradle.maven.publish.plugin)
+}
 
 apply from: "$rootDir/build-rust.gradle"
 preBuild.dependsOn "buildRust"

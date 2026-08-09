@@ -4,19 +4,11 @@ import kotlin.system.exitProcess
 
 plugins {
     alias(libs.plugins.kotlin.jvm) apply false
+    alias(libs.plugins.kotlin.android) apply false
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.android.library) apply false
     alias(libs.plugins.gradle.maven.publish.plugin) apply false
     alias(libs.plugins.ktlint.gradle.plugin) apply false
-}
-
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
-buildscript {
-    dependencies {
-//        classpath(libs.gradle)
-        classpath(libs.kotlin.gradle.plugin)
-//        classpath(libs.kotlin.android.extensions)
-    }
 }
 
 allprojects {
