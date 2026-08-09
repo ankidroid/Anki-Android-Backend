@@ -54,7 +54,7 @@ android {
     // https://developer.android.com/reference/tools/gradle-api/8.3/null/com/android/build/api/dsl/JniLibsPackaging#getUseLegacyPackaging()
     // https://developer.android.com/topic/performance/reduce-apk-size#extract-false
     // https://developer.android.com/guide/topics/manifest/application-element#extractNativeLibs
-    packagingOptions {
+    packaging {
         jniLibs {
             useLegacyPackaging = true
         }
