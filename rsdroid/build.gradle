@@ -95,9 +95,6 @@ android {
 
     defaultConfig {
         minSdk = libs.versions.minSdk.get().toInteger()
-        targetSdk = libs.versions.targetSdk.get().toInteger()
-        versionCode = 1
-        versionName = VERSION_NAME
 
         consumerProguardFiles "consumer-rules.pro"
 
@@ -114,6 +111,14 @@ android {
             minifyEnabled = false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+    }
+
+    testOptions {
+        targetSdk = libs.versions.targetSdk.get().toInteger()
+    }
+
+    lint {
+        targetSdk = libs.versions.targetSdk.get().toInteger()
     }
 
     sourceSets {
