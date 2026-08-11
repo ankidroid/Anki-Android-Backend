@@ -14,9 +14,10 @@ use anki_proto::{
     generic::Int64,
 };
 use jni::{
+    errors::ThrowRuntimeExAndDefault,
     objects::{JByteArray, JClass, JObject},
     sys::{jint, jlong},
-    JNIEnv,
+    Env, EnvUnowned,
 };
 use prost::Message;
 
@@ -24,32 +25,35 @@ mod logging;
 
 #[no_mangle]
 pub unsafe extern "C" fn Java_net_ankiweb_rsdroid_NativeMethods_openBackend<'l>(
-    mut env: JNIEnv<'l>,
+    mut env: EnvUnowned<'l>,
     _: JClass,
     args: JByteArray,
 ) -> JObject<'l> {
     logging::setup_logging();
 
-    let input = env.convert_byte_array(args).unwrap();
-    let result = init_backend(&input)
-        .map(|backend| {
-            let backend_ptr = Box::into_raw(Box::new(backend)) as i64;
-            Int64 { val: backend_ptr }.encode_to_vec()
-        })
-        .map_err(|err| {
-            BackendError {
-                message: err,
-                kind: backend_error::Kind::InvalidInput as i32,
-                ..Default::default()
-            }
-            .encode_to_vec()
-        });
-    pack_result(result, &mut env)
+    env.with_env(|env| -> jni::errors::Result<JObject<'l>> {
+        let input = env.convert_byte_array(&args)?;
+        let result = init_backend(&input)
+            .map(|backend| {
+                let backend_ptr = Box::into_raw(Box::new(backend)) as i64;
+                Int64 { val: backend_ptr }.encode_to_vec()
+            })
+            .map_err(|err| {
+                BackendError {
+                    message: err,
+                    kind: backend_error::Kind::InvalidInput as i32,
+                    ..Default::default()
+                }
+                .encode_to_vec()
+            });
+        Ok(pack_result(result, env))
+    })
+    .resolve::<ThrowRuntimeExAndDefault>()
 }
 
 #[no_mangle]
 pub unsafe extern "C" fn Java_net_ankiweb_rsdroid_NativeMethods_closeBackend(
-    _env: JNIEnv,
+    _env: EnvUnowned,
     _: JClass,
     args: jlong,
 ) {
@@ -59,7 +63,7 @@ pub unsafe extern "C" fn Java_net_ankiweb_rsdroid_NativeMethods_closeBackend(
 
 #[no_mangle]
 pub unsafe extern "C" fn Java_net_ankiweb_rsdroid_NativeMethods_runMethodRaw<'l>(
-    mut env: JNIEnv<'l>,
+    mut env: EnvUnowned<'l>,
     _: JClass,
     backend_ptr: jlong,
     service: jint,
@@ -69,10 +73,13 @@ pub unsafe extern "C" fn Java_net_ankiweb_rsdroid_NativeMethods_runMethodRaw<'l>
     let backend = to_backend(backend_ptr);
     let service: u32 = service as u32;
     let method: u32 = method as u32;
-    let input = env.convert_byte_array(args).unwrap();
-    with_packed_result(&mut env, || {
-        backend.run_service_method(service, method, &input)
+    env.with_env(|env| -> jni::errors::Result<JObject<'l>> {
+        let input = env.convert_byte_array(&args)?;
+        Ok(with_packed_result(env, || {
+            backend.run_service_method(service, method, &input)
+        }))
     })
+    .resolve::<ThrowRuntimeExAndDefault>()
 }
 
 unsafe fn to_backend(ptr: jlong) -> &'static mut Backend {
@@ -89,7 +96,7 @@ macro_rules! null_on_error {
 }
 
 /// Run provided func and pack result into jarray. Catches panics.
-fn with_packed_result<'l, F>(env: &mut JNIEnv<'l>, func: F) -> JObject<'l>
+fn with_packed_result<'l, F>(env: &mut Env<'l>, func: F) -> JObject<'l>
 where
     F: FnOnce() -> Result<Vec<u8>, Vec<u8>>,
 {
@@ -102,28 +109,19 @@ where
 
 /// Pack Result<okBytes, errBytes> into jArray[okBytes, null] | jarray[null, errBytes] | null
 /// Null returned in case conversion to a jbyteArray fails (eg low mem),
-fn pack_result<'l>(result: Result<Vec<u8>, Vec<u8>>, env: &mut JNIEnv<'l>) -> JObject<'l> {
-    // create the outer 2-element array
-    let byte_array_class = null_on_error!(env.find_class("[B"));
-    let mut outer_array =
-        null_on_error!(env.new_object_array(2, byte_array_class, JObject::null()));
+fn pack_result<'l>(result: Result<Vec<u8>, Vec<u8>>, env: &mut Env<'l>) -> JObject<'l> {
+    // create the outer 2-element array; elements default to null
+    let byte_array_class = null_on_error!(env.find_class(jni::jni_str!("[B")));
+    let outer_array = null_on_error!(env.new_object_array(2, byte_array_class, JObject::null()));
     // pack return/error into bytearrays
     match result {
         Ok(msg) => {
-            null_on_error!(env.set_object_array_element(
-                &mut outer_array,
-                0,
-                null_on_error!(env.byte_array_from_slice(&msg))
-            ));
-            null_on_error!(env.set_object_array_element(&mut outer_array, 1, JObject::null()));
+            let bytes = null_on_error!(env.byte_array_from_slice(&msg));
+            null_on_error!(outer_array.set_element(env, 0, bytes));
         }
         Err(err) => {
-            null_on_error!(env.set_object_array_element(&mut outer_array, 0, JObject::null()));
-            null_on_error!(env.set_object_array_element(
-                &mut outer_array,
-                1,
-                null_on_error!(env.byte_array_from_slice(&err))
-            ));
+            let bytes = null_on_error!(env.byte_array_from_slice(&err));
+            null_on_error!(outer_array.set_element(env, 1, bytes));
         }
     };
     outer_array.into()
