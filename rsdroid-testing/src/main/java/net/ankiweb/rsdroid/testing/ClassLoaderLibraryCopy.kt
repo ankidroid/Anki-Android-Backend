@@ -54,13 +54,36 @@ internal val UnsatisfiedLinkError.isOwnedByAnotherClassLoader: Boolean
  */
 internal fun loadCopyForCurrentClassLoader(path: String) {
     val library = File(path)
-    val loaded = library.copiesToTry().firstOrNull { copy -> copy.loadIfUnowned() }
+    val loaded = library.loadUnownedCopy() ?: library.loadCopyFreedByGc()
     checkNotNull(loaded) {
         "More than $maxCopies classloaders require a distinct copy of the library. " +
             "See RustBackendLoader.maxOnDiskLibraryCopies for tradeoffs."
     }
     // the next classloader starts after the copy this one now owns
     nextCopy = loaded.number % maxCopies + 1
+}
+
+/**
+ * Loads the first copy of this library which no classloader owns.
+ *
+ * @return the loaded copy, or `null` if every copy is owned
+ */
+private fun File.loadUnownedCopy(): LibraryCopy? = copiesToTry().firstOrNull { copy -> copy.loadIfUnowned() }
+
+/**
+ * [loadUnownedCopy], after asking the JVM to collect discarded classloaders.
+ *
+ * @return the loaded copy, or `null` if every copy remained owned
+ */
+private fun File.loadCopyFreedByGc(): LibraryCopy? {
+    repeat(10) {
+        // GC is a hint - try a few times
+        System.gc()
+        // The JVM closes the collected classloader's libraries asynchronously
+        Thread.sleep(50)
+        loadUnownedCopy()?.let { return it }
+    }
+    return null
 }
 
 /** A numbered copy of a library, which at most one classloader may own */
