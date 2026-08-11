@@ -50,11 +50,11 @@ internal val UnsatisfiedLinkError.isOwnedByAnotherClassLoader: Boolean
  *
  * @param path a library file which another classloader owns
  * @throws UnsatisfiedLinkError no copy of the library could be loaded
- * @throws IllegalStateException no library file was available
+ * @throws IllegalStateException no library file was available before cleanup ended
  */
 internal fun loadCopyForCurrentClassLoader(path: String) {
     val library = File(path)
-    val loaded = library.copiesToTry().firstOrNull { copy -> copy.loadIfUnowned() }
+    val loaded = library.loadUnownedCopy() ?: library.loadCopyFreedByGc()
     checkNotNull(loaded) {
         "No library file is available for this classloader (capacity: ${maxCopies + 1}, including the original). " +
             "See RustBackendLoader.maxOnDiskLibraryCopies for tradeoffs."
@@ -62,6 +62,42 @@ internal fun loadCopyForCurrentClassLoader(path: String) {
     // the next classloader starts after the copy this one now owns
     nextCopy = loaded.number % maxCopies + 1
 }
+
+/**
+ * Loads the first copy of this library which no classloader owns.
+ *
+ * @return the loaded copy, or `null` if every copy is owned
+ */
+private fun File.loadUnownedCopy(): LibraryCopy? = copiesToTry().firstOrNull { copy -> copy.loadIfUnowned() }
+
+/**
+ * [loadUnownedCopy], after asking the JVM to collect discarded classloaders.
+ *
+ * @return the loaded copy, or `null` if every copy remained owned
+ */
+private fun File.loadCopyFreedByGc(): LibraryCopy? {
+    repeat(10) {
+        // GC is a hint - try a few times
+        System.gc()
+        if (!awaitClassLoaderCleanup()) return null
+        loadUnownedCopy()?.let { return it }
+    }
+    return null
+}
+
+/**
+ * Waits for the JVM to close collected classloaders' libraries asynchronously.
+ *
+ * @return `false` if interrupted, with the interrupt flag restored so the caller can stop retrying
+ */
+internal fun awaitClassLoaderCleanup(): Boolean =
+    try {
+        Thread.sleep(50)
+        true
+    } catch (_: InterruptedException) {
+        Thread.currentThread().interrupt()
+        false
+    }
 
 /** A numbered copy of a library, which at most one classloader may own */
 private class LibraryCopy(
