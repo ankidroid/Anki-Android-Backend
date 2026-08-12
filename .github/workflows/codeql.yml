@@ -183,7 +183,10 @@ jobs:
       if: matrix.build-mode == 'manual'
       run: |
         cargo run -p build_rust
-        ./gradlew build
+        # 'build test -x check': compile everything and run unit tests, but skip
+        # the other 'check' tasks (ktlint, Android Lint) which normal CI covers
+        # TODO: Only compile tests for CodeQL, don't run them
+        ./gradlew build test -x check
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v4
