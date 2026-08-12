@@ -261,7 +261,7 @@ jobs:
         run: ./check-rust.bat
 
       - name: Run tests (Unit)
-        run: ./gradlew test rsdroid:lint --daemon
+        run: ./gradlew test rsdroid:lint ktlintCheck --daemon
 
       - name: Run tests (Emulator)
         uses: reactivecircus/android-emulator-runner@v2
