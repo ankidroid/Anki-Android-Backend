@@ -21,13 +21,14 @@ def getAnkiCommitHash = { ->
 }
 
 def getFsrsVersion = { ->
-    // the fsrs version is pinned in anki/Cargo.lock:
+    // the compiled fsrs version is resolved by the root Cargo.lock, not anki/Cargo.lock:
+    // rslib-bridge consumes anki as a path dependency, whose lockfile cargo ignores
     //  name = "fsrs"
     //  version = "A.B.C"
-    def lockText = new File("${project.rootDir}", "anki/Cargo.lock").getText("UTF-8")
+    def lockText = rootProject.file("Cargo.lock").getText("UTF-8")
     def matcher = lockText =~ /(?m)^name = "fsrs"\r?\nversion = "([^"]+)"/
     if (!matcher.find()) {
-        throw new GradleException("Could not find the fsrs version in anki/Cargo.lock")
+        throw new GradleException("Could not find the fsrs version in Cargo.lock")
     }
     def version = matcher.group(1)
     println("FSRS version: ${version}")
