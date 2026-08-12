@@ -33,6 +33,9 @@ import org.json.JSONObject
 import timber.log.Timber
 import java.io.Closeable
 import java.io.File
+import java.util.concurrent.locks.ReentrantReadWriteLock
+import kotlin.concurrent.read
+import kotlin.concurrent.write
 
 open class Backend(
     langs: Iterable<String> = listOf("en"),
@@ -41,6 +44,11 @@ open class Backend(
     Closeable {
     // Set on init; unset on .close(). Access via withBackend()
     private var backendPointer: Long? = null
+
+    /**
+     * AnkiDroid#21455): Ensures [close] cannot free the backend during a [runMethodRaw] call.
+     */
+    private val backendLock = ReentrantReadWriteLock()
 
     val tr: Translations by lazy {
         Translations(this)
@@ -93,8 +101,10 @@ open class Backend(
     override fun close() {
         checkMainThreadOp()
         Timber.d("Closing rust backend")
-        NativeMethods.closeBackend(backendPointer!!)
-        backendPointer = null
+        backendLock.write {
+            NativeMethods.closeBackend(backendPointer!!)
+            backendPointer = null
+        }
     }
 
     /**
@@ -138,12 +148,11 @@ open class Backend(
      * Run the provided closure with access to the backend.
      * @throws BackendException if backend closed.
      */
-    private fun <T> withBackend(fn: (ptr: Long) -> T): T {
-        if (backendPointer == null) {
-            throw BackendException("Backend has been closed")
+    private fun <T> withBackend(fn: (ptr: Long) -> T): T =
+        backendLock.read {
+            val pointer = backendPointer ?: throw BackendException("Backend has been closed")
+            fn(pointer)
         }
-        return fn(backendPointer!!)
-    }
 
     // other DB methods
 
