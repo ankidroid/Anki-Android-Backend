@@ -7,7 +7,7 @@ minSdk = "23"
 ndk = "29.0.14206865"
 
 # https://developer.android.com/jetpack/androidx/releases/appcompat
-androidxAppCompat = "1.7.1"
+androidxAppCompat = "1.8.0"
 # https://developer.android.com/jetpack/androidx/releases/core
 androidxCore = "1.7.0"
 # https://developer.android.com/jetpack/androidx/releases/sqlite
