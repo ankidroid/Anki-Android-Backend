@@ -122,7 +122,6 @@ afterEvaluate {
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar", '*.so'])
-    implementation libs.androidx.appcompat
     // Protobuf is part of the ABI, so include it as a compile/api dependency.
     api libs.protobuf.kotlin.lite
 
