@@ -15,7 +15,6 @@
  */
 package net.ankiweb.rsdroid
 
-import android.os.Looper
 import androidx.annotation.CheckResult
 import androidx.annotation.VisibleForTesting
 import anki.ankidroid.DbResponse
@@ -68,7 +67,6 @@ open class Backend(
                     collectionPath.replace(".anki2", ".media.db"),
                 )
             }
-        checkMainThreadOp()
         openCollection(collectionPath, mediaFolder, mediaDb)
     }
 
@@ -85,7 +83,6 @@ open class Backend(
      * Open a backend instance, loading the shared library if not already loaded.
      */
     init {
-        checkMainThreadOp()
         logger.debug("Opening rust backend with lang={}", langs)
         val input =
             BackendInit
@@ -101,7 +98,6 @@ open class Backend(
      * Close the backend, and any open collection. This object can not be used after this.
      */
     override fun close() {
-        checkMainThreadOp()
         logger.debug("Closing rust backend")
         backendLock.write {
             NativeMethods.closeBackend(backendPointer!!)
@@ -139,12 +135,10 @@ open class Backend(
         service: Int,
         method: Int,
         input: ByteArray,
-    ): ByteArray {
-        checkMainThreadOp()
-        return withBackend {
+    ): ByteArray =
+        withBackend {
             unpackResult(NativeMethods.runMethodRaw(it, service, method, input))
         }
-    }
 
     /**
      * Run the provided closure with access to the backend.
@@ -178,7 +172,6 @@ open class Backend(
         sql: String,
         bindArgs: Array<Any?>,
     ): JSONArray {
-        checkMainThreadSQL(sql)
         val output = runDbCommand(dbRequestJson(sql, bindArgs)).toStringUtf8()
         return JSONArray(output)
     }
@@ -186,27 +179,18 @@ open class Backend(
     override fun insertForId(
         sql: String,
         bindArgs: Array<Any?>?,
-    ): Long {
-        checkMainThreadSQL(sql)
-        return super.insertForId(dbRequestJson(sql, bindArgs ?: emptyArray()))
-    }
+    ): Long = super.insertForId(dbRequestJson(sql, bindArgs ?: emptyArray()))
 
     override fun executeGetRowsAffected(
         sql: String,
         bindArgs: Array<Any?>?,
-    ): Int {
-        checkMainThreadSQL(sql)
-        return runDbCommandForRowCount(dbRequestJson(sql, bindArgs ?: emptyArray())).toInt()
-    }
+    ): Int = runDbCommandForRowCount(dbRequestJson(sql, bindArgs ?: emptyArray())).toInt()
 
     // Begin Protobuf-based database streaming methods (#6)
     override fun fullQueryProto(
         query: String,
         bindArgs: Array<out Any?>,
-    ): DbResponse {
-        checkMainThreadSQL(query)
-        return runDbCommandProto(dbRequestJson(query, bindArgs))
-    }
+    ): DbResponse = runDbCommandProto(dbRequestJson(query, bindArgs))
 
     override fun getNextSlice(
         startIndex: Long,
@@ -229,65 +213,7 @@ open class Backend(
 
     override fun getColumnNames(sql: String): Array<String> = getColumnNamesFromQuery(sql).toTypedArray()
 
-    private fun checkMainThreadOp(sql: String? = null) {
-        if (!checkOperationsRunOnMainThread) return
-        runIfOnMainThread {
-            val stackTraceElements = Thread.currentThread().stackTrace
-            val firstElem =
-                stackTraceElements
-                    .filter {
-                        val klass = it.className
-                        for (text in listOf(
-                            "rsdroid",
-                            "libanki",
-                            "java.lang",
-                            "dalvik",
-                            "anki.backend",
-                            "DatabaseChangeDecorator",
-                        )) {
-                            if (text in klass) {
-                                return@filter false
-                            }
-                        }
-                        true
-                    }.first()
-            logger.warn("Op on UI thread: {}", firstElem)
-            sql?.let {
-                logger.warn("{}", sql)
-            }
-        }
-    }
-
-    private fun checkMainThreadSQL(query: String) {
-        checkMainThreadOp(query)
-    }
-
-    private fun runIfOnMainThread(func: () -> Unit) {
-        try {
-            if (Looper.getMainLooper().thread == Thread.currentThread()) {
-                func()
-            }
-        } catch (exc: NoSuchMethodError) {
-            // running outside Android, or old API
-        } catch (ex: RuntimeException) {
-            // If running with no Android dependencies, we get the error:
-            // Method getMainLooper in android.os.Looper not mocked.
-            // See https://developer.android.com/r/studio-ui/build/not-mocked for details.
-            // runIfOnMainThread is non-vital, so we can ignore the exception
-            if (ex.message?.contains("android.os.Looper not mocked") == true) {
-                return
-            }
-            throw ex
-        }
-    }
-
     companion object {
-        /**
-         * Debug setting: if true, logs all operations executed on the main thread
-         */
-        // This is false by default: translate() ais an extremely fast operation
-        // which does not require execution on a worker thread
-        var checkOperationsRunOnMainThread: Boolean = false
         const val MAX_MEDIA_FILENAME_LENGTH = 120
 
         const val MAX_MEDIA_FILENAME_LENGTH_SERVER = 255
