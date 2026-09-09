@@ -33,7 +33,7 @@ protobuf = "4.36.1"
 robolectric = "4.16.1"
 # https://www.slf4j.org/news.html
 # must stay on 1.7.x for AnkiDroid's slf4j-timber bridge: see Slf4jBindingTest
-slf4j = "1.7.36"
+slf4j = "2.0.19"
 timber = "5.0.1"
 ktlint = '1.5.0'
 ktlintGradlePlugin = "14.2.0"
