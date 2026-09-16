@@ -28,7 +28,7 @@ fn monitor_io_handle(handle: BufferRedirect) {
     std::thread::spawn(move || {
         let mut buf = String::new();
         loop {
-            buf.truncate(0);
+            buf.clear();
             match handle.read_line(&mut buf) {
                 Ok(0) => {
                     // currently EOF
