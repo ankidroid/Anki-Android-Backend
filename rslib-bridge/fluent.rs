@@ -50,6 +50,44 @@ fn methods(modules: &[Module]) -> String {
     out.join("\n") + "\n"
 }
 
+/// Rewrites Fluent placeables (`{$deck_name}`) into Kotlin string templates
+/// (`${`deckName`}`), using the same parameter names as `get_arg_types`.
+fn kotlin_template_text(translation: &Translation) -> String {
+    translation
+        .variables
+        .iter()
+        .fold(translation.text.clone(), |text, var| {
+            text.replace(
+                &format!("{{${}}}", var.name),
+                &format!("${{`{}`}}", var.name.to_camel_case()),
+            )
+        })
+}
+
+// Similar with methods() but the generated methods return the backend strings directy
+fn static_text_methods(modules: &[Module]) -> String {
+    let mut out = vec![];
+    for module in modules {
+        for translation in &module.translations {
+            let key = translation.key.replace('-', "_").to_camel_case();
+            let arg_types = get_arg_types(&translation.variables);
+            out.push(format!(
+                "
+    /** {} */
+    override fun {}({}): String {{
+        return \"\"\"{}\"\"\"
+    }}
+",
+                translation.text,
+                key,
+                arg_types,
+                kotlin_template_text(translation)
+            ));
+        }
+    }
+    out.join("\n") + "\n"
+}
+
 fn get_arg_types(args: &[Variable]) -> String {
     args.iter()
         .map(|arg| format!("`{}`: {}", arg.name.to_camel_case(), arg_kind(&arg.kind)))
@@ -112,6 +150,16 @@ interface GeneratedTranslations {
     );
 
     out.push_str(&methods(modules));
+    out.push('}');
+    out.push_str("
+
+/** Note: This class is used for tooling and should not be used directly */
+object PreviewTranslations : GeneratedTranslations {
+    override fun translate(module: Int, translation: Int, args: Map<String, TranslateArgValue>): String = \"Unused\"
+
+"
+    );
+    out.push_str(&static_text_methods(modules));
     out.push('}');
 
     out
