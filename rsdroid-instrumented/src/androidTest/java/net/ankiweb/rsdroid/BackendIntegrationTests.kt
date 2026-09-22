@@ -17,6 +17,7 @@ package net.ankiweb.rsdroid
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import anki.ankidroid.SchedTimingTodayLegacyRequest
+import kotlinx.serialization.json.jsonArray
 import net.ankiweb.rsdroid.ankiutil.InstrumentedTest
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.core.Is
@@ -60,8 +61,8 @@ class BackendIntegrationTests : InstrumentedTest() {
     fun fullQueryTest() {
         val backendV1 = getBackend("initial_version_2_12_1.anki2")
         val result = backendV1.fullQuery("select * from col")
-        Assert.assertEquals(1, result.length())
-        Assert.assertEquals(13, result.getJSONArray(0).length())
+        Assert.assertEquals(1, result.size)
+        Assert.assertEquals(13, result[0].jsonArray.size)
     }
 
     @Test
