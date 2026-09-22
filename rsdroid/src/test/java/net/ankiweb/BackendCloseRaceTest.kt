@@ -2,6 +2,9 @@
 package net.ankiweb
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.long
 import net.ankiweb.rsdroid.Backend
 import net.ankiweb.rsdroid.BackendException
 import net.ankiweb.rsdroid.BackendFactory.getBackend
@@ -36,7 +39,7 @@ class BackendCloseRaceTest {
         val backend = getBackend()
         backend.openCollection(":memory:")
         val warmup = backend.fullQuery(longQuery(rows = 1_000))
-        assertEquals(1_000L, warmup.getJSONArray(0).getLong(0))
+        assertEquals(1_000L, warmup[0].jsonArray[0].jsonPrimitive.long)
 
         var queryError: Exception? = null
         var queryCount: Long? = null
@@ -45,7 +48,7 @@ class BackendCloseRaceTest {
                 try {
                     // keeps the backend busy inside a single native call for over a second
                     val result = backend.fullQuery(longQuery(rows = 50_000_000))
-                    queryCount = result.getJSONArray(0).getLong(0)
+                    queryCount = result[0].jsonArray[0].jsonPrimitive.long
                 } catch (e: Exception) {
                     queryError = e
                 }

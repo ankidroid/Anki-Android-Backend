@@ -93,6 +93,8 @@ afterEvaluate {
 dependencies {
     // Protobuf is part of the ABI, so include it as a compile/api dependency.
     api libs.protobuf.kotlin.lite
+    // JsonArray is returned by the public fullQuery API.
+    api libs.kotlinx.serialization.json
 
     implementation libs.androidx.annotation
     implementation libs.androidx.sqlite.ktx
