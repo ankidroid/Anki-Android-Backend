@@ -20,6 +20,14 @@ import anki.ankidroid.DbResponse
 import org.json.JSONArray
 
 interface SQLHandler {
+    /**
+     * Executes [query] and returns all rows as JSON arrays of column values.
+     *
+     * The result is fully materialized; no paging or query-cache cleanup is
+     * required. Pass `null` for [bindArgs] when there are no bind arguments.
+     *
+     * For large results, use [fullQueryProto] to retrieve the result in pages.
+     */
     @CheckResult
     fun fullQuery(
         query: String,

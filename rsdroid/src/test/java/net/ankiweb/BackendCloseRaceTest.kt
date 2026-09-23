@@ -1,12 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package net.ankiweb
 
-import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import net.ankiweb.rsdroid.Backend
 import net.ankiweb.rsdroid.BackendException
 import net.ankiweb.rsdroid.BackendFactory.getBackend
 import net.ankiweb.rsdroid.testing.RustBackendLoader.ensureSetup
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -34,15 +35,17 @@ class BackendCloseRaceTest {
     fun closeDoesNotInterruptInFlightCalls() {
         val backend = getBackend()
         backend.openCollection(":memory:")
-        @SuppressLint("CheckResult")
-        backend.fullQuery(longQuery(rows = 1_000), null) // warm up the query path
+        val warmup = backend.fullQuery(longQuery(rows = 1_000))
+        assertEquals(1_000L, warmup.getJSONArray(0).getLong(0))
 
         var queryError: Exception? = null
+        var queryCount: Long? = null
         val queryThread =
             thread(name = "backend-slow-query") {
                 try {
                     // keeps the backend busy inside a single native call for over a second
-                    backend.fullQuery(longQuery(rows = 50_000_000), null)
+                    val result = backend.fullQuery(longQuery(rows = 50_000_000))
+                    queryCount = result.getJSONArray(0).getLong(0)
                 } catch (e: Exception) {
                     queryError = e
                 }
@@ -51,12 +54,16 @@ class BackendCloseRaceTest {
         sleep(500.milliseconds) // let the query enter native code
         backend.close()
         queryThread.join(1.minutes)
+        assertFalse("query thread did not finish", queryThread.isAlive)
 
         // Acceptable outcomes:
         // * close() waited for the in-flight call: the query succeeds.
         // * the call lost the race and was cleanly rejected.
         if (queryError != null) {
             assertTrue("unexpected query error: $queryError", queryError is BackendException)
+            assertEquals("Backend has been closed", queryError.message)
+        } else {
+            assertEquals(50_000_000L, queryCount)
         }
     }
 
