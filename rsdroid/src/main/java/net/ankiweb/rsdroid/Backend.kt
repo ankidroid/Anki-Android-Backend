@@ -24,10 +24,12 @@ import anki.backend.GeneratedBackend
 import anki.generic.Int64
 import com.google.protobuf.ByteString
 import com.google.protobuf.InvalidProtocolBufferException
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.jsonArray
 import net.ankiweb.rsdroid.database.NotImplementedException
 import net.ankiweb.rsdroid.database.SQLHandler
 import org.json.JSONArray
-import org.json.JSONException
 import org.json.JSONObject
 import org.slf4j.LoggerFactory
 import java.io.Closeable
@@ -155,20 +157,9 @@ open class Backend(
     override fun fullQuery(
         query: String,
         bindArgs: Array<Any?>?,
-    ): JSONArray =
-        try {
-            fullQueryInternal(query, bindArgs ?: emptyArray())
-        } catch (e: JSONException) {
-            throw RuntimeException(e)
-        }
-
-    @Throws(JSONException::class)
-    private fun fullQueryInternal(
-        sql: String,
-        bindArgs: Array<Any?>,
-    ): JSONArray {
-        val output = runDbCommand(dbRequestJson(sql, bindArgs)).toStringUtf8()
-        return JSONArray(output)
+    ): JsonArray {
+        val output = runDbCommand(dbRequestJson(query, bindArgs ?: emptyArray())).toStringUtf8()
+        return Json.parseToJsonElement(output).jsonArray
     }
 
     override fun insertForId(
