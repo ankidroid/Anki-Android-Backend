@@ -7,7 +7,7 @@ minSdk = "23"
 ndk = "29.0.14206865"
 
 # https://developer.android.com/jetpack/androidx/releases/annotation
-androidxAnnotation = "1.9.1"
+androidxAnnotation = "1.11.0"
 # https://developer.android.com/jetpack/androidx/releases/appcompat
 androidxAppCompat = "1.8.0"
 # https://developer.android.com/jetpack/androidx/releases/core
