@@ -24,19 +24,27 @@ import anki.backend.GeneratedBackend
 import anki.generic.Int64
 import com.google.protobuf.ByteString
 import com.google.protobuf.InvalidProtocolBufferException
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.JsonUnquotedLiteral
+import kotlinx.serialization.json.add
+import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.put
+import kotlinx.serialization.json.putJsonArray
 import net.ankiweb.rsdroid.database.NotImplementedException
 import net.ankiweb.rsdroid.database.SQLHandler
-import org.json.JSONArray
-import org.json.JSONObject
 import org.slf4j.LoggerFactory
 import java.io.Closeable
 import java.io.File
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.read
 import kotlin.concurrent.write
+import java.lang.reflect.Array as ReflectArray
 
 private val logger = LoggerFactory.getLogger(Backend::class.java)
 
@@ -209,22 +217,88 @@ open class Backend(
 }
 
 /**
- * Build a JSON DB request
+ * Build a JSON DB request.
+ *
+ * TODO: consider a typed protobuf request upstream: the RunDbCommand* RPCs in
+ *  anki/proto/anki/ankidroid.proto take generic.Json. That would remove the JSON
+ *  encode/parse on every statement and allow binding ByteArray values directly.
  */
-private fun dbRequestJson(
+internal fun dbRequestJson(
     sql: String = "",
     bindArgs: Array<out Any?> = emptyArray(),
     firstRowOnly: Boolean = false,
 ): ByteString {
-    val o =
-        JSONObject().apply {
+    val request =
+        buildJsonObject {
             put("kind", "query")
             put("sql", sql)
-            put("args", JSONArray(bindArgs.toList()))
+            putJsonArray("args") { bindArgs.forEach { add(it.toBindArgJson()) } }
             put("first_row_only", firstRowOnly)
         }
-    return ByteString.copyFromUtf8(o.toString())
+    return ByteString.copyFromUtf8(request.toString())
 }
+
+/**
+ * Use org.json's number formatting: the backend binds JSON `3` as SQLite INTEGER, but `3.0` as REAL.
+ *
+ * Affects queries such as `SELECT typeof(?)`.
+ */
+@OptIn(ExperimentalSerializationApi::class)
+private fun Any?.toBindArgJson(): JsonElement =
+    when (this) {
+        null -> JsonNull
+        is String -> JsonPrimitive(this)
+        is Char -> JsonPrimitive(toString())
+        is Boolean -> JsonPrimitive(this)
+        // Preserve org.json's signed-byte array encoding. The backend accepts
+        // bytes 0..127 as blobs and rejects negative values, as before.
+        is ByteArray -> JsonArray(map { JsonPrimitive(it) })
+        is Collection<*> -> JsonArray(map { it.toBindArgJson() })
+        is Map<*, *> ->
+            if (keys.all { it is String }) {
+                buildJsonObject {
+                    for ((key, value) in this@toBindArgJson) {
+                        put(key as String, value.toBindArgJson())
+                    }
+                }
+            } else {
+                // org.json returned null when wrapping a map with invalid keys.
+                JsonNull
+            }
+        is Double, is Float -> {
+            val value = (this as Number).toDouble()
+            require(value.isFinite()) {
+                "JSON does not allow non-finite numbers: $value"
+            }
+            val asLong = value.toLong()
+            val literal =
+                when {
+                    // org.json wrote Double -0.0 as -0, but Float -0.0f as 0.
+                    this is Double && equals(-0.0) -> "-0"
+                    value == asLong.toDouble() -> asLong.toString()
+                    else -> toString()
+                }
+            JsonUnquotedLiteral(literal)
+        }
+        is Int, is Long, is Short, is Byte -> JsonUnquotedLiteral(toString())
+        else ->
+            when {
+                javaClass.isArray ->
+                    JsonArray(
+                        List(ReflectArray.getLength(this)) {
+                            ReflectArray.get(this, it).toBindArgJson()
+                        },
+                    )
+                // Accept Android callers' org.json containers, including subclasses,
+                // without requiring org.json on the JVM classpath.
+                generateSequence<Class<*>>(javaClass) { it.superclass }.any {
+                    it.name == "org.json.JSONArray" || it.name == "org.json.JSONObject"
+                } -> Json.parseToJsonElement(toString())
+                javaClass.`package`?.name?.startsWith("java.") == true -> JsonPrimitive(toString())
+                // org.json wrapped other objects as null. This also covers JSONObject.NULL.
+                else -> JsonNull
+            }
+    }
 
 /**
  * Unpack success/error tuple from backend, and throw if error.
