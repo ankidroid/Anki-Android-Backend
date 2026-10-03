@@ -50,7 +50,12 @@ Thumbs.db
 .idea/
 
 # IDEA/Android Studio Ignore exceptions - this lets you share things you specifically want all team members to use
+!/.idea/
+/.idea/*
 !/.idea/codeStyles/
+# Keep dictionaries to have less false positives in spellcheck inspection.
+# Each user gets their own dictionary and these dictionaries are merged
+!.idea/dictionaries
 
 # Crowdin files
 ankidroid.zip
