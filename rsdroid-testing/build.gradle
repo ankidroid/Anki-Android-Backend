@@ -29,6 +29,12 @@ apply from: "$rootDir/build-rust.gradle"
 
 dependencies {
     implementation libs.kotlin.stdlib.jdk8
+    testImplementation libs.junit.jupiter
+    testRuntimeOnly libs.junit.platform.launcher
+}
+
+test {
+    useJUnitPlatform()
 }
 
 jar {
@@ -58,16 +64,18 @@ mavenPublishing {
 }
 
 compileKotlin {
-    kotlin {
-        compilerOptions {
-            jvmTarget = JvmTarget.JVM_11
-        }
+    compilerOptions {
+        jvmTarget = JvmTarget.JVM_11
     }
 }
 compileTestKotlin {
-    kotlin {
-        compilerOptions {
-            jvmTarget = JvmTarget.JVM_11
-        }
+    compilerOptions {
+        jvmTarget = JvmTarget.JVM_17
     }
+}
+
+// JUnit 6 requires Java 17; the published library still targets Java 11.
+compileTestJava {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
