@@ -30,6 +30,11 @@ class ClassLoaderLibraryCopyTest {
     }
 
     @Test
+    fun retainedClassLoadersExhaustTheConfiguredCapacity() {
+        runNativeScenario(Scenario.EXHAUSTION)
+    }
+
+    @Test
     fun interruptedCleanupPreservesInterruptAndReportsFailure() {
         try {
             Thread.currentThread().interrupt()

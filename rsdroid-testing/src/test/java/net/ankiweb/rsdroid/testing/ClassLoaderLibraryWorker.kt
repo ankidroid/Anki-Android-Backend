@@ -19,6 +19,9 @@ object ClassLoaderLibraryWorker {
 
         /** Collecting the original's owner frees its slot while the copy owner stays live. */
         REUSE_ORIGINAL,
+
+        /** Two live owners fill the configured capacity and prevent a third from loading. */
+        EXHAUSTION,
     }
 
     @JvmStatic
@@ -31,6 +34,7 @@ object ClassLoaderLibraryWorker {
                 Scenario.INDEPENDENT -> independentClassLoaders()
                 Scenario.REUSE_COPY -> reuseCollectedSlot(discardOriginal = false)
                 Scenario.REUSE_ORIGINAL -> reuseCollectedSlot(discardOriginal = true)
+                Scenario.EXHAUSTION -> retainedClassLoadersExhaustCapacity()
             }
             result.writeText("OK")
         } catch (failure: Throwable) {
@@ -67,6 +71,29 @@ object ClassLoaderLibraryWorker {
                 }
             } finally {
                 Reference.reachabilityFence(retained)
+            }
+        }
+    }
+
+    private fun retainedClassLoadersExhaustCapacity() {
+        newClassLoader().use { original ->
+            verifyNativeCall(original)
+            newClassLoader().use { copy ->
+                verifyNativeCall(copy)
+                try {
+                    newClassLoader().use { excess ->
+                        val failure = runCatching { verifyNativeCall(excess) }.exceptionOrNull()
+                        check(failure is IllegalStateException && failure.message?.contains("capacity: 2") == true) {
+                            "Expected capacity exhaustion, got $failure"
+                        }
+                    }
+                    verifyNativeCall(original)
+                    verifyNativeCall(copy)
+                    check(libraryFiles().size == 2)
+                } finally {
+                    Reference.reachabilityFence(original)
+                    Reference.reachabilityFence(copy)
+                }
             }
         }
     }
