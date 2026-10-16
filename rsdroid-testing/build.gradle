@@ -35,6 +35,8 @@ dependencies {
 
 test {
     useJUnitPlatform()
+    // Include the native resources as well as the classes in the isolated integration-test JVMs.
+    systemProperty 'rsdroidTesting.testClasspath', sourceSets.test.runtimeClasspath.asPath
 }
 
 jar {
