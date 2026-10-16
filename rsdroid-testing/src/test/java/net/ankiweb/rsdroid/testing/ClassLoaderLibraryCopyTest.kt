@@ -20,6 +20,16 @@ class ClassLoaderLibraryCopyTest {
     }
 
     @Test
+    fun collectedClassLoaderFreesItsCopyForAnotherClassLoader() {
+        runNativeScenario(Scenario.REUSE_COPY)
+    }
+
+    @Test
+    fun collectedClassLoaderFreesTheOriginalForAnotherClassLoader() {
+        runNativeScenario(Scenario.REUSE_ORIGINAL)
+    }
+
+    @Test
     fun interruptedCleanupPreservesInterruptAndReportsFailure() {
         try {
             Thread.currentThread().interrupt()
