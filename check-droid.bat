@@ -3,4 +3,4 @@ if not exist rsdroid\build\outputs\aar\rsdroid-release.aar (
     exit 1
 )
 
-./gradlew rsdroid:lint rsdroid-instrumented:connectedCheck
+./gradlew rsdroid:lint rsdroid-android:lint rsdroid-instrumented:connectedCheck
