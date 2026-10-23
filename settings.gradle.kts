@@ -8,4 +8,4 @@ pluginManagement {
 
 rootProject.name = "Anki-Android-Backend"
 
-include(":rsdroid-testing", ":rsdroid-instrumented", ":rsdroid")
+include(":rsdroid-testing", ":rsdroid-instrumented", ":rsdroid", ":rsdroid-android")

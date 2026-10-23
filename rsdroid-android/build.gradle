@@ -1,0 +1,48 @@
+plugins {
+    alias(libs.plugins.android.library)
+}
+
+android {
+    namespace = 'net.ankiweb.rsdroid.android'
+    compileSdk = libs.versions.compileSdk.get().toInteger()
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+
+    defaultConfig {
+        minSdk = libs.versions.minSdk.get().toInteger()
+
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled = false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    testOptions {
+        targetSdk = libs.versions.targetSdk.get().toInteger()
+    }
+
+    lint {
+        targetSdk = libs.versions.targetSdk.get().toInteger()
+    }
+}
+
+dependencies {
+    api project(path: ':rsdroid')
+
+    implementation libs.androidx.annotation
+    implementation libs.androidx.sqlite.ktx
+    implementation libs.androidx.sqlite.framework
+    implementation libs.slf4j.api
+
+    testImplementation libs.robolectric
+    testImplementation libs.androidx.core
+    testImplementation libs.androidx.test.junit
+    testImplementation project(path: ':rsdroid-testing')
+}
