@@ -10,5 +10,4 @@ After the split, `anki-backend-android` will contain:
 
 - Android native libraries (`librsdroid.so` for each supported architecture).
 - Web assets packaged as Android assets.
-- Android SQLite adapters.
-  - Planned to be extracted later.
+- Android SQLite adapters
