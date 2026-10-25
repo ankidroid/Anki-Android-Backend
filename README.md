@@ -90,10 +90,12 @@ set PATH=%PATH%;c:\msys64\usr\bin
 
 ## Building
 
-Two main files need to be built:
+The build produces three artifacts:
 
 - The main .aar file, which contains the backend Kotlin code, web assets, and
 Anki backend code compiled for Android.
+- An Android wrapper .aar in `rsdroid-android/build/outputs/aar`. Its published
+Maven metadata declares an API dependency on the main backend artifact.
 - A .jar that contains the backend code compiled for the host platform, for use
 with Robolectric unit tests.
 
