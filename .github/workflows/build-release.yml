@@ -175,6 +175,13 @@ jobs:
           if-no-files-found: error
           path: rsdroid/build/outputs/aar
 
+      - name: Upload Android wrapper AAR as artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: rsdroid-android-aar
+          if-no-files-found: error
+          path: rsdroid-android/build/outputs/aar
+
       - name: Upload rsdroid-robo JAR as artifact
         uses: actions/upload-artifact@v6
         with:
@@ -184,7 +191,7 @@ jobs:
 
       # following steps only run on workflow dispatch
 
-      - name: Publish AAR to Maven
+      - name: Publish backend and Android wrapper AARs to Maven
         if: "${{ github.event.inputs.mavenPublish != '' && github.event_name == 'workflow_dispatch'}}"
         env:
           ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_PRIVATE_KEY }}
@@ -192,7 +199,7 @@ jobs:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
         run: |
-          ./gradlew rsdroid:publishAllPublicationsToMavenCentral -DtestBuildType=release -Dorg.gradle.daemon=false -Dorg.gradle.console=plain
+          ./gradlew rsdroid:publishAllPublicationsToMavenCentral rsdroid-android:publishAllPublicationsToMavenCentral -DtestBuildType=release -Dorg.gradle.daemon=false -Dorg.gradle.console=plain
 
       - name: Publish JAR to Maven
         if: "${{ github.event.inputs.mavenPublish != '' && github.event_name == 'workflow_dispatch'}}"

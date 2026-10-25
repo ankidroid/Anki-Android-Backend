@@ -287,6 +287,14 @@ jobs:
           if-no-files-found: error
           path: rsdroid/build/outputs/aar
 
+      - name: Upload Android wrapper AAR as artifact
+        uses: actions/upload-artifact@v6
+        if: '!cancelled()'
+        with:
+          name: rsdroid-android-aar-${{ matrix.os }}
+          if-no-files-found: error
+          path: rsdroid-android/build/outputs/aar
+
       - name: Upload rsdroid-robo JAR as artifact
         uses: actions/upload-artifact@v6
         if: '!cancelled()'
