@@ -1,16 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package net.ankiweb
 
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import anki.ankidroid.SqlValue.DataCase
 import net.ankiweb.rsdroid.BackendFactory.getBackend
 import net.ankiweb.rsdroid.testing.RustBackendLoader.ensureSetup
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import org.junit.runner.RunWith
 
-@RunWith(AndroidJUnit4::class)
 class DbRequestBindingTest {
     @Test
     fun bindArgumentsKeepTheirSqliteTypesAndValues() {

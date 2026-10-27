@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package net.ankiweb
 
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.long
@@ -14,7 +13,6 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
 import kotlin.concurrent.thread
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -27,7 +25,6 @@ import kotlin.time.Duration.Companion.minutes
  *
  * https://github.com/ankidroid/Anki-Android/issues/21455
  */
-@RunWith(AndroidJUnit4::class)
 class BackendCloseRaceTest {
     @Before
     fun loadLibrary() {
