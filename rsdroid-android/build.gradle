@@ -37,6 +37,17 @@ android {
 
 dependencies {
     api project(path: ':rsdroid')
+
+    implementation libs.androidx.annotation
+    implementation libs.androidx.sqlite.ktx
+    implementation libs.androidx.sqlite.framework
+    implementation libs.slf4j.api
+
+    testImplementation libs.robolectric
+    testImplementation libs.androidx.core
+    testImplementation libs.androidx.test.junit
+    testImplementation project(path: ':rsdroid-testing')
+    testRuntimeOnly libs.slf4j.nop
 }
 
 mavenPublishing {
