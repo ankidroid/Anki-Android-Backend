@@ -15,17 +15,11 @@
  */
 package net.ankiweb.rsdroid
 
-import android.database.sqlite.SQLiteConstraintException
-import android.database.sqlite.SQLiteDatabaseCorruptException
-import android.database.sqlite.SQLiteException
-import android.database.sqlite.SQLiteFullException
 import anki.backend.BackendError
 import anki.links.HelpPageLinkRequest.HelpPage
 import net.ankiweb.rsdroid.exceptions.*
 import net.ankiweb.rsdroid.exceptions.BackendSyncException.BackendSyncAuthFailedException
 import net.ankiweb.rsdroid.exceptions.BackendSyncException.BackendSyncServerMessageException
-import java.util.*
-import java.util.regex.Pattern
 
 open class BackendException : RuntimeException {
     private val error: BackendError?
@@ -49,41 +43,9 @@ open class BackendException : RuntimeException {
     @Suppress("unused")
     fun getDesktopHelpPageLink(backend: Backend): String? = helpPage?.let { backend.helpPageLink(it) }
 
-    open fun toSQLiteException(query: String): RuntimeException {
-        val message = String.format(Locale.ROOT, "error while compiling: \"%s\": %s", query, this.localizedMessage)
-        return SQLiteException(message, this)
-    }
-
     open class BackendDbException(
         error: BackendError,
     ) : BackendException(error) {
-        override fun toSQLiteException(query: String): RuntimeException {
-            val message = this.localizedMessage
-            if (message == null) {
-                val outMessage = String.format(Locale.ROOT, "Unknown error while compiling: \"%s\"", query)
-                return SQLiteException(outMessage, this)
-            }
-            if (message.contains("InvalidParameterCount")) {
-                val p = Pattern.compile("InvalidParameterCount\\((\\d*), (\\d*)\\)").matcher(message)
-                if (p.find()) {
-                    val givenParams = p.group(1)!!.toInt()
-                    val expectedParams = p.group(2)!!.toInt()
-                    val errorMessage =
-                        String.format(
-                            Locale.ROOT,
-                            "Cannot bind argument at index %d because the index is out of range.  The statement has %d parameters.",
-                            givenParams,
-                            expectedParams,
-                        )
-                    return IllegalArgumentException(errorMessage, this)
-                }
-            } else if (message.contains("ConstraintViolation")) {
-                return SQLiteConstraintException(message)
-            }
-            val outMessage = String.format(Locale.ROOT, "error while compiling: \"%s\": %s", query, message)
-            return SQLiteException(outMessage, this)
-        }
-
         class BackendDbFileTooNewException(
             error: BackendError,
         ) : BackendException(error)
@@ -103,17 +65,12 @@ open class BackendException : RuntimeException {
         /** The disk is full: analogue of android's SQLiteFullException */
         class BackendDbFullException(
             error: BackendError,
-        ) : BackendDbException(error) {
-            override fun toSQLiteException(query: String): RuntimeException = SQLiteFullException(localizedMessage)
-        }
+        ) : BackendDbException(error)
 
         /** The collection database is corrupt: analogue of android's SQLiteDatabaseCorruptException */
         class BackendDbCorruptException(
             error: BackendError,
-        ) : BackendDbException(error) {
-            override fun toSQLiteException(query: String): RuntimeException =
-                SQLiteDatabaseCorruptException(String.format(Locale.ROOT, "error while compiling: \"%s\": %s", query, localizedMessage))
-        }
+        ) : BackendDbException(error)
 
         companion object {
             fun fromDbError(error: BackendError): BackendException {
