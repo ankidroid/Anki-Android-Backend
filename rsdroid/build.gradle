@@ -99,10 +99,7 @@ dependencies {
     implementation libs.androidx.annotation
     implementation libs.slf4j.api
 
-    testImplementation libs.junit.jupiter
-    testImplementation libs.robolectric
-    testImplementation libs.androidx.core
-    testImplementation libs.androidx.test.junit
+    testImplementation libs.junit4
     testImplementation project(path: ':rsdroid-testing')
 }
 
