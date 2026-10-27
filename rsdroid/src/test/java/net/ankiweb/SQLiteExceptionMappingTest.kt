@@ -10,6 +10,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import anki.backend.BackendError
 import net.ankiweb.rsdroid.BackendException
 import net.ankiweb.rsdroid.BackendException.BackendDbException
+import net.ankiweb.rsdroid.database.toSQLiteException
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
