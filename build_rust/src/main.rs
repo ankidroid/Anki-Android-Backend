@@ -13,7 +13,7 @@ use std::process::Command;
 use streaming_iterator::StreamingIterator;
 use tree_sitter::{Parser, Query, QueryCursor};
 
-const ANDROID_OUT_DIR: &str = "rsdroid/build/generated/jniLibs";
+const ANDROID_OUT_DIR: &str = "rsdroid-android/build/generated/jniLibs";
 const ROBOLECTRIC_OUT_DIR: &str = "rsdroid-testing/build/generated/jniLibs";
 
 fn main() -> Result<()> {
@@ -55,7 +55,7 @@ fn run_gradle() -> Result<()> {
 
 fn build_web_artifacts() -> Result<()> {
     println!("*** Building desktop web components");
-    let artifacts_dir = Path::new("rsdroid/build/generated/anki_artifacts/backend");
+    let artifacts_dir = Path::new("rsdroid-android/build/generated/anki_artifacts/backend");
     let mut cmd = if cfg!(windows) {
         let mut cmd = Command::new("cmd");
         cmd.args(["/c", "tools\\ninja.bat"]);
