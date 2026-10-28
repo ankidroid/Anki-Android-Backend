@@ -92,8 +92,8 @@ set PATH=%PATH%;c:\msys64\usr\bin
 
 The build produces three artifacts:
 
-- The backend API .aar in `rsdroid/build/outputs/aar`, which contains the backend
-Kotlin code and generated Protocol Buffer classes.
+- The backend API .jar in `rsdroid/build/libs`, published as `anki-android-backend`,
+which contains the backend Kotlin code and generated Protocol Buffer classes.
 - The Android .aar in `rsdroid-android/build/outputs/aar`, which contains the SQLite
 adapter, web assets, and Anki backend code compiled for Android. Its published
 Maven metadata declares an API dependency on the backend API artifact.
@@ -158,13 +158,11 @@ local_backend=true
 ```
 
 The local dependency configuration in AnkiDroid must include both
-`rsdroid/build/outputs/aar/rsdroid-release.aar` and
+`rsdroid/build/libs/rsdroid.jar` and
 `rsdroid-android/build/outputs/aar/rsdroid-android-release.aar`.
 
-Check `Anki-AndroidBackend/gradle.properties`'s `BACKEND_VERSION` and
-`Anki-Android/build.gradle`'s `ext.ankidroid_backend_version`. Both variables
-should have the same value. If it is not the case, you must edit Anki-Android's
-one.
+Ensure `VERSION_NAME` in this repository's `gradle.properties` matches
+`ankiBackend` in AnkiDroid's `gradle/libs.versions.toml`.
 
 After making the change, you should be able to build and run the project on an x86_64
 emulator/device (arm64 on M1 Macs), and run unit tests.
@@ -216,7 +214,7 @@ the repository.
 1. Head over to the main `Anki-Android` repository and update the
 `AnkiDroid/build.gradle` file there to adopt the new backend version once it
 shows up in
-https://repo1.maven.org/maven2/io/github/david-allison/anki-android-backend/
+https://repo1.maven.org/maven2/io/github/david-allison/anki-backend-android/
 
 ## test library copies
 

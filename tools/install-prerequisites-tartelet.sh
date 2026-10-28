@@ -46,7 +46,7 @@ cd ..
 # from build-quick.yml
 cargo run -p build_rust
 ./check-rust.sh
-./gradlew test rsdroid:lint
+./gradlew test rsdroid-android:lint
 
 # from build-release.yml
 export ALL_ARCHS=1

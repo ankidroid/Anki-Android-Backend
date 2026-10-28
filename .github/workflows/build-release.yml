@@ -168,12 +168,12 @@ jobs:
           retry_on: error
           command: ./build.sh
 
-      - name: Upload rsdroid AAR as artifact
+      - name: Upload backend core JARs as artifact
         uses: actions/upload-artifact@v6
         with:
-          name: rsdroid-aar
+          name: rsdroid-core
           if-no-files-found: error
-          path: rsdroid/build/outputs/aar
+          path: rsdroid/build/libs
 
       - name: Upload Android wrapper AAR as artifact
         uses: actions/upload-artifact@v6
@@ -191,7 +191,7 @@ jobs:
 
       # following steps only run on workflow dispatch
 
-      - name: Publish backend and Android wrapper AARs to Maven
+      - name: Publish backend core JAR and Android wrapper AAR to Maven
         if: "${{ github.event.inputs.mavenPublish != '' && github.event_name == 'workflow_dispatch'}}"
         env:
           ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_PRIVATE_KEY }}

@@ -4,6 +4,9 @@ Android entry point for the Anki backend. This Android library exposes
 [`:rsdroid`](../rsdroid) through an `api` dependency, so consumers can use the
 backend API through this module.
 
+
+Maven consumers should depend on ths via `io.github.david-allison:anki-backend-android`.
+
 ## Contents
 
 `anki-backend-android` contains:
