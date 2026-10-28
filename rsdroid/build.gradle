@@ -12,15 +12,16 @@ def gitHead = { File repo ->
     }.standardOutput.asText.map { it.trim() }
 }
 
-// Generate BuildConfig
+def generateBuildConfig = tasks.register("generateBuildConfig", GenerateBuildConfigTask) {
+    ankiCommitHash = gitHead(new File(rootDir, "anki"))
+    backendGitCommitHash = gitHead(rootDir)
+    ankiDesktopVersion = providers.gradleProperty("VERSION_NAME").map { it.replaceFirst(/.*anki/, "") }
+    cargoLock = rootProject.file("Cargo.lock")
+    outputDir = layout.buildDirectory.dir("generated/source/buildConfig")
+}
+
 androidComponents {
     onVariants(selector().all()) { variant ->
-        def generateBuildConfig = tasks.register("generate${variant.name.capitalize()}BuildConfig", GenerateBuildConfigTask) {
-            ankiCommitHash = gitHead(new File(rootDir, "anki"))
-            backendGitCommitHash = gitHead(rootDir)
-            ankiDesktopVersion = providers.gradleProperty("VERSION_NAME").map { it.replaceFirst(/.*anki/, "") }
-            cargoLock = rootProject.file("Cargo.lock")
-        }
         variant.sources.kotlin.addGeneratedSourceDirectory(generateBuildConfig) { it.outputDir }
     }
 }
