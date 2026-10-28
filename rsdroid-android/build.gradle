@@ -9,7 +9,7 @@ plugins {
 }
 
 // The Rust build generates the core sources and this module's native libraries and assets.
-tasks.named('preBuild').configure { dependsOn(':rsdroid:buildRust') }
+tasks.named('preBuild').configure { dependsOn(':buildRust') }
 
 android {
     namespace = 'net.ankiweb.rsdroid.android'

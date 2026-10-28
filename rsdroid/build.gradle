@@ -4,8 +4,7 @@ plugins {
     alias(libs.plugins.gradle.maven.publish.plugin)
 }
 
-apply from: "$rootDir/build-rust.gradle"
-preBuild.dependsOn "buildRust"
+tasks.named('preBuild').configure { dependsOn(':buildRust') }
 
 def gitHead = { File repo ->
     providers.exec {

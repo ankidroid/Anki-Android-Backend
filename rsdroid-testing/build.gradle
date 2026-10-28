@@ -25,8 +25,6 @@ plugins {
     alias(libs.plugins.gradle.maven.publish.plugin)
 }
 
-apply from: "$rootDir/build-rust.gradle"
-
 dependencies {
     implementation libs.kotlin.stdlib.jdk8
     testImplementation libs.junit.jupiter
@@ -39,8 +37,10 @@ test {
     systemProperty 'rsdroidTesting.testClasspath', sourceSets.test.runtimeClasspath.asPath
 }
 
+// The native libraries must exist before they are copied into the test support JAR.
+tasks.named('processResources').configure { dependsOn(':buildRust') }
+
 jar {
-    mustRunAfter("buildRust")
     sourceSets {
         main {
             resources {
