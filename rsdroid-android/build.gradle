@@ -1,12 +1,20 @@
+import com.android.build.gradle.tasks.BundleAar
+
+import java.util.zip.ZipFile
+
 plugins {
     alias(libs.plugins.android.library)
     id 'signing'
     alias(libs.plugins.gradle.maven.publish.plugin)
 }
 
+// The Rust build generates the core sources and this module's native libraries and assets.
+tasks.named('preBuild').configure { dependsOn(':rsdroid:buildRust') }
+
 android {
     namespace = 'net.ankiweb.rsdroid.android'
     compileSdk = libs.versions.compileSdk.get().toInteger()
+    ndkVersion = libs.versions.ndk.get()
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -32,6 +40,29 @@ android {
 
     lint {
         targetSdk = libs.versions.targetSdk.get().toInteger()
+    }
+
+    sourceSets {
+        main {
+            jniLibs.srcDirs 'build/generated/jniLibs'
+            assets {
+                srcDirs "build/generated/anki_artifacts"
+            }
+        }
+    }
+}
+
+afterEvaluate {
+    // only the publishable AARs: AGP 9's bundle<Variant>LocalLintAar tasks omit jniLibs
+    tasks.withType(BundleAar).matching { it.name ==~ /bundle(Debug|Release)Aar/ }.configureEach { bundleAarTask ->
+        bundleAarTask.doLast {
+            def aarFile = bundleAarTask.outputs.files.singleFile
+            def zipFile = new ZipFile(aarFile)
+            int libCount = zipFile.entries().toList().count { it.name.contains(".so") }
+            if (libCount == 0 || (System.getenv("ALL_ARCHS") == "1" && libCount != 4)) {
+                throw new GradleException("AAR appears to be missing shared library!")
+            }
+        }
     }
 }
 

@@ -11,9 +11,9 @@ This repo is comprised of three main components:
 - `rsdroid` is a Kotlin library that provides a friendly interface to the backend code. The bulk of its code is automatically
   generated from the service definitions in `anki/proto/anki`. It also exposes the Rust database functionality
   through `SQLHandler`.
-- `rsdroid-android` is the Android entry point, published as `anki-backend-android`. It is to be
-  referenced by `Anki-Android` and package the Android native libraries (`librsdroid.so` for each
-  supported architecture) and bundle web assets as Android assets. It exposes `rsdroid` through an `api` dependency.
+- `rsdroid-android` is the Android entry point, published as `anki-backend-android`. It is
+  referenced by `Anki-Android`, packages the Android native libraries (`librsdroid.so` for each 
+  supported architecture), and bundles web assets as Android assets. It exposes `rsdroid` through an `api` dependency.
 
 Other folders:
 

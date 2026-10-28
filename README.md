@@ -92,10 +92,11 @@ set PATH=%PATH%;c:\msys64\usr\bin
 
 The build produces three artifacts:
 
-- The main .aar file, which contains the backend Kotlin code, web assets, and
-Anki backend code compiled for Android.
-- An Android wrapper .aar in `rsdroid-android/build/outputs/aar`. Its published
-Maven metadata declares an API dependency on the main backend artifact.
+- The backend API .aar in `rsdroid/build/outputs/aar`, which contains the backend
+Kotlin code and generated Protocol Buffer classes.
+- The Android .aar in `rsdroid-android/build/outputs/aar`, which contains the SQLite
+adapter, web assets, and Anki backend code compiled for Android. Its published
+Maven metadata declares an API dependency on the backend API artifact.
 - A .jar that contains the backend code compiled for the host platform, for use
 with Robolectric unit tests.
 
@@ -155,6 +156,10 @@ in the AnkiDroid repo, and add the following line:
 ```
 local_backend=true
 ```
+
+The local dependency configuration in AnkiDroid must include both
+`rsdroid/build/outputs/aar/rsdroid-release.aar` and
+`rsdroid-android/build/outputs/aar/rsdroid-android-release.aar`.
 
 Check `Anki-AndroidBackend/gradle.properties`'s `BACKEND_VERSION` and
 `Anki-Android/build.gradle`'s `ext.ankidroid_backend_version`. Both variables
