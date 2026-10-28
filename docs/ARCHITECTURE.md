@@ -8,11 +8,11 @@ This repo is comprised of three main components:
   of only three different functions: `openBackend()`, `closeBackend()`, and `runMethodRaw()`. When one of these functions is called by
   Java code, `rslib-bridge` takes care of converting the Java objects to a native Rust representation, and then passes the call
   on to Anki's Rust backend, which gets included in `rslib-bridge` via the `anki[/rslib]` submodule.
-- `rsdroid` is a Kotlin library that provides a friendly interface to the backend code. The bulk of its code is automatically
-  generated from the service definitions in `anki/proto/anki`. It also exposes the Rust database functionality
-  through `SQLHandler`.
+- `rsdroid` is a Kotlin/JVM library, published as `anki-android-backend`, that provides a friendly interface to the backend code.
+  Its JAR targets Java 11. The bulk of its code is automatically generated from the service definitions in `anki/proto/anki`.
+  It also exposes the Rust database functionality through `SQLHandler`.
 - `rsdroid-android` is the Android entry point, published as `anki-backend-android`. It is
-  referenced by `Anki-Android`, packages the Android native libraries (`librsdroid.so` for each 
+  referenced by `Anki-Android`, packages the Android native libraries (`librsdroid.so` for each
   supported architecture), and bundles web assets as Android assets. It exposes `rsdroid` through an `api` dependency.
 
 Other folders:
@@ -21,7 +21,7 @@ Other folders:
 
 `/tools/` Scripts to generate the backend interface and translations
 
-`rsdroid-testing` - Builds a testing library targetting desktop machines, for use with Robolectric
+`rsdroid-testing` - Builds native libraries for desktop machines, for use in JVM tests and Robolectric
 
 `rsdroid-instrumented` - Android Instrumented Test
 

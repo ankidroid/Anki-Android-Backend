@@ -9,4 +9,4 @@ test -f rsdroid-android/build/outputs/aar/rsdroid-android-release.aar || (
 
 . ./set-android-ndk-home.sh
 
-./gradlew rsdroid:lint rsdroid-android:lint rsdroid-instrumented:connectedCheck
+./gradlew rsdroid-android:lint rsdroid-instrumented:connectedCheck

@@ -1,10 +1,13 @@
+import com.vanniktech.maven.publish.KotlinJvm
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
-    alias(libs.plugins.android.library) // required for aar generation to link to from AnkiDroid
+    id 'java-library'
+    alias(libs.plugins.kotlin.jvm)
     id 'signing'
     alias(libs.plugins.gradle.maven.publish.plugin)
 }
-
-tasks.named('preBuild').configure { dependsOn(':buildRust') }
 
 def gitHead = { File repo ->
     providers.exec {
@@ -20,66 +23,45 @@ def generateBuildConfig = tasks.register("generateBuildConfig", GenerateBuildCon
     outputDir = layout.buildDirectory.dir("generated/source/buildConfig")
 }
 
-androidComponents {
-    onVariants(selector().all()) { variant ->
-        variant.sources.kotlin.addGeneratedSourceDirectory(generateBuildConfig) { it.outputDir }
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+
+tasks.withType(KotlinCompile).configureEach {
+    compilerOptions {
+        jvmTarget = JvmTarget.JVM_11
     }
 }
 
-android {
-    namespace = 'net.ankiweb.rsdroid'
-    compileSdk = libs.versions.compileSdk.get().toInteger()
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+sourceSets {
+    main {
+        kotlin.srcDir("build/generated/source/backend")
+        kotlin.srcDir(generateBuildConfig.flatMap { it.outputDir })
+        // protoc emits Java messages alongside the generated Kotlin API.
+        java.srcDir("build/generated/source/backend")
     }
+}
 
-    defaultConfig {
-        minSdk = libs.versions.minSdk.get().toInteger()
+tasks.named('compileKotlin').configure { dependsOn(':buildRust', 'installGitHook') }
+tasks.named('compileJava').configure { dependsOn(':buildRust') }
+tasks.matching { it.name == 'sourcesJar' }.configureEach { dependsOn(':buildRust') }
 
-        consumerProguardFiles "consumer-rules.pro"
-    }
-
-    buildTypes {
-        release {
-            minifyEnabled = false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
-    }
-
-    testOptions {
-        targetSdk = libs.versions.targetSdk.get().toInteger()
-    }
-
-    lint {
-        targetSdk = libs.versions.targetSdk.get().toInteger()
-    }
-
-    sourceSets {
-        main {
-            kotlin.srcDirs += "build/generated/source/backend"
-            java.srcDirs += "build/generated/source/backend"
-            resources {
-                srcDirs "src/main/resources"
-            }
-        }
-    }
+test {
+    useJUnit()
 }
 
 dependencies {
-    // Protobuf is part of the ABI, so include it as a compile/api dependency.
+    // These types and annotations appear in the public API.
     api libs.protobuf.kotlin.lite
-    // JsonArray is returned by the public fullQuery API.
     api libs.kotlinx.serialization.json
+    api libs.androidx.annotation
 
-    implementation libs.androidx.annotation
     implementation libs.slf4j.api
 
     testImplementation libs.junit4
     testImplementation project(path: ':rsdroid-testing')
 }
-
 
 // Install Git pre-commit hook for format-rust
 tasks.register('installGitHook', Copy) {
@@ -92,9 +74,10 @@ tasks.register('installGitHook', Copy) {
     }
 }
 // to run manually: `./gradlew installGitHook`
-tasks.named('preBuild').configure { dependsOn('installGitHook') }
 
 mavenPublishing {
+    // Publish sources and an empty Javadoc JAR for the Kotlin/generated API.
+    configure(new KotlinJvm())
     // Use https://central.sonatype.com/account with david-allison's GitHub login, not Google
     // the host should match rsdroid-testing
     publishToMavenCentral(true) // "true" means publish+release automatically+unattended

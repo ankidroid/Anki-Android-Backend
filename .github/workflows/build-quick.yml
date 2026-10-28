@@ -261,7 +261,7 @@ jobs:
         run: ./check-rust.bat
 
       - name: Run tests (Unit)
-        run: ./gradlew test rsdroid:lint rsdroid-android:lint ktlintCheck --daemon
+        run: ./gradlew test rsdroid-android:lint ktlintCheck --daemon
 
       - name: Run tests (Emulator)
         uses: reactivecircus/android-emulator-runner@v2
@@ -279,13 +279,13 @@ jobs:
             sleep 5
             ./gradlew rsdroid-instrumented:connectedCheck
 
-      - name: Upload rsdroid AAR as artifact
+      - name: Upload backend core JARs as artifact
         uses: actions/upload-artifact@v6
         if: '!cancelled()'
         with:
-          name: rsdroid-aar-${{ matrix.os }}
+          name: rsdroid-core-${{ matrix.os }}
           if-no-files-found: error
-          path: rsdroid/build/outputs/aar
+          path: rsdroid/build/libs
 
       - name: Upload Android wrapper AAR as artifact
         uses: actions/upload-artifact@v6
