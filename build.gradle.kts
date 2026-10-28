@@ -11,6 +11,9 @@ plugins {
     alias(libs.plugins.ktlint.gradle.plugin) apply false
 }
 
+// One Rust pipeline generates native libraries and API sources for all modules.
+apply(from = "build-rust.gradle")
+
 allprojects {
     repositories {
         google()
