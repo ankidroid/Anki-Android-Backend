@@ -92,7 +92,7 @@ set PATH=%PATH%;c:\msys64\usr\bin
 
 The build produces three artifacts:
 
-- The backend API .jar in `rsdroid/build/libs`, published as `anki-android-backend`,
+- The backend API .jar in `rsdroid/build/libs`, published as `anki-backend-core`,
 which contains the backend Kotlin code and generated Protocol Buffer classes.
 - The Android .aar in `rsdroid-android/build/outputs/aar`, which contains the SQLite
 adapter, web assets, and Anki backend code compiled for Android. Its published
