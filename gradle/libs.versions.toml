@@ -33,7 +33,7 @@ kotlin = '2.4.21'
 kotlinxSerialization = "1.12.0"
 # https://github.com/protocolbuffers/protobuf/releases
 protobuf = "4.36.2"
-robolectric = "4.17"
+robolectric = "4.18"
 # https://www.slf4j.org/news.html
 # must stay on 1.7.x for AnkiDroid's slf4j-timber bridge: see Slf4jBindingTest
 slf4j = "1.7.36"
