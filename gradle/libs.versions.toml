@@ -30,7 +30,7 @@ junit4 = "4.13.2"
 # https://github.com/JetBrains/kotlin/releases/
 kotlin = '2.4.21'
 # https://github.com/Kotlin/kotlinx.serialization/releases
-kotlinxSerialization = "1.12.0"
+kotlinxSerialization = "1.13.0"
 # https://github.com/protocolbuffers/protobuf/releases
 protobuf = "4.36.2"
 robolectric = "4.17"
